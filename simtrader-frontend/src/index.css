@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-surface text-ink font-sans text-sm;
+    min-height: 100dvh;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-border-strong rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-ink-disabled; }
+
+  /* Focus ring — institutional blue */
+  :focus-visible {
+    outline: 2px solid theme('colors.accent.DEFAULT');
+    outline-offset: 2px;
+  }
+
+  input, textarea, select {
+    @apply text-sm text-ink placeholder:text-ink-disabled;
+  }
+}
+
+@layer components {
+  /* Skeleton loader */
+  .skeleton {
+    @apply bg-surface-tertiary rounded;
+    background: linear-gradient(
+      90deg,
+      theme('colors.surface.tertiary') 25%,
+      theme('colors.surface.secondary') 50%,
+      theme('colors.surface.tertiary') 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+
+  /* Number formatting — monospace for prices */
+  .num {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Price color helpers */
+  .price-up   { @apply text-success; }
+  .price-down { @apply text-danger; }
+  .price-flat { @apply text-ink-secondary; }
+}
+
+/* AG Grid — institutional theme override */
+.ag-theme-simtrader {
+  --ag-background-color: #FFFFFF;
+  --ag-foreground-color: #0F0F0E;
+  --ag-border-color: #E4E4E0;
+  --ag-row-hover-color: #F8F8F7;
+  --ag-selected-row-background-color: #EEF3FF;
+  --ag-header-background-color: #F8F8F7;
+  --ag-header-foreground-color: #4A4A47;
+  --ag-odd-row-background-color: #FFFFFF;
+  --ag-font-family: 'Geist', system-ui, sans-serif;
+  --ag-font-size: 13px;
+  --ag-cell-horizontal-padding: 12px;
+  --ag-row-height: 36px;
+  --ag-header-height: 36px;
+  --ag-borders: solid 1px;
+  --ag-border-radius: 8px;
+  --ag-cell-widget-spacing: 8px;
+  --ag-range-selection-border-color: #1A5CFF;
+  --ag-input-focus-border-color: #1A5CFF;
+}
+
+.ag-theme-simtrader .ag-header-cell-text {
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A8A85;
+}
+
+.ag-theme-simtrader .ag-row {
+  border-bottom: 1px solid #F2F1EF;
+}

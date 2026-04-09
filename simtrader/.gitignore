@@ -1,0 +1,21 @@
+# Environment — NEVER commit this
+.env
+
+# Compiled binary
+bin/
+
+# Go test cache
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go module cache (not needed in repo — go mod tidy regenerates)
+vendor/
