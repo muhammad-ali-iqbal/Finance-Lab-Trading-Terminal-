@@ -64,6 +64,24 @@ export const simulationApi = {
 
   getActive: () =>
     client.get<Simulation>('/simulations/active').then(r => r.data),
+
+  // Admin
+  create: (data: { name: string; description: string; speedMultiplier: number; startingCash: number }) =>
+    client.post<Simulation>('/admin/simulations', data).then(r => r.data),
+
+  uploadCSV: (simId: string, file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return client.post<{ message: string; rowsLoaded: number }>(
+      `/admin/simulations/${simId}/upload`, fd,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    ).then(r => r.data)
+  },
+
+  start:    (simId: string) => client.post(`/admin/simulations/${simId}/start`).then(r => r.data),
+  pause:    (simId: string) => client.post(`/admin/simulations/${simId}/pause`).then(r => r.data),
+  resume:   (simId: string) => client.post(`/admin/simulations/${simId}/resume`).then(r => r.data),
+  complete: (simId: string) => client.post(`/admin/simulations/${simId}/complete`).then(r => r.data),
 }
 
 // ── Portfolio ────────────────────────────────────────────────────────────────

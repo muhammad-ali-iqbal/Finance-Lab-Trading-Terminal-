@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/simtrader/backend/internal/types"
 )
 
 var (
@@ -47,6 +48,21 @@ func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*Simulation, er
 		       speed_multiplier, starting_cash, created_by, created_at, updated_at
 		FROM simulations WHERE id = $1`
 	return r.scanOne(r.db.QueryRow(ctx, query, id))
+}
+
+// GetSimStatus returns the status and starting cash for a simulation.
+// This is a lightweight version used by order and portfolio handlers.
+func (r *Repository) GetSimStatus(ctx context.Context, id uuid.UUID) (string, float64, error) {
+	query := `
+		SELECT status, starting_cash
+		FROM simulations WHERE id = $1`
+	var status string
+	var startingCash float64
+	err := r.db.QueryRow(ctx, query, id).Scan(&status, &startingCash)
+	if err != nil {
+		return "", 0, err
+	}
+	return status, startingCash, nil
 }
 
 // GetActive returns the currently active simulation (there should be at most one).
@@ -121,7 +137,7 @@ func (r *Repository) IngestCSV(ctx context.Context, simulationID uuid.UUID, read
 
 	// Parse all rows first — validate before touching the database.
 	// If row 50,000 is bad, we don't want a half-ingested dataset.
-	var ticks []PriceTick
+	var ticks []types.PriceTick
 	lineNum := 1
 	for {
 		lineNum++
@@ -172,7 +188,7 @@ func (r *Repository) IngestCSV(ctx context.Context, simulationID uuid.UUID, read
 
 // GetTicksAtTime returns all symbols' bars at exactly one simulated timestamp.
 // This is the hot path — called by the clock goroutine every tick interval.
-func (r *Repository) GetTicksAtTime(ctx context.Context, simID uuid.UUID, simTime time.Time) ([]PriceTick, error) {
+func (r *Repository) GetTicksAtTime(ctx context.Context, simID uuid.UUID, simTime time.Time) ([]types.PriceTick, error) {
 	query := `
 		SELECT symbol, sim_time, open, high, low, close, volume
 		FROM price_ticks
@@ -185,9 +201,9 @@ func (r *Repository) GetTicksAtTime(ctx context.Context, simID uuid.UUID, simTim
 	}
 	defer rows.Close()
 
-	var ticks []PriceTick
+	var ticks []types.PriceTick
 	for rows.Next() {
-		var t PriceTick
+		var t types.PriceTick
 		t.SimulationID = simID
 		if err := rows.Scan(&t.Symbol, &t.SimTime, &t.Open, &t.High, &t.Low, &t.Close, &t.Volume); err != nil {
 			return nil, err
@@ -247,7 +263,7 @@ func (r *Repository) GetSymbols(ctx context.Context, simID uuid.UUID) ([]string,
 }
 
 // GetTicksForSymbol returns all bars for one symbol — used by the chart history endpoint.
-func (r *Repository) GetTicksForSymbol(ctx context.Context, simID uuid.UUID, symbol string) ([]PriceTick, error) {
+func (r *Repository) GetTicksForSymbol(ctx context.Context, simID uuid.UUID, symbol string) ([]types.PriceTick, error) {
 	query := `
 		SELECT symbol, sim_time, open, high, low, close, volume
 		FROM price_ticks
@@ -260,9 +276,9 @@ func (r *Repository) GetTicksForSymbol(ctx context.Context, simID uuid.UUID, sym
 	}
 	defer rows.Close()
 
-	var ticks []PriceTick
+	var ticks []types.PriceTick
 	for rows.Next() {
-		var t PriceTick
+		var t types.PriceTick
 		if err := rows.Scan(&t.Symbol, &t.SimTime, &t.Open, &t.High, &t.Low, &t.Close, &t.Volume); err != nil {
 			return nil, err
 		}
@@ -291,9 +307,9 @@ func validateHeader(fields []string) error {
 	return nil
 }
 
-func parseCSVRow(simID uuid.UUID, record []string, lineNum int) (PriceTick, error) {
+func parseCSVRow(simID uuid.UUID, record []string, lineNum int) (types.PriceTick, error) {
 	if len(record) < 7 {
-		return PriceTick{}, fmt.Errorf("line %d: expected 7 columns, got %d", lineNum, len(record))
+		return types.PriceTick{}, fmt.Errorf("line %d: expected 7 columns, got %d", lineNum, len(record))
 	}
 
 	// Column order: timestamp,symbol,open,high,low,close,volume
@@ -302,29 +318,29 @@ func parseCSVRow(simID uuid.UUID, record []string, lineNum int) (PriceTick, erro
 
 	simTime, err := time.Parse(time.RFC3339, tsStr)
 	if err != nil {
-		return PriceTick{}, fmt.Errorf("line %d: invalid timestamp %q (use YYYY-MM-DDTHH:MM:SSZ): %w", lineNum, tsStr, err)
+		return types.PriceTick{}, fmt.Errorf("line %d: invalid timestamp %q (use YYYY-MM-DDTHH:MM:SSZ): %w", lineNum, tsStr, err)
 	}
 
 	open,  err := strconv.ParseFloat(strings.TrimSpace(record[2]), 64)
-	if err != nil { return PriceTick{}, fmt.Errorf("line %d: invalid open %q", lineNum, record[2]) }
+	if err != nil { return types.PriceTick{}, fmt.Errorf("line %d: invalid open %q", lineNum, record[2]) }
 	high,  err := strconv.ParseFloat(strings.TrimSpace(record[3]), 64)
-	if err != nil { return PriceTick{}, fmt.Errorf("line %d: invalid high %q", lineNum, record[3]) }
+	if err != nil { return types.PriceTick{}, fmt.Errorf("line %d: invalid high %q", lineNum, record[3]) }
 	low,   err := strconv.ParseFloat(strings.TrimSpace(record[4]), 64)
-	if err != nil { return PriceTick{}, fmt.Errorf("line %d: invalid low %q", lineNum, record[4]) }
+	if err != nil { return types.PriceTick{}, fmt.Errorf("line %d: invalid low %q", lineNum, record[4]) }
 	close, err := strconv.ParseFloat(strings.TrimSpace(record[5]), 64)
-	if err != nil { return PriceTick{}, fmt.Errorf("line %d: invalid close %q", lineNum, record[5]) }
+	if err != nil { return types.PriceTick{}, fmt.Errorf("line %d: invalid close %q", lineNum, record[5]) }
 	volume, err := strconv.ParseInt(strings.TrimSpace(record[6]), 10, 64)
-	if err != nil { return PriceTick{}, fmt.Errorf("line %d: invalid volume %q", lineNum, record[6]) }
+	if err != nil { return types.PriceTick{}, fmt.Errorf("line %d: invalid volume %q", lineNum, record[6]) }
 
 	// Validate OHLC logic
 	if open <= 0 || high <= 0 || low <= 0 || close <= 0 {
-		return PriceTick{}, fmt.Errorf("line %d: prices must be positive", lineNum)
+		return types.PriceTick{}, fmt.Errorf("line %d: prices must be positive", lineNum)
 	}
 	if high < low {
-		return PriceTick{}, fmt.Errorf("line %d: high (%.4f) < low (%.4f)", lineNum, high, low)
+		return types.PriceTick{}, fmt.Errorf("line %d: high (%.4f) < low (%.4f)", lineNum, high, low)
 	}
 
-	return PriceTick{
+	return types.PriceTick{
 		SimulationID: simID,
 		Symbol:       symbol,
 		SimTime:      simTime.UTC(),

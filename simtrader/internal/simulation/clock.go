@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/simtrader/backend/internal/types"
 	"nhooyr.io/websocket"
 )
 
@@ -45,7 +46,7 @@ type Clock struct {
 	mu           sync.RWMutex
 	simID        uuid.UUID
 	repo         *Repository
-	orderEngine  OrderFiller  // fills orders on each tick
+	orderEngine  types.OrderFiller  // fills orders on each tick
 	clients      map[uuid.UUID]*Client
 	register     chan *Client
 	deregister   chan *Client
@@ -53,14 +54,8 @@ type Clock struct {
 	running      bool
 }
 
-// OrderFiller is implemented by the order service.
-// The clock calls it on every tick so limit/stop orders get checked.
-type OrderFiller interface {
-	ProcessTickOrders(ctx context.Context, simID uuid.UUID, ticks []PriceTick) error
-}
-
 // NewClock creates a clock for a given simulation.
-func NewClock(simID uuid.UUID, repo *Repository, filler OrderFiller) *Clock {
+func NewClock(simID uuid.UUID, repo *Repository, filler types.OrderFiller) *Clock {
 	return &Clock{
 		simID:       simID,
 		repo:        repo,
@@ -224,7 +219,7 @@ func (c *Clock) run(ctx context.Context, currentSimTime time.Time, interval time
 
 // broadcast serialises a TickBroadcast to JSON and sends it to all connected clients.
 // Uses a goroutine per client so a slow client doesn't block others.
-func (c *Clock) broadcast(simTime time.Time, ticks []PriceTick) {
+func (c *Clock) broadcast(simTime time.Time, ticks []types.PriceTick) {
 	msg := TickBroadcast{
 		SimulationTime: simTime,
 		Ticks:          ticks,

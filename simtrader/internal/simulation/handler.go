@@ -14,17 +14,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/middleware"
-	"github.com/simtrader/backend/internal/order"
+	"github.com/simtrader/backend/internal/types"
 	"nhooyr.io/websocket"
 )
 
 type Handler struct {
-	repo   *Repository
-	engine *order.Engine
+	repo        *Repository
+	orderEngine types.OrderFiller
+	authParser  middleware.TokenParser
 }
 
-func NewHandler(repo *Repository, engine *order.Engine) *Handler {
-	return &Handler{repo: repo, engine: engine}
+func NewHandler(repo *Repository, orderEngine types.OrderFiller, authParser middleware.TokenParser) *Handler {
+	return &Handler{repo: repo, orderEngine: orderEngine, authParser: authParser}
 }
 
 func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) {
@@ -122,10 +123,15 @@ func (h *Handler) GetTickHistory(c *fiber.Ctx) error {
 // Authentication: token is passed as ?token=<accessToken> query param
 // because browsers can't set Authorization headers on WebSocket connections.
 func (h *Handler) WebSocketHandler(c *fiber.Ctx) error {
-	// Validate token from query param
-	claims := middleware.GetClaims(c)
-	if claims == nil {
-		return c.Status(fiber.StatusUnauthorized).SendString("unauthorized")
+	// Extract and validate token from query param
+	token := c.Query("token")
+	if token == "" {
+		return c.Status(fiber.StatusUnauthorized).SendString("missing token")
+	}
+
+	claims, err := h.authParser.ParseAccessToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).SendString("invalid or expired token")
 	}
 
 	simID, err := uuid.Parse(c.Params("id"))
@@ -310,7 +316,7 @@ func (h *Handler) StartSimulation(c *fiber.Ctx) error {
 	}
 
 	// Create and start the clock
-	clock := NewClock(simID, h.repo, h.engine)
+	clock := NewClock(simID, h.repo, h.orderEngine)
 	if err := clock.Start(context.Background()); err != nil {
 		// Roll back status
 		_ = h.repo.UpdateStatus(c.Context(), simID, StatusDraft)

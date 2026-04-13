@@ -181,22 +181,23 @@ def forward_fill_gaps(rows: list[dict], symbol: str, trade_date: date) -> list[d
     by_ts = {r["timestamp"]: r for r in rows}
 
     # Generate every expected bar timestamp (UTC)
-    session_start_utc = _pkt_to_utc(trade_date, SESSION_START_PKT)
-    session_end_utc   = _pkt_to_utc(trade_date, SESSION_END_PKT)
+    session_start_dt = _pkt_to_datetime(trade_date, SESSION_START_PKT)
+    session_end_dt   = _pkt_to_datetime(trade_date, SESSION_END_PKT)
 
     all_bars = []
-    ts = session_start_utc
+    ts = session_start_dt
     last_close = rows[0]["open"]  # seed with first open price
 
-    while ts < session_end_utc:
-        if ts in by_ts:
-            bar = by_ts[ts]
+    while ts < session_end_dt:
+        ts_str = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
+        if ts_str in by_ts:
+            bar = by_ts[ts_str]
             last_close = bar["close"]
             all_bars.append(bar)
         else:
             # Forward-fill: flat bar at last known price
             all_bars.append({
-                "timestamp": ts,
+                "timestamp": ts_str,
                 "symbol":    symbol.upper(),
                 "open":      last_close,
                 "high":      last_close,
@@ -359,16 +360,24 @@ def _valid_ohlc(o: float, h: float, l: float, c: float) -> bool:
     return True
 
 
+def _pkt_to_datetime(trade_date: date, time_pkt: str) -> datetime:
+    """
+    Convert a PKT time string (HH:MM) on a given date to a UTC datetime object.
+    PKT = UTC+5, so we subtract 5 hours.
+    """
+    from datetime import timedelta
+    h, m = map(int, time_pkt.split(":"))
+    dt_pkt = datetime(trade_date.year, trade_date.month, trade_date.day, h, m, 0)
+    return dt_pkt - timedelta(hours=PKT_OFFSET_HOURS)
+
+
 def _pkt_to_utc(trade_date: date, time_pkt: str) -> str:
     """
     Convert a PKT time string (HH:MM) on a given date to a UTC ISO 8601 string.
     PKT = UTC+5, so we subtract 5 hours.
     Example: 2026-04-01 09:30 PKT → 2026-04-01T04:30:00Z
     """
-    from datetime import timedelta
-    h, m = map(int, time_pkt.split(":"))
-    dt_pkt = datetime(trade_date.year, trade_date.month, trade_date.day, h, m, 0)
-    dt_utc = dt_pkt - timedelta(hours=PKT_OFFSET_HOURS)
+    dt_utc = _pkt_to_datetime(trade_date, time_pkt)
     return dt_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 

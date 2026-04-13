@@ -32,10 +32,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/simtrader/backend/internal/simulation"
+	"github.com/simtrader/backend/internal/types"
 )
 
-// Engine processes orders. Implements simulation.OrderFiller.
+// Engine processes orders. Implements types.OrderFiller.
 type Engine struct {
 	db *pgxpool.Pool
 }
@@ -46,9 +46,9 @@ func NewEngine(db *pgxpool.Pool) *Engine {
 
 // ProcessTickOrders is called by the clock on every tick.
 // It checks all pending orders for each symbol and fills eligible ones.
-func (e *Engine) ProcessTickOrders(ctx context.Context, simID uuid.UUID, ticks []simulation.PriceTick) error {
+func (e *Engine) ProcessTickOrders(ctx context.Context, simID uuid.UUID, ticks []types.PriceTick) error {
 	// Build a price map: symbol → tick (for O(1) lookup per order)
-	priceMap := make(map[string]simulation.PriceTick, len(ticks))
+	priceMap := make(map[string]types.PriceTick, len(ticks))
 	for _, t := range ticks {
 		priceMap[t.Symbol] = t
 	}
@@ -63,7 +63,7 @@ func (e *Engine) ProcessTickOrders(ctx context.Context, simID uuid.UUID, ticks [
 }
 
 // processSymbolOrders fills all eligible pending orders for one symbol at one tick.
-func (e *Engine) processSymbolOrders(ctx context.Context, simID uuid.UUID, tick simulation.PriceTick) error {
+func (e *Engine) processSymbolOrders(ctx context.Context, simID uuid.UUID, tick types.PriceTick) error {
 	// Fetch all pending orders for this symbol in this simulation.
 	// We use FOR UPDATE SKIP LOCKED to prevent double-fills if multiple
 	// goroutines ever ran (they don't in v1, but defensive is correct).
@@ -124,7 +124,7 @@ func (e *Engine) processSymbolOrders(ctx context.Context, simID uuid.UUID, tick 
 func (e *Engine) determineFill(
 	orderType, side string,
 	limitPrice, stopPrice *float64,
-	tick simulation.PriceTick,
+	tick types.PriceTick,
 ) (float64, bool) {
 	switch orderType {
 	case "market":

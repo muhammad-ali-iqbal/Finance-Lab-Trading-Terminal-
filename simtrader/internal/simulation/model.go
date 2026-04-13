@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/simtrader/backend/internal/types"
 )
 
 type Status string
@@ -30,22 +31,9 @@ type Simulation struct {
 	UpdatedAt       time.Time  `json:"updatedAt"`
 }
 
-// PriceTick is one bar of OHLCV data for one symbol at one simulated time.
-type PriceTick struct {
-	ID           int64     `json:"-"`
-	SimulationID uuid.UUID `json:"-"`
-	Symbol       string    `json:"symbol"`
-	SimTime      time.Time `json:"timestamp"`
-	Open         float64   `json:"open"`
-	High         float64   `json:"high"`
-	Low          float64   `json:"low"`
-	Close        float64   `json:"close"`
-	Volume       int64     `json:"volume"`
-}
-
 // TickBroadcast is the WebSocket message sent to students each clock tick.
 // Contains all symbols' bars for the current simulated minute.
 type TickBroadcast struct {
-	SimulationTime time.Time   `json:"simulationTime"`
-	Ticks          []PriceTick `json:"ticks"`
+	SimulationTime time.Time          `json:"simulationTime"`
+	Ticks          []types.PriceTick `json:"ticks"`
 }

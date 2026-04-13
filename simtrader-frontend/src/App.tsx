@@ -1,7 +1,4 @@
 // src/App.tsx
-// Central router. All routes live here — one file makes it easy to see
-// the full navigation structure at a glance.
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -11,8 +8,9 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import { ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 
-// Layout
+// Layouts
 import DashboardLayout from '@/components/layout/DashboardLayout'
+import AdminLayout from '@/pages/admin/AdminLayout'
 
 // Student pages
 import PortfolioPage from '@/pages/student/PortfolioPage'
@@ -22,25 +20,27 @@ import OrderBookPage from '@/pages/student/OrderBookPage'
 import { OrdersPage } from '@/pages/student/OrdersPage'
 import { ProfilePage } from '@/pages/student/ProfilePage'
 
+// Admin pages
+import AdminOverviewPage from '@/pages/admin/AdminOverviewPage'
+import AdminSimulationsPage from '@/pages/admin/AdminSimulationsPage'
+import AdminUsersPage from '@/pages/admin/AdminUsersPage'
+import AdminSettingsPage from '@/pages/admin/AdminSettingsPage'
+
 // Guards
 import { RequireAuth } from '@/components/auth/RequireAuth'
 
-// TanStack Query client — global config
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Don't retry on 4xx errors — those are auth/validation failures, not transient
       retry: (failureCount, error) => {
         const status = (error as { response?: { status?: number } })?.response?.status
         if (status && status >= 400 && status < 500) return false
         return failureCount < 2
       },
-      staleTime: 30_000,        // data is fresh for 30s before refetch
-      gcTime: 5 * 60 * 1000,   // cache held 5min after last use
+      staleTime: 30_000,
+      gcTime: 5 * 60 * 1000,
     },
-    mutations: {
-      retry: false,
-    },
+    mutations: { retry: false },
   },
 })
 
@@ -49,13 +49,13 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* ── Public auth routes ─────────────────────────────────── */}
+          {/* ── Public auth routes ──────────────────────────────────── */}
           <Route path="/login"           element={<LoginPage />} />
           <Route path="/register"        element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password"  element={<ResetPasswordPage />} />
 
-          {/* ── Student dashboard ──────────────────────────────────── */}
+          {/* ── Student dashboard ───────────────────────────────────── */}
           <Route
             path="/dashboard"
             element={
@@ -64,7 +64,6 @@ export default function App() {
               </RequireAuth>
             }
           >
-            {/* Index → portfolio */}
             <Route index          element={<PortfolioPage />} />
             <Route path="trade"   element={<OrderEntryPage />} />
             <Route path="chart"   element={<ChartPage />} />
@@ -73,16 +72,27 @@ export default function App() {
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 
-          {/* ── Root redirect ───────────────────────────────────────── */}
-          {/* Sends to login; LoginPage redirects to dashboard after auth */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* ── Admin panel ─────────────────────────────────────────── */}
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth role="admin">
+                <AdminLayout />
+              </RequireAuth>
+            }
+          >
+            <Route index               element={<AdminOverviewPage />} />
+            <Route path="simulations"  element={<AdminSimulationsPage />} />
+            <Route path="users"        element={<AdminUsersPage />} />
+            <Route path="settings"     element={<AdminSettingsPage />} />
+          </Route>
 
-          {/* ── 404 ─────────────────────────────────────────────────── */}
+          {/* ── Root redirect ────────────────────────────────────────── */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
 
-      {/* Only rendered in development — hidden in production builds */}
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )

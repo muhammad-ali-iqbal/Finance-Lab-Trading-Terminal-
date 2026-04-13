@@ -198,6 +198,9 @@ psql -U postgres -c "CREATE DATABASE simtrader;"
 
 # Run migrations
 make migrate
+go mod tidy
+go run ./cmd/server/main.go (run this in the simtrader folder)
+
 
 # Start server
 make run
