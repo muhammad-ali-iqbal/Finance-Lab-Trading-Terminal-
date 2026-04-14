@@ -18,12 +18,12 @@ const navItems = [
 
 export default function AdminLayout() {
   const navigate = useNavigate()
-  const { user, refreshToken, logout } = useAuthStore(s => ({
-    user: s.user, refreshToken: s.refreshToken, logout: s.logout
+  const { user, logout } = useAuthStore(s => ({
+    user: s.user, logout: s.logout
   }))
 
   const logoutMutation = useMutation({
-    mutationFn: () => authApi.logout(refreshToken ?? ''),
+    mutationFn: () => authApi.logout(),
     onSettled: () => { logout(); navigate('/login') },
   })
 

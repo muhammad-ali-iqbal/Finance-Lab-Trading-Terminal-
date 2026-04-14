@@ -30,7 +30,12 @@ export default function RegisterPage() {
 
   const register = useMutation({
     mutationFn: () =>
-      authApi.register(inviteToken, form.firstName, form.lastName, form.password),
+      authApi.register({
+        inviteToken,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        password: form.password,
+      }),
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken, data.refreshToken)
       navigate('/dashboard')

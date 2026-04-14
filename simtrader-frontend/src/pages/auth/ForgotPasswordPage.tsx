@@ -10,7 +10,7 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
 
   const forgot = useMutation({
-    mutationFn: () => authApi.forgotPassword(email),
+    mutationFn: () => authApi.forgotPassword({ email }),
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -98,7 +98,7 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   const reset = useMutation({
-    mutationFn: () => authApi.resetPassword(token, password),
+    mutationFn: () => authApi.resetPassword({ token, newPassword: password }),
     onSuccess: () => {
       setTimeout(() => navigate('/login'), 1500)
     },

@@ -12,11 +12,11 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // Proxy API calls to Go backend during development
-      // so you don't have to worry about CORS locally
+      // Proxy all /api requests to Go backend (REST + WebSocket)
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        ws: true, // Forward WebSocket upgrades
       },
     },
   },

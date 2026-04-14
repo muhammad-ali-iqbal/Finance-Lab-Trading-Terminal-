@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   const login = useMutation({
-    mutationFn: () => authApi.login(email, password),
+    mutationFn: () => authApi.login({ email, password }),
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken, data.refreshToken)
       navigate(data.user.role === 'admin' ? '/admin' : '/dashboard')

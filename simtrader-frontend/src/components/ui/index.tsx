@@ -107,12 +107,16 @@ interface CardProps {
   children: ReactNode
   className?: string
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  onClick?: () => void
 }
 
-export function Card({ children, className, padding = 'md' }: CardProps) {
+export function Card({ children, className, padding = 'md', onClick }: CardProps) {
   const paddings = { none: '', sm: 'p-3', md: 'p-4', lg: 'p-6' }
   return (
-    <div className={clsx('bg-surface border border-border rounded-lg shadow-card', paddings[padding], className)}>
+    <div
+      onClick={onClick}
+      className={clsx('bg-surface border border-border rounded-lg shadow-card', paddings[padding], className, onClick && 'cursor-pointer')}
+    >
       {children}
     </div>
   )

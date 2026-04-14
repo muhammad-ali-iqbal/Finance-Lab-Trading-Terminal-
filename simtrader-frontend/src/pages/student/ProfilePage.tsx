@@ -18,7 +18,7 @@ export function ProfilePage() {
   const [pwMsg, setPwMsg] = useState<'success' | null>(null)
 
   const updateProfile = useMutation({
-    mutationFn: () => userApi.updateProfile(firstName, lastName),
+    mutationFn: () => userApi.updateProfile({ firstName, lastName }),
     onSuccess: (updated) => {
       setUser(updated)
       qc.invalidateQueries({ queryKey: ['me'] })

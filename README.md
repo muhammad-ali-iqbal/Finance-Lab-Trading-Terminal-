@@ -198,12 +198,12 @@ psql -U postgres -c "CREATE DATABASE simtrader;"
 
 # Run migrations
 make migrate
-go mod tidy
-go run ./cmd/server/main.go (run this in the simtrader folder)
+```
 
+**Start the backend server** (keep this running in a terminal):
 
-# Start server
-make run
+```bash
+go run ./cmd/server/main.go
 ```
 
 Server starts at **http://localhost:8080**
@@ -230,7 +230,67 @@ npm run dev
 
 Frontend starts at **http://localhost:5173**
 
-The Vite dev server proxies API requests (`/api/*`) to the backend at `:8080`, eliminating CORS issues during development.
+The Vite dev server proxies API requests (`/api/*`) and WebSocket connections to the backend at `:8080`, eliminating CORS issues during development.
+
+---
+
+### 📋 Session Workflow (Admin + Students)
+
+This section describes the end-to-end flow for running a SimTrading session in a lab environment.
+
+#### Step 1: Admin Login
+1. Open a browser window (Chrome Profile 1)
+2. Navigate to `http://localhost:5173`
+3. Login with admin credentials
+
+#### Step 2: Invite Students
+1. Go to **Admin → Students** (`/admin/users`)
+2. Click **Invite student**
+3. Enter the student's email (e.g., `student@iba.edu.pk`)
+4. Click **Send invite**
+
+**⚠️ Important:** The invite token is printed in the **Go backend terminal console** (not emailed in dev mode). Look for:
+```
+[DEV EMAIL] Invite to student@iba.edu.pk → token: 608de6c4fb71ac7762a39bc755361875dea7e58e3ec8a45b666bc91097246d5d
+```
+
+#### Step 3: Student Registration
+Each student needs their own browser profile (or incognito window) to maintain separate sessions:
+
+1. **Open a new Chrome profile** (or incognito window)
+2. Navigate to:
+   ```
+   http://localhost:5173/register?token=<TOKEN_FROM_CONSOLE>
+   ```
+   Replace `<TOKEN_FROM_CONSOLE>` with the actual token from step 2.
+3. Fill in **First name**, **Last name**, and **Password** (8+ chars with number and letter)
+4. Click **Create account**
+5. Student is redirected to their dashboard
+
+**Repeat for each student** — one browser profile per student.
+
+#### Step 4: Create & Start a Simulation
+1. Back in the **Admin** browser, go to **Simulations** (`/admin/simulations`)
+2. Click **New simulation**
+3. Fill in name, speed multiplier, starting cash
+4. Upload the PSX CSV data file (prepared via `simtrader-tools/`)
+5. Click **Start** — the simulation status changes to `active`
+
+#### Step 5: Students Start Trading
+Once the simulation is active:
+- Students see **"Connected to simulation"** in their dashboard
+- Live candlestick charts appear on the **Chart** page
+- Order book depth populates on the **Order Book** page
+- Students can place **Market**, **Limit**, or **Stop** orders from the **Trade** page
+
+#### Multi-User Lab Setup
+For a classroom with 1 admin + N students:
+- **Admin**: Use Chrome Profile 1 (or normal window)
+- **Student 1**: Use Chrome Profile 2 (or incognito)
+- **Student 2**: Use Chrome Profile 3
+- **Student N**: Each in a separate profile/incognito window
+
+Each browser profile maintains an independent session. The WebSocket singleton ensures each tab uses exactly **one** connection regardless of how many components (Chart, OrderBook, OrderEntry) are active.
 
 ---
 
@@ -543,6 +603,122 @@ VITE_WS_URL=ws://localhost:8080  # WebSocket URL for simulation ticks
 ## 🧪 Testing
 
 *(Coming soon — test coverage is planned for future releases)*
+
+---
+
+## 🐛 Troubleshooting
+
+### WebSocket "Insufficient resources" Error
+**Symptom:** Browser console shows `WebSocket connection failed: Insufficient resources` with repeated reconnection attempts.
+
+**Cause:** Multiple components (Chart, OrderBook, OrderEntry) each opened separate WebSocket connections to the same simulation, exhausting the browser's connection limit.
+
+**Solution:** The frontend uses a **singleton WebSocket pool** — only one connection per simulation is created per browser tab, shared across all components.
+
+### Blank Page on `npm run dev`
+**Symptom:** The dev server starts but the browser shows a blank white page.
+
+**Cause:** TypeScript compilation errors prevent Vite from serving the app.
+
+**Solution:**
+```bash
+cd simtrader-frontend
+npm run build   # Shows compilation errors
+```
+Fix the reported errors and restart the dev server.
+
+### Invite Token Not Received
+**Symptom:** After inviting a student, no email arrives.
+
+**Cause:** In development mode, emails are **not sent**. The invite token is printed to the **Go backend terminal console**.
+
+**Solution:** Check the terminal where `go run ./cmd/server/main.go` is running. Look for:
+```
+[DEV EMAIL] Invite to student@example.com → token: <64-char-hex-token>
+```
+The token is a random 64-character hex string. Use it in the registration URL:
+```
+http://localhost:5173/register?token=<TOKEN>
+```
+
+### 404 Not Found on Admin Endpoints
+**Symptom:** Admin panel shows 404 errors for user management or simulation control endpoints.
+
+**Cause:** Frontend API client was calling wrong endpoints (missing `/admin/` prefix).
+
+**Correct endpoint prefixes:**
+- Admin user management: `POST /api/admin/users/invite`, `GET /api/admin/users`
+- Admin simulation control: `POST /api/admin/simulations/:id/start`, `pause`, `resume`, `restart`, `complete`
+- User profile: `PUT /api/me`, `PUT /api/me/password`
+
+**Solution:** Ensure frontend is rebuilt after any API route changes:
+```bash
+cd simtrader-frontend
+npm run build
+```
+
+### Simulation Shows "Connecting..."
+**Symptom:** Student dashboard shows "Connecting to simulation…" indefinitely.
+
+**Check these:**
+1. **Backend is running** on `:8080` — check `http://localhost:8080/health`
+2. **Simulation is active** — Admin must start the simulation first
+3. **Student is logged in** — WebSocket requires a valid auth token
+4. **Backend logs show `[clock] started`** — If not, no CSV was uploaded
+5. **Check Go terminal for `[ws] user=... connected`** — If missing, WebSocket upgrade failed
+
+### Simulation Controls Unresponsive (Pause/Restart/Start)
+**Symptom:** Clicking Start/Pause/Restart buttons does nothing. The status stays the same.
+
+**Cause:** Frontend was calling `/api/simulations/:id/start` instead of `/api/admin/simulations/:id/start`.
+
+**Solution:** All admin simulation control endpoints require the `/admin/` prefix. Fixed and rebuilt.
+
+---
+
+## 📝 Development Log
+
+### Session: 2025-04-14 — WebSocket + Admin Routes Fix
+
+**Issues Fixed:**
+
+1. **Blank page on `npm run dev`** — 87 TypeScript compilation errors from missing API client modules
+   - Created `authApi`, `simulationApi`, `orderApi`, `portfolioApi`, `userApi` clients
+   - Fixed all import paths from `@/types` to `@/api`
+   - Fixed function call signatures to match backend API
+
+2. **WebSocket "Insufficient resources"** — Multiple WebSocket connections per tab
+   - Implemented singleton WebSocket pool (`useSimulationSocket` hook)
+   - Each browser tab now uses exactly 1 connection regardless of active components
+
+3. **WebSocket connection failure (code 1006)** — `nhooyr.io/websocket` incompatible with Fiber
+   - Replaced with `github.com/gofiber/contrib/websocket` (native fasthttp support)
+   - WebSocket now connects directly to Go backend (not through Vite proxy)
+
+4. **Admin endpoints returning 404** — Missing `/admin/` prefix on API routes
+   - Fixed user management: `/users/*` → `/api/admin/users/*`
+   - Fixed simulation control: `/simulations/:id/start` → `/api/admin/simulations/:id/start`
+   - Fixed user profile: `/users/profile` → `/api/me`, `/users/change-password` → `/api/me/password`
+
+5. **Registration flow broken** — Invite token not sent to backend
+   - Fixed `RegisterPage` to pass `inviteToken` from URL query param
+   - Fixed `RegisterInput` type to match backend: `{ inviteToken, firstName, lastName, password }`
+
+6. **Admin "Invite student" not working** — Wrong endpoint
+   - Fixed: `POST /users/invite` → `POST /api/admin/users/invite`
+
+7. **Simulation controls unresponsive** — Same root cause as #4 (missing `/admin/` prefix)
+   - Start, Pause, Resume, Restart, Complete now all hit correct admin endpoints
+
+8. **Updated README** — Added:
+   - Complete session workflow (admin login → invite → register → simulate)
+   - Multi-user lab setup instructions (Chrome profiles)
+   - Troubleshooting section for all discovered issues
+
+**Technologies:**
+- Backend: Go Fiber, `github.com/gofiber/contrib/websocket`, `bcrypt` (cost=12), SHA-256 token hashing
+- Frontend: React 18, TypeScript, Vite 5, WebSocket singleton pattern
+- Database: PostgreSQL 16+
 
 ---
 

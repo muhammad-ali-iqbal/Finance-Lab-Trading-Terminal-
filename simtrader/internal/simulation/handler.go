@@ -8,14 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
-	"time"
 
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/middleware"
 	"github.com/simtrader/backend/internal/types"
-	"nhooyr.io/websocket"
 )
 
 type Handler struct {
@@ -36,10 +34,9 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	sims.Get("/:id", h.GetSimulation)
 	sims.Get("/:id/symbols", h.GetSymbols)
 	sims.Get("/:id/ticks/:symbol", h.GetTickHistory)
+	sims.Get("/:id/progress", h.GetProgress) // timer + progress for all users
 
 	// WebSocket — students connect here to receive live ticks
-	// Note: Fiber doesn't handle WebSocket natively with nhooyr.
-	// We register a special handler that hijacks the connection.
 	app.Get("/api/simulations/:id/ws", h.WebSocketHandler)
 
 	// Admin only
@@ -50,6 +47,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	admin.Post("/:id/pause", h.PauseSimulation)
 	admin.Post("/:id/resume", h.ResumeSimulation)
 	admin.Post("/:id/complete", h.CompleteSimulation)
+	admin.Post("/:id/restart", h.RestartSimulation) // reset clock to beginning
 }
 
 // ── Student endpoints ─────────────────────────────────────────────────────────
@@ -139,69 +137,49 @@ func (h *Handler) WebSocketHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("invalid simulation ID")
 	}
 
-	// Upgrade to WebSocket using nhooyr library
-	// Fiber doesn't natively support WebSocket hijacking, so we use the
-	// underlying net/http request.
-	w, ok := c.Locals("responseWriter").(http.ResponseWriter)
-	r, ok2 := c.Locals("request").(*http.Request)
-	if !ok || !ok2 {
-		// Fallback: use Fiber's adapter
-		return c.Status(fiber.StatusInternalServerError).SendString("ws upgrade failed")
-	}
-
-	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		OriginPatterns: []string{"*"}, // CORS handled at Fiber level
-	})
-	if err != nil {
-		log.Printf("[ws] accept error: %v", err)
-		return nil
-	}
-
 	userID, _ := uuid.Parse(claims.UserID)
-	client := &Client{
-		id:   userID,
-		conn: conn,
-		send: make(chan []byte, 32), // buffer 32 ticks — about 30 seconds at 60× speed
-	}
 
 	// Register with the clock
 	clock, ok := Registry.Get(simID)
 	if !ok {
-		conn.Close(websocket.StatusNormalClosure, "simulation not running")
-		return nil
+		return c.Status(fiber.StatusNotFound).SendString("simulation not running")
 	}
-	clock.AddClient(client)
 
-	ctx := conn.CloseRead(context.Background())
+	// Use Fiber's websocket handler (wraps fasthttp properly)
+	return websocket.New(func(conn *websocket.Conn) {
+		client := &Client{
+			id:   userID,
+			conn: conn,
+			send: make(chan []byte, 32),
+		}
 
-	// Write loop — sends queued messages to the client
-	go func() {
-		defer func() {
-			clock.RemoveClient(client)
-			conn.Close(websocket.StatusNormalClosure, "done")
-		}()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case msg, ok := <-client.send:
+		clock.AddClient(client)
+		defer clock.RemoveClient(client)
+
+		log.Printf("[ws] user=%s connected to sim=%s", userID, simID)
+
+		// Write loop — sends queued messages
+		go func() {
+			for {
+				msg, ok := <-client.send
 				if !ok {
 					return
 				}
-				writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-				err := conn.Write(writeCtx, websocket.MessageText, msg)
-				cancel()
-				if err != nil {
+				if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
 					log.Printf("[ws] write error user=%s: %v", userID, err)
 					return
 				}
 			}
-		}
-	}()
+		}()
 
-	// Block until the client disconnects
-	<-ctx.Done()
-	return nil
+		// Read loop — keep connection alive
+		for {
+			if _, _, err := conn.ReadMessage(); err != nil {
+				log.Printf("[ws] user=%s disconnected", userID)
+				return
+			}
+		}
+	})(c)
 }
 
 // ── Admin endpoints ───────────────────────────────────────────────────────────
@@ -370,6 +348,127 @@ func (h *Handler) CompleteSimulation(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"message": "Simulation marked as completed."})
+}
+
+// GetProgress godoc
+// GET /api/simulations/:id/progress
+// Returns timing info for the simulation timer on both admin and student views.
+// Accessible to all authenticated users.
+func (h *Handler) GetProgress(c *fiber.Ctx) error {
+	simID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return badRequest(c, "invalid simulation ID")
+	}
+
+	sim, err := h.repo.GetByID(c.Context(), simID)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
+		}
+		return internalError(c)
+	}
+
+	firstTime, err := h.repo.GetFirstSimTime(c.Context(), simID)
+	if err != nil || firstTime == nil {
+		// No data uploaded yet
+		return c.JSON(fiber.Map{
+			"status":          sim.Status,
+			"hasData":         false,
+			"progressPct":     0,
+			"currentSimTime":  nil,
+			"firstSimTime":    nil,
+			"lastSimTime":     nil,
+			"elapsedMinutes":  0,
+			"totalMinutes":    0,
+			"remainingMinutes": 0,
+		})
+	}
+
+	lastTime, err := h.repo.GetLastSimTime(c.Context(), simID)
+	if err != nil || lastTime == nil {
+		lastTime = firstTime
+	}
+
+	totalMinutes := int(lastTime.Sub(*firstTime).Minutes())
+	if totalMinutes <= 0 {
+		totalMinutes = 1
+	}
+
+	var elapsedMinutes int
+	var progressPct float64
+
+	if sim.CurrentSimTime != nil {
+		elapsedMinutes = int(sim.CurrentSimTime.Sub(*firstTime).Minutes())
+		if elapsedMinutes < 0 {
+			elapsedMinutes = 0
+		}
+		progressPct = float64(elapsedMinutes) / float64(totalMinutes) * 100
+		if progressPct > 100 {
+			progressPct = 100
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"status":           sim.Status,
+		"hasData":          true,
+		"progressPct":      progressPct,
+		"currentSimTime":   sim.CurrentSimTime,
+		"firstSimTime":     firstTime,
+		"lastSimTime":      lastTime,
+		"elapsedMinutes":   elapsedMinutes,
+		"totalMinutes":     totalMinutes,
+		"remainingMinutes": totalMinutes - elapsedMinutes,
+		"speedMultiplier":  sim.SpeedMultiplier,
+	})
+}
+
+// RestartSimulation godoc
+// POST /api/admin/simulations/:id/restart
+// Stops the clock, resets current_sim_time to the first tick, then restarts.
+// Admin only.
+func (h *Handler) RestartSimulation(c *fiber.Ctx) error {
+	simID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return badRequest(c, "invalid simulation ID")
+	}
+
+	// Stop the current clock if running
+	if clock, ok := Registry.Get(simID); ok {
+		clock.Stop()
+		Registry.Remove(simID)
+	}
+
+	// Reset current_sim_time to NULL so the clock starts from the beginning
+	if err := h.repo.ResetSimTime(c.Context(), simID); err != nil {
+		return internalError(c)
+	}
+
+	// Set status back to draft so StartSimulation can proceed
+	if err := h.repo.UpdateStatus(c.Context(), simID, StatusDraft); err != nil {
+		return internalError(c)
+	}
+
+	// Immediately start again
+	sim, err := h.repo.GetByID(c.Context(), simID)
+	if err != nil {
+		return internalError(c)
+	}
+	_ = sim
+
+	if err := h.repo.UpdateStatus(c.Context(), simID, StatusActive); err != nil {
+		return internalError(c)
+	}
+
+	clock := NewClock(simID, h.repo, h.orderEngine)
+	if err := clock.Start(c.Context()); err != nil {
+		_ = h.repo.UpdateStatus(c.Context(), simID, StatusDraft)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": fmt.Sprintf("Failed to restart clock: %v", err),
+		})
+	}
+	Registry.Register(simID, clock)
+
+	return c.JSON(fiber.Map{"message": "Simulation restarted from the beginning."})
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

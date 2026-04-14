@@ -17,7 +17,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
   const [success, setSuccess] = useState(false)
 
   const invite = useMutation({
-    mutationFn: () => userApi.inviteStudent(email),
+    mutationFn: () => userApi.inviteStudent({ email, firstName: '', lastName: '' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'users'] })
       setSuccess(true)

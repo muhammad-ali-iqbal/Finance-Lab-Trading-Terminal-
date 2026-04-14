@@ -29,9 +29,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofiber/contrib/websocket"
 	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/types"
-	"nhooyr.io/websocket"
 )
 
 // Client represents one connected student.

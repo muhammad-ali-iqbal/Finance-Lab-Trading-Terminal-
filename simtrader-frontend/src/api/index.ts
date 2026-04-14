@@ -1,115 +1,151 @@
 // src/api/index.ts
-// One function per backend endpoint. Every function returns typed data.
-// Callers never import axios directly — always use these functions.
+// Re-export types and API clients
 
-import { client } from './client'
-import type {
-  AuthResponse, User, Portfolio, Order, OrderBook,
-  OrderSide, OrderType, Simulation,
-} from '@/types'
+// Types (mirror Go backend models)
+export type Role = 'admin' | 'student'
+export type UserStatus = 'pending' | 'active' | 'blocked'
+export type OrderSide = 'buy' | 'sell'
+export type OrderType = 'market' | 'limit' | 'stop'
+export type OrderStatus = 'pending' | 'filled' | 'partially_filled' | 'cancelled' | 'rejected'
+export type SimulationStatus = 'draft' | 'active' | 'paused' | 'completed'
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
-
-export const authApi = {
-  login: (email: string, password: string) =>
-    client.post<AuthResponse>('/auth/login', { email, password }).then(r => r.data),
-
-  register: (inviteToken: string, firstName: string, lastName: string, password: string) =>
-    client.post<AuthResponse>('/auth/register', { inviteToken, firstName, lastName, password }).then(r => r.data),
-
-  logout: (refreshToken: string) =>
-    client.post('/auth/logout', { refreshToken }),
-
-  forgotPassword: (email: string) =>
-    client.post('/auth/forgot-password', { email }),
-
-  resetPassword: (token: string, newPassword: string) =>
-    client.post('/auth/reset-password', { token, newPassword }),
+export interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  role: Role
+  status: UserStatus
+  createdAt: string
 }
 
-// ── User / Profile ───────────────────────────────────────────────────────────
-
-export const userApi = {
-  me: () =>
-    client.get<User>('/me').then(r => r.data),
-
-  updateProfile: (firstName: string, lastName: string) =>
-    client.put<User>('/me', { firstName, lastName }).then(r => r.data),
-
-  changePassword: (currentPassword: string, newPassword: string) =>
-    client.put('/me/password', { currentPassword, newPassword }),
-
-  // Admin
-  listUsers: (role?: string) =>
-    client.get<{ users: User[]; total: number }>('/admin/users', { params: { role } }).then(r => r.data),
-
-  inviteStudent: (email: string) =>
-    client.post<{ user: User; message: string }>('/admin/users/invite', { email }).then(r => r.data),
-
-  blockUser: (id: string) =>
-    client.post(`/admin/users/${id}/block`),
-
-  unblockUser: (id: string) =>
-    client.post(`/admin/users/${id}/unblock`),
+export interface AuthTokens {
+  accessToken: string
+  refreshToken: string
 }
 
-// ── Simulation ───────────────────────────────────────────────────────────────
-
-export const simulationApi = {
-  list: () =>
-    client.get<{ simulations: Simulation[] }>('/simulations').then(r => r.data),
-
-  get: (id: string) =>
-    client.get<Simulation>(`/simulations/${id}`).then(r => r.data),
-
-  getActive: () =>
-    client.get<Simulation>('/simulations/active').then(r => r.data),
-
-  // Admin
-  create: (data: { name: string; description: string; speedMultiplier: number; startingCash: number }) =>
-    client.post<Simulation>('/admin/simulations', data).then(r => r.data),
-
-  uploadCSV: (simId: string, file: File) => {
-    const fd = new FormData()
-    fd.append('file', file)
-    return client.post<{ message: string; rowsLoaded: number }>(
-      `/admin/simulations/${simId}/upload`, fd,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    ).then(r => r.data)
-  },
-
-  start:    (simId: string) => client.post(`/admin/simulations/${simId}/start`).then(r => r.data),
-  pause:    (simId: string) => client.post(`/admin/simulations/${simId}/pause`).then(r => r.data),
-  resume:   (simId: string) => client.post(`/admin/simulations/${simId}/resume`).then(r => r.data),
-  complete: (simId: string) => client.post(`/admin/simulations/${simId}/complete`).then(r => r.data),
+export interface AuthResponse {
+  accessToken: string
+  refreshToken: string
+  user: User
 }
 
-// ── Portfolio ────────────────────────────────────────────────────────────────
-
-export const portfolioApi = {
-  get: (simulationId: string) =>
-    client.get<Portfolio>(`/simulations/${simulationId}/portfolio`).then(r => r.data),
+export interface Simulation {
+  id: string
+  name: string
+  description: string
+  status: SimulationStatus
+  startTime: string | null
+  endTime: string | null
+  speedMultiplier: number
+  startingCash: number
+  rowsLoaded: number | null
+  currentSimTime: string | null
+  createdAt: string
 }
 
-// ── Orders ───────────────────────────────────────────────────────────────────
-
-export const orderApi = {
-  submit: (simulationId: string, params: {
-    symbol: string
-    side: OrderSide
-    type: OrderType
-    quantity: number
-    limitPrice?: number
-    stopPrice?: number
-  }) =>
-    client.post<Order>(`/simulations/${simulationId}/orders`, params).then(r => r.data),
-
-  list: (simulationId: string) =>
-    client.get<{ orders: Order[] }>(`/simulations/${simulationId}/orders`).then(r => r.data),
-
-  cancel: (simulationId: string, orderId: string) =>
-    client.delete(`/simulations/${simulationId}/orders/${orderId}`),
-
-  getBook: (simulationId: string, symbol: string) =>
-    client.get<OrderBook>(`/simulations/${simulationId}/orderbook/${symbol}`).then(r => r.data),
+export interface SimulationProgress {
+  status: SimulationStatus
+  hasData: boolean
+  progressPct: number
+  currentSimTime: string | null
+  firstSimTime: string | null
+  lastSimTime: string | null
+  elapsedMinutes: number
+  totalMinutes: number
+  remainingMinutes: number
+  speedMultiplier: number
 }
+
+export interface PriceTick {
+  symbol: string
+  timestamp: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+// What the WebSocket broadcasts each tick
+export interface SimulationTick {
+  simulationTime: string
+  ticks: PriceTick[]
+}
+
+export interface Position {
+  symbol: string
+  quantity: number
+  averageCost: number
+  currentPrice: number
+  marketValue: number
+  unrealizedPnL: number
+  unrealizedPnLPct: number
+}
+
+export interface Portfolio {
+  userId: string
+  simulationId: string
+  cashBalance: number
+  totalMarketValue: number
+  totalEquity: number
+  unrealizedPnL: number
+  unrealizedPnLPct: number
+  positions: Position[]
+  updatedAt: string
+}
+
+export interface Order {
+  id: string
+  userId: string
+  simulationId: string
+  symbol: string
+  side: OrderSide
+  type: OrderType
+  quantity: number
+  limitPrice: number | null
+  stopPrice: number | null
+  filledQuantity: number
+  averageFillPrice: number | null
+  status: OrderStatus
+  createdAt: string
+  filledAt: string | null
+}
+
+export interface OrderBookLevel {
+  price: number
+  quantity: number
+  orderCount: number
+}
+
+export interface OrderBook {
+  symbol: string
+  bids: OrderBookLevel[]   // buy orders, sorted price desc
+  asks: OrderBookLevel[]   // sell orders, sorted price asc
+  lastPrice: number
+  spread: number
+}
+
+// API error shape from the Go backend
+export interface ApiError {
+  error: string
+  warning?: string
+}
+
+// Paginated list response
+export interface ListResponse<T> {
+  items: T[]
+  total: number
+}
+
+// API clients
+export { authApi } from './auth'
+export type { LoginInput, RegisterInput, ChangePasswordInput, ForgotPasswordInput, ResetPasswordInput } from './auth'
+export { simulationApi } from './simulation'
+export type { CreateSimulationInput, UpdateSimulationInput, SimulationsListResponse } from './simulation'
+export { orderApi } from './order'
+export type { CreateOrderInput, OrdersListResponse } from './order'
+export { portfolioApi } from './portfolio'
+export { userApi } from './user'
+export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
+export { client } from './client'

@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderApi, simulationApi } from '@/api'
 import { Badge, Card, Button, EmptyState, Spinner } from '@/components/ui'
 import { Activity, X } from 'lucide-react'
-import clsx from 'clsx'
 
 function fmt(n: number) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })

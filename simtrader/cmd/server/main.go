@@ -89,7 +89,7 @@ func main() {
 	}))
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     cfg.FrontendURL,
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, Sec-WebSocket-Key, Sec-WebSocket-Version, Sec-WebSocket-Extensions, Upgrade",
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowCredentials: true,
 		MaxAge:           86400,

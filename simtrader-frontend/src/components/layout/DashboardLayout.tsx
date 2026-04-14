@@ -1,14 +1,50 @@
 // src/components/layout/DashboardLayout.tsx
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
-import { authApi } from '@/api'
+import { authApi, simulationApi } from '@/api'
+import { SimulationTimer } from '@/components/simulation/SimulationTimer'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
   User, LogOut, Menu, X, ChevronRight, Activity
 } from 'lucide-react'
+
+// Compact sidebar widget — fetches active sim and shows live timer
+function SimulationSidebarWidget() {
+  const { data: sim } = useQuery({
+    queryKey: ['simulation', 'active'],
+    queryFn: simulationApi.getActive,
+    retry: false,
+    refetchInterval: 15000,
+  })
+
+  if (!sim) {
+    return (
+      <div className="px-3 py-2 border-b border-border">
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-secondary">
+          <span className="w-1.5 h-1.5 rounded-full bg-ink-disabled flex-shrink-0" />
+          <span className="text-xs text-ink-tertiary truncate">No active simulation</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="px-3 py-2 border-b border-border space-y-1.5">
+      <div className="flex items-center gap-1.5 px-1">
+        <span className={clsx(
+          'w-1.5 h-1.5 rounded-full flex-shrink-0',
+          sim.status === 'active' ? 'bg-success animate-pulse_dot' :
+          sim.status === 'paused' ? 'bg-warning' : 'bg-ink-disabled'
+        )} />
+        <span className="text-xs text-ink-secondary font-medium truncate">{sim.name}</span>
+      </div>
+      <SimulationTimer simulationId={sim.id} compact />
+    </div>
+  )
+}
 
 const navItems = [
   { to: '/dashboard',       icon: LayoutDashboard, label: 'Portfolio'    },
@@ -22,12 +58,12 @@ const navItems = [
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
-  const { user, refreshToken, logout } = useAuthStore(s => ({
-    user: s.user, refreshToken: s.refreshToken, logout: s.logout
+  const { user, logout } = useAuthStore(s => ({
+    user: s.user, logout: s.logout
   }))
 
   const logoutMutation = useMutation({
-    mutationFn: () => authApi.logout(refreshToken ?? ''),
+    mutationFn: () => authApi.logout(),
     onSettled: () => {
       logout()
       navigate('/login')
@@ -50,13 +86,8 @@ export default function DashboardLayout() {
           <span className="font-semibold text-sm tracking-tight">SimTrader</span>
         </div>
 
-        {/* Simulation indicator */}
-        <div className="px-3 py-2 border-b border-border">
-          <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-secondary">
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse_dot flex-shrink-0" />
-            <span className="text-xs text-ink-secondary font-medium truncate">Sim: Spring 2025</span>
-          </div>
-        </div>
+        {/* Live simulation timer */}
+        <SimulationSidebarWidget />
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-2 px-2">

@@ -368,3 +368,23 @@ func (r *Repository) scanOne(row pgx.Row) (*Simulation, error) {
 	}
 	return s, nil
 }
+
+// GetLastSimTime returns the latest timestamp in the simulation data.
+func (r *Repository) GetLastSimTime(ctx context.Context, simID uuid.UUID) (*time.Time, error) {
+	query := `SELECT MAX(sim_time) FROM price_ticks WHERE simulation_id = $1`
+	var last time.Time
+	err := r.db.QueryRow(ctx, query, simID).Scan(&last)
+	if err != nil {
+		return nil, err
+	}
+	return &last, nil
+}
+
+// ResetSimTime clears current_sim_time so the clock restarts from the first tick.
+func (r *Repository) ResetSimTime(ctx context.Context, simID uuid.UUID) error {
+	_, err := r.db.Exec(ctx,
+		`UPDATE simulations SET current_sim_time = NULL, updated_at = NOW() WHERE id = $1`,
+		simID,
+	)
+	return err
+}
