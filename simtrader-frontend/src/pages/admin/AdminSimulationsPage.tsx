@@ -6,7 +6,8 @@ import { SimulationTimer } from '@/components/simulation/SimulationTimer'
 import { Card, Button, Input, Badge, Alert, Spinner, EmptyState } from '@/components/ui'
 import {
   PlayCircle, PauseCircle, CheckCircle2, RotateCcw,
-  Upload, Plus, X, Activity, ChevronDown, ChevronUp
+  Upload, Plus, X, Activity, ChevronDown, ChevronUp,
+  Pencil, Trash2
 } from 'lucide-react'
 import type { Simulation } from '@/api'
 
@@ -24,7 +25,9 @@ function SimulationCard({ sim }: { sim: Simulation }) {
   )
   const [uploading, setUploading] = useState(false)
   const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [showEdit, setShowEdit] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const reuploadRef = useRef<HTMLInputElement>(null)
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['admin', 'simulations'] })
@@ -36,6 +39,21 @@ function SimulationCard({ sim }: { sim: Simulation }) {
   const resume   = useMutation({ mutationFn: () => simulationApi.resume(sim.id),   onSuccess: invalidate })
   const complete = useMutation({ mutationFn: () => simulationApi.complete(sim.id), onSuccess: invalidate })
   const restart  = useMutation({ mutationFn: () => simulationApi.restart(sim.id),  onSuccess: invalidate })
+  const del      = useMutation({
+    mutationFn: async () => {
+      console.log('[delete] Attempting to delete simulation:', sim.id)
+      return simulationApi.delete(sim.id)
+    },
+    onSuccess: () => {
+      console.log('[delete] Success')
+      invalidate()
+    },
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to delete'
+      console.error('[delete] Error:', err)
+      alert(`Delete failed: ${msg}`)
+    },
+  })
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -55,8 +73,37 @@ function SimulationCard({ sim }: { sim: Simulation }) {
     }
   }
 
+  const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadMsg(null)
+    try {
+      const result = await simulationApi.reuploadCSV(sim.id, file)
+      setUploadMsg({ type: 'success', text: `✓ Replaced data — ${(result.rowsLoaded ?? 0).toLocaleString()} rows` })
+      invalidate()
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Upload failed'
+      setUploadMsg({ type: 'error', text: msg })
+    } finally {
+      setUploading(false)
+      if (reuploadRef.current) reuploadRef.current.value = ''
+    }
+  }
+
+  const handleDelete = () => {
+    if (confirm(
+      `Delete "${sim.name}"?\n\nThis will permanently remove the simulation, all uploaded price data, and any student orders/portfolio. This cannot be undone.`
+    )) {
+      del.mutate()
+    }
+  }
+
   const hasTimer = sim.status === 'active' || sim.status === 'paused' || sim.status === 'completed'
   const canRestart = sim.status === 'active' || sim.status === 'paused' || sim.status === 'completed'
+  const isDraft = sim.status === 'draft'
+  const isNotActive = sim.status !== 'active'
+  const canReupload = sim.status === 'paused' || sim.status === 'completed'
 
   const borderColor =
     sim.status === 'active'    ? 'border-success/40' :
@@ -64,6 +111,11 @@ function SimulationCard({ sim }: { sim: Simulation }) {
 
   return (
     <div className={`border rounded-lg overflow-hidden ${borderColor}`}>
+      {/* Edit modal */}
+      {showEdit && isDraft && (
+        <EditModal sim={sim} onClose={() => setShowEdit(false)} />
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-surface">
         <button
@@ -85,9 +137,34 @@ function SimulationCard({ sim }: { sim: Simulation }) {
         </span>
         <StatusBadge status={sim.status} />
 
+        {/* Manage / Delete */}
+        {isNotActive && (
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {isDraft && (
+              <Button
+                size="sm"
+                variant="ghost"
+                title="Edit name and description"
+                onClick={() => setShowEdit(true)}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Delete simulation"
+              onClick={handleDelete}
+              loading={del.isPending}
+            >
+              <Trash2 className="w-3.5 h-3.5 text-danger" />
+            </Button>
+          </div>
+        )}
+
         {/* Control buttons */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {sim.status === 'draft' && (
+          {isDraft && (
             <Button size="sm" onClick={() => start.mutate()} loading={start.isPending}>
               <PlayCircle className="w-3.5 h-3.5" /> Start
             </Button>
@@ -156,7 +233,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
           </div>
 
           {/* CSV upload (draft only) */}
-          {sim.status === 'draft' && (
+          {isDraft && (
             <div className="space-y-2">
               <p className="text-xs font-medium text-ink-secondary">Upload price data (CSV)</p>
               <div className="flex items-center gap-3 flex-wrap">
@@ -190,6 +267,40 @@ function SimulationCard({ sim }: { sim: Simulation }) {
                 variant="warning"
                 message="Upload a CSV before starting — the clock needs price data to broadcast."
               />
+            </div>
+          )}
+
+          {/* CSV re-upload (paused or completed) */}
+          {canReupload && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-ink-secondary">Replace price data (CSV)</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <input
+                  ref={reuploadRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleReupload}
+                  className="hidden"
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  loading={uploading}
+                  onClick={() => reuploadRef.current?.click()}
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  {uploading ? 'Uploading…' : 'Upload new CSV'}
+                </Button>
+                <span className="text-xs text-ink-tertiary">
+                  This replaces all existing price data. Use this to correct or update the simulation data.
+                </span>
+              </div>
+              {uploadMsg && (
+                <Alert
+                  variant={uploadMsg.type === 'success' ? 'success' : 'error'}
+                  message={uploadMsg.text}
+                />
+              )}
             </div>
           )}
 
@@ -247,6 +358,54 @@ function CreateModal({ onClose }: { onClose: () => void }) {
           <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
             <Button type="submit" size="sm" loading={create.isPending}>Create</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── Edit modal ───────────────────────────────────────────────────────────────
+function EditModal({ sim, onClose }: { sim: Simulation; onClose: () => void }) {
+  const qc = useQueryClient()
+  const [form, setForm] = useState({ name: sim.name, description: sim.description })
+
+  const update = useMutation({
+    mutationFn: () => simulationApi.update(sim.id, form),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'simulations'] }); onClose() },
+  })
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-4">
+      <div className="bg-surface rounded-xl border border-border shadow-modal w-full max-w-md">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h2 className="text-sm font-semibold text-ink">Edit simulation</h2>
+          <button onClick={onClose} className="text-ink-tertiary hover:text-ink"><X className="w-4 h-4" /></button>
+        </div>
+        <form
+          onSubmit={(e: FormEvent) => { e.preventDefault(); update.mutate() }}
+          className="p-5 space-y-4"
+        >
+          {update.isError && (
+            <Alert variant="error" message={
+              (update.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to update'
+            } />
+          )}
+          <Input
+            label="Simulation name"
+            value={form.name}
+            onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
+            required
+            autoFocus
+          />
+          <Input
+            label="Description (optional)"
+            value={form.description}
+            onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+          />
+          <div className="flex justify-end gap-2 pt-1">
+            <Button type="button" variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
+            <Button type="submit" size="sm" loading={update.isPending}>Save</Button>
           </div>
         </form>
       </div>
@@ -321,6 +480,8 @@ export default function AdminSimulationsPage() {
             'Upload the CSV — all price ticks are loaded into the database',
             'Click Start — the clock broadcasts ticks to connected students in real time',
             'Use Pause / Resume to control pacing, ↺ to reset the clock to market open',
+            'Edit name/description or delete drafts before starting',
+            'Replace CSV data on paused or completed simulations if needed',
           ].map((step, i) => (
             <li key={i} className="flex gap-2.5 text-xs text-ink-secondary">
               <span className="w-4 h-4 rounded-full bg-ink text-surface text-[10px] font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>

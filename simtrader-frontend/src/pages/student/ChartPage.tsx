@@ -10,17 +10,23 @@ import { useSimulationSocket } from '@/hooks/useSimulationSocket'
 import { Card, Spinner, Badge } from '@/components/ui'
 import type { PriceTick, SimulationTick } from '@/types'
 import clsx from 'clsx'
+import { Activity } from 'lucide-react'
 
 function fmt(n: number, d = 2) {
   return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
 }
 
 export default function ChartPage() {
-  const { data: simulation } = useQuery({
+  const { data: simulation, error: simError, isLoading: simLoading } = useQuery({
     queryKey: ['simulation', 'active'],
     queryFn: simulationApi.getActive,
     retry: false,
   })
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[chart] simulation:', simulation?.id, simulation?.status, 'error:', simError, 'loading:', simLoading)
+  }, [simulation, simError, simLoading])
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null)
   const [lastTick, setLastTick] = useState<PriceTick | null>(null)
@@ -198,7 +204,15 @@ export default function ChartPage() {
 
       {/* Chart */}
       <Card padding="none" className="flex-1 min-h-0 overflow-hidden">
-        {!connected && symbols.length === 0 ? (
+        {!simulation && !simLoading ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3">
+            <Activity className="w-8 h-8 text-ink-tertiary" />
+            <p className="text-sm text-ink-secondary text-center max-w-xs">
+              No active simulation found.{' '}
+              <span className="text-ink font-medium">Your instructor needs to create and start a simulation first.</span>
+            </p>
+          </div>
+        ) : !connected && symbols.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-ink-secondary">Connecting to simulation…</p>

@@ -27,6 +27,12 @@ func NewHandler(repo *Repository, orderEngine types.OrderFiller, authParser midd
 }
 
 func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) {
+	// WebSocket — MUST be registered before the auth group.
+	// Auth is handled via ?token= query param, NOT Bearer header.
+	// If registered after the group, Fiber's group middleware blocks
+	// the upgrade with 401 before the handler ever runs.
+	app.Get("/api/simulations/:id/ws", h.WebSocketHandler)
+
 	// Public (authenticated students + admins)
 	sims := app.Group("/api/simulations", authMW)
 	sims.Get("/", h.ListSimulations)
@@ -36,13 +42,13 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	sims.Get("/:id/ticks/:symbol", h.GetTickHistory)
 	sims.Get("/:id/progress", h.GetProgress) // timer + progress for all users
 
-	// WebSocket — students connect here to receive live ticks
-	app.Get("/api/simulations/:id/ws", h.WebSocketHandler)
-
 	// Admin only
 	admin := app.Group("/api/admin/simulations", authMW, adminMW)
 	admin.Post("/", h.CreateSimulation)
+	admin.Put("/:id", h.UpdateSimulation)
+	admin.Delete("/:id", h.DeleteSimulation)
 	admin.Post("/:id/upload", h.UploadCSV)
+	admin.Put("/:id/upload", h.ReuploadCSV)
 	admin.Post("/:id/start", h.StartSimulation)
 	admin.Post("/:id/pause", h.PauseSimulation)
 	admin.Post("/:id/resume", h.ResumeSimulation)
@@ -264,6 +270,110 @@ func (h *Handler) UploadCSV(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message":    "CSV uploaded and ingested successfully.",
+		"rowsLoaded": count,
+	})
+}
+
+// UpdateSimulation allows admin to rename or update description.
+// Only allowed when simulation is in draft status.
+func (h *Handler) UpdateSimulation(c *fiber.Ctx) error {
+	simID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return badRequest(c, "invalid simulation ID")
+	}
+
+	sim, err := h.repo.GetByID(c.Context(), simID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
+	}
+	if sim.Status != StatusDraft {
+		return badRequest(c, "can only edit a simulation in draft status")
+	}
+
+	var req struct {
+		Name        *string `json:"name"`
+		Description *string `json:"description"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return badRequest(c, "invalid request body")
+	}
+
+	if req.Name != nil {
+		if err := h.repo.UpdateName(c.Context(), simID, *req.Name); err != nil {
+			return internalError(c)
+		}
+	}
+	if req.Description != nil {
+		if err := h.repo.UpdateDescription(c.Context(), simID, *req.Description); err != nil {
+			return internalError(c)
+		}
+	}
+
+	return c.JSON(fiber.Map{"message": "Simulation updated."})
+}
+
+// DeleteSimulation permanently removes a simulation and all associated data.
+// Only allowed when simulation is NOT active.
+func (h *Handler) DeleteSimulation(c *fiber.Ctx) error {
+	simID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return badRequest(c, "invalid simulation ID")
+	}
+
+	sim, err := h.repo.GetByID(c.Context(), simID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
+	}
+	if sim.Status == StatusActive {
+		return badRequest(c, "cannot delete an active simulation. Pause it first.")
+	}
+
+	if err := h.repo.Delete(c.Context(), simID); err != nil {
+		return internalError(c)
+	}
+
+	return c.JSON(fiber.Map{"message": "Simulation deleted."})
+}
+
+// ReuploadCSV replaces existing price data with a new CSV upload.
+// Allowed for draft, paused, or completed simulations (not active).
+func (h *Handler) ReuploadCSV(c *fiber.Ctx) error {
+	simID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return badRequest(c, "invalid simulation ID")
+	}
+
+	sim, err := h.repo.GetByID(c.Context(), simID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
+	}
+	if sim.Status == StatusActive {
+		return badRequest(c, "cannot replace CSV data while simulation is running. Pause it first.")
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return badRequest(c, "file is required (field name: 'file')")
+	}
+	if file.Size > 50*1024*1024 { // 50MB max
+		return badRequest(c, "file too large (max 50MB)")
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		return internalError(c)
+	}
+	defer f.Close()
+
+	count, err := h.repo.IngestCSV(c.Context(), simID, f)
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": fmt.Sprintf("CSV ingestion failed: %v", err),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message":    "CSV data replaced successfully.",
 		"rowsLoaded": count,
 	})
 }

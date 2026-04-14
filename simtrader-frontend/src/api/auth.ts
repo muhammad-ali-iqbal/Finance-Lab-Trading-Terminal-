@@ -44,12 +44,12 @@ export const authApi = {
   },
 
   getMe: async () => {
-    const { data } = await client.get<User>('/auth/me')
+    const { data } = await client.get<User>('/me')
     return data
   },
 
   changePassword: async (input: ChangePasswordInput) => {
-    const { data } = await client.post('/auth/change-password', input)
+    const { data } = await client.put('/me/password', input)
     return data
   },
 

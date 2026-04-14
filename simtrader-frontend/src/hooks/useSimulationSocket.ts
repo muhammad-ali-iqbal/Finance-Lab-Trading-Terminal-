@@ -148,6 +148,7 @@ export function useSimulationSocket({ simulationId, onTick }: UseSimulationSocke
 
   useEffect(() => {
     if (!simulationId) {
+      console.log('[ws-pool] No simulationId — skipping connection')
       setState(s => ({ ...s, connected: false, connecting: false }))
       return
     }
@@ -175,7 +176,9 @@ export function useSimulationSocket({ simulationId, onTick }: UseSimulationSocke
     callbacks.get(simulationId)!.add(onChange)
 
     // Connect if needed
+    console.log('[ws-pool] Check — connected:', conn.connected, 'hasWs:', !!conn.ws, 'hasToken:', !!accessToken)
     if (!conn.connected && !conn.ws && accessToken) {
+      console.log('[ws-pool] Attempting connection to sim:', simulationId)
       wsConnect(simulationId, accessToken)
     } else {
       onChange() // sync existing state

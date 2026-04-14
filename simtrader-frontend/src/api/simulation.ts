@@ -47,7 +47,7 @@ export const simulationApi = {
     return data
   },
 
-  update: async (id: string, input: UpdateSimulationInput) => {
+  update: async (id: string, input: { name?: string; description?: string }) => {
     const { data } = await client.put<Simulation>(`/admin/simulations/${id}`, input)
     return data
   },
@@ -71,11 +71,6 @@ export const simulationApi = {
     return data
   },
 
-  stop: async (id: string) => {
-    const { data } = await client.post<Simulation>(`/admin/simulations/${id}/stop`)
-    return data
-  },
-
   complete: async (id: string) => {
     const { data } = await client.post<Simulation>(`/admin/simulations/${id}/complete`)
     return data
@@ -94,7 +89,16 @@ export const simulationApi = {
   uploadCSV: async (id: string, file: File) => {
     const formData = new FormData()
     formData.append('file', file)
-    const { data } = await client.post<Simulation>(`/simulations/${id}/upload`, formData, {
+    const { data } = await client.post<{ message: string; rowsLoaded: number }>(`/admin/simulations/${id}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return data
+  },
+
+  reuploadCSV: async (id: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const { data } = await client.put<{ message: string; rowsLoaded: number }>(`/admin/simulations/${id}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     return data

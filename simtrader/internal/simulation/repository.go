@@ -111,6 +111,44 @@ func (r *Repository) UpdateStatus(ctx context.Context, id uuid.UUID, status Stat
 	return nil
 }
 
+// UpdateName changes the simulation name.
+func (r *Repository) UpdateName(ctx context.Context, id uuid.UUID, name string) error {
+	query := `UPDATE simulations SET name = $2, updated_at = NOW() WHERE id = $1`
+	result, err := r.db.Exec(ctx, query, id, name)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+// UpdateDescription changes the simulation description.
+func (r *Repository) UpdateDescription(ctx context.Context, id uuid.UUID, description string) error {
+	query := `UPDATE simulations SET description = $2, updated_at = NOW() WHERE id = $1`
+	result, err := r.db.Exec(ctx, query, id, description)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+// Delete permanently removes a simulation and all cascading data.
+func (r *Repository) Delete(ctx context.Context, id uuid.UUID) error {
+	result, err := r.db.Exec(ctx, `DELETE FROM simulations WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
 // UpdateCurrentSimTime atomically updates the clock position.
 // Called by the clock goroutine after each tick is broadcast.
 func (r *Repository) UpdateCurrentSimTime(ctx context.Context, id uuid.UUID, simTime time.Time) error {

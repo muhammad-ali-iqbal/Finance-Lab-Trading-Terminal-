@@ -33,7 +33,7 @@ export const orderApi = {
   },
 
   cancel: async (simulationId: string, orderId: string) => {
-    const { data } = await client.post<Order>(`/simulations/${simulationId}/orders/${orderId}/cancel`)
+    const { data } = await client.delete<Order>(`/simulations/${simulationId}/orders/${orderId}`)
     return data
   },
 
