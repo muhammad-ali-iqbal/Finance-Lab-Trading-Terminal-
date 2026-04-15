@@ -101,8 +101,8 @@ export default function OrderEntryPage() {
   return (
     <div className="p-6 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-ink tracking-tight">Order Entry</h1>
-        <p className="text-sm text-ink-secondary mt-0.5">
+        <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Order Entry</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">
           Submit buy and sell orders against the live simulation
         </p>
       </div>
@@ -114,8 +114,8 @@ export default function OrderEntryPage() {
           <div className={clsx(
             'flex items-center gap-2 px-3 py-2 rounded border text-xs font-medium',
             connected
-              ? 'border-success/30 bg-success-muted text-success-text'
-              : 'border-warning/30 bg-warning-muted text-warning-text'
+              ? 'border-success/30 bg-success-muted text-success-text dark:border-dark-success/30 dark:bg-dark-success-muted dark:text-dark-success-text'
+              : 'border-warning/30 bg-warning-muted text-warning-text dark:border-dark-warning/30 dark:bg-dark-warning-muted dark:text-dark-warning-text'
           )}>
             <span className={clsx('w-1.5 h-1.5 rounded-full', connected ? 'bg-success animate-pulse_dot' : 'bg-warning')} />
             {connected ? 'Connected to simulation' : 'Connecting to simulation…'}
@@ -124,7 +124,7 @@ export default function OrderEntryPage() {
           <Card>
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Buy / Sell toggle */}
-              <div className="grid grid-cols-2 gap-1 p-1 bg-surface-secondary rounded-md">
+              <div className="grid grid-cols-2 gap-1 p-1 bg-surface-secondary dark:bg-dark-surface-secondary rounded-md">
                 {(['buy', 'sell'] as OrderSide[]).map(s => (
                   <button
                     key={s}
@@ -136,7 +136,7 @@ export default function OrderEntryPage() {
                         ? s === 'buy'
                           ? 'bg-success text-white shadow-sm'
                           : 'bg-danger text-white shadow-sm'
-                        : 'text-ink-secondary hover:text-ink'
+                        : 'text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink'
                     )}
                   >
                     {s}
@@ -146,10 +146,10 @@ export default function OrderEntryPage() {
 
               {/* Symbol */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-ink-secondary">Symbol</label>
+                <label className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Symbol</label>
                 <div className="grid grid-cols-3 gap-1.5 flex-wrap">
                   {symbols.length === 0 && (
-                    <p className="col-span-3 text-xs text-ink-tertiary py-1">
+                    <p className="col-span-3 text-xs text-ink-tertiary dark:text-dark-ink-tertiary py-1">
                       Waiting for simulation data…
                     </p>
                   )}
@@ -161,8 +161,8 @@ export default function OrderEntryPage() {
                       className={clsx(
                         'px-2 py-1.5 rounded border text-xs font-mono font-semibold transition-all',
                         symbol === s
-                          ? 'border-accent bg-accent-muted text-accent'
-                          : 'border-border text-ink-secondary hover:border-border-strong hover:text-ink'
+                          ? 'border-accent bg-accent-muted text-accent dark:border-dark-accent dark:bg-dark-accent-muted dark:text-dark-accent'
+                          : 'border-border dark:border-dark-border text-ink-secondary dark:text-dark-ink-secondary hover:border-border-strong dark:hover:border-dark-border-strong hover:text-ink dark:hover:text-dark-ink'
                       )}
                     >
                       {s}
@@ -170,15 +170,15 @@ export default function OrderEntryPage() {
                   ))}
                 </div>
                 {symbol && currentPrice !== undefined && (
-                  <p className="text-xs text-ink-tertiary">
-                    Last price: <span className="font-mono font-medium text-ink">${fmt(currentPrice)}</span>
+                  <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
+                    Last price: <span className="font-mono font-medium text-ink dark:text-dark-ink">${fmt(currentPrice)}</span>
                   </p>
                 )}
               </div>
 
               {/* Order type */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-ink-secondary">Order type</label>
+                <label className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Order type</label>
                 <div className="space-y-1">
                   {ORDER_TYPES.map(ot => (
                     <button
@@ -188,19 +188,19 @@ export default function OrderEntryPage() {
                       className={clsx(
                         'w-full flex items-start gap-3 p-2.5 rounded border text-left transition-all',
                         orderType === ot.value
-                          ? 'border-accent bg-accent-muted'
-                          : 'border-border hover:border-border-strong'
+                          ? 'border-accent bg-accent-muted dark:border-dark-accent dark:bg-dark-accent-muted'
+                          : 'border-border dark:border-dark-border hover:border-border-strong dark:hover:border-dark-border-strong'
                       )}
                     >
                       <div className={clsx(
                         'w-3.5 h-3.5 rounded-full border-2 mt-0.5 flex-shrink-0 transition-colors',
-                        orderType === ot.value ? 'border-accent bg-accent' : 'border-border'
+                        orderType === ot.value ? 'border-accent bg-accent' : 'border-border dark:border-dark-border'
                       )} />
                       <div>
-                        <p className={clsx('text-xs font-semibold', orderType === ot.value ? 'text-accent' : 'text-ink')}>
+                        <p className={clsx('text-xs font-semibold', orderType === ot.value ? 'text-accent dark:text-dark-accent' : 'text-ink dark:text-dark-ink')}>
                           {ot.label}
                         </p>
-                        <p className="text-[11px] text-ink-tertiary mt-0.5">{ot.description}</p>
+                        <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5">{ot.description}</p>
                       </div>
                     </button>
                   ))}
@@ -249,21 +249,21 @@ export default function OrderEntryPage() {
 
               {/* Estimated value + buying power */}
               {qty > 0 && (orderType === 'market' ? currentPrice : lp > 0) && (
-                <div className="rounded border border-border bg-surface-secondary p-3 space-y-1.5">
+                <div className="rounded border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary p-3 space-y-1.5">
                   <div className="flex justify-between text-xs">
-                    <span className="text-ink-tertiary">Estimated {side === 'buy' ? 'cost' : 'proceeds'}</span>
-                    <span className="font-mono font-medium text-ink">${fmt(estimatedValue)}</span>
+                    <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Estimated {side === 'buy' ? 'cost' : 'proceeds'}</span>
+                    <span className="font-mono font-medium text-ink dark:text-dark-ink">${fmt(estimatedValue)}</span>
                   </div>
                   {side === 'buy' && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-ink-tertiary">Available cash</span>
-                      <span className={clsx('font-mono font-medium', canAfford ? 'text-ink' : 'text-danger')}>
+                      <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Available cash</span>
+                      <span className={clsx('font-mono font-medium', canAfford ? 'text-ink dark:text-dark-ink' : 'text-danger dark:text-dark-danger')}>
                         ${fmt(portfolio?.cashBalance ?? 0)}
                       </span>
                     </div>
                   )}
                   {!canAfford && (
-                    <p className="text-[11px] text-danger font-medium">Insufficient cash for this order</p>
+                    <p className="text-[11px] text-danger dark:text-dark-danger font-medium">Insufficient cash for this order</p>
                   )}
                 </div>
               )}
@@ -295,10 +295,10 @@ export default function OrderEntryPage() {
 
         {/* Recent orders */}
         <Card padding="none">
-          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-ink">Recent orders</h2>
+          <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Recent orders</h2>
             {recentOrders && (
-              <span className="text-xs text-ink-tertiary">{recentOrders.orders.length} orders</span>
+              <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">{recentOrders.orders.length} orders</span>
             )}
           </div>
 
@@ -311,18 +311,18 @@ export default function OrderEntryPage() {
               description="Your submitted orders will appear here."
             />
           ) : (
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border dark:divide-dark-border">
               {recentOrders.orders.slice(0, 20).map(order => (
-                <div key={order.id} className="px-4 py-3 flex items-center gap-4 hover:bg-surface-secondary transition-colors">
+                <div key={order.id} className="px-4 py-3 flex items-center gap-4 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-sm text-ink">{order.symbol}</span>
+                      <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{order.symbol}</span>
                       <Badge variant={order.side === 'buy' ? 'success' : 'danger'}>
                         {order.side.toUpperCase()}
                       </Badge>
                       <Badge variant="neutral">{order.type}</Badge>
                     </div>
-                    <p className="text-xs text-ink-tertiary mt-0.5 font-mono">
+                    <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5 font-mono">
                       {order.quantity.toLocaleString()} shares
                       {order.limitPrice != null && ` @ $${fmt(order.limitPrice)}`}
                     </p>
@@ -331,7 +331,7 @@ export default function OrderEntryPage() {
                   <div className="text-right flex-shrink-0">
                     <OrderStatusBadge status={order.status} />
                     {order.averageFillPrice && (
-                      <p className="text-[11px] text-ink-tertiary font-mono mt-0.5">
+                      <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary font-mono mt-0.5">
                         filled @ ${fmt(order.averageFillPrice)}
                       </p>
                     )}

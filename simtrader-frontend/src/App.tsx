@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ThemeProvider } from '@/context/ThemeContext'
 
 // Auth pages
 import LoginPage from '@/pages/auth/LoginPage'
@@ -47,7 +48,8 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
         <Routes>
           {/* ── Public auth routes ──────────────────────────────────── */}
           <Route path="/login"           element={<LoginPage />} />
@@ -94,6 +96,7 @@ export default function App() {
       </BrowserRouter>
 
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

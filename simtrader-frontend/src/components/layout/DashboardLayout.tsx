@@ -5,6 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
 import { authApi, simulationApi } from '@/api'
 import { SimulationTimer } from '@/components/simulation/SimulationTimer'
+import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
@@ -22,24 +23,24 @@ function SimulationSidebarWidget() {
 
   if (!sim) {
     return (
-      <div className="px-3 py-2 border-b border-border">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-secondary">
-          <span className="w-1.5 h-1.5 rounded-full bg-ink-disabled flex-shrink-0" />
-          <span className="text-xs text-ink-tertiary truncate">No active simulation</span>
+      <div className="px-3 py-2 border-b border-border dark:border-dark-border">
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-secondary dark:bg-dark-surface-secondary">
+          <span className="w-1.5 h-1.5 rounded-full bg-ink-disabled dark:bg-dark-ink-disabled flex-shrink-0" />
+          <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary truncate">No active simulation</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="px-3 py-2 border-b border-border space-y-1.5">
+    <div className="px-3 py-2 border-b border-border dark:border-dark-border space-y-1.5">
       <div className="flex items-center gap-1.5 px-1">
         <span className={clsx(
           'w-1.5 h-1.5 rounded-full flex-shrink-0',
           sim.status === 'active' ? 'bg-success animate-pulse_dot' :
-          sim.status === 'paused' ? 'bg-warning' : 'bg-ink-disabled'
+          sim.status === 'paused' ? 'bg-warning' : 'bg-ink-disabled dark:bg-dark-ink-disabled'
         )} />
-        <span className="text-xs text-ink-secondary font-medium truncate">{sim.name}</span>
+        <span className="text-xs text-ink-secondary dark:text-dark-ink-secondary font-medium truncate">{sim.name}</span>
       </div>
       <SimulationTimer simulationId={sim.id} compact />
     </div>
@@ -71,19 +72,19 @@ export default function DashboardLayout() {
   })
 
   return (
-    <div className="flex h-screen bg-surface overflow-hidden">
+    <div className="flex h-screen bg-surface dark:bg-dark-surface overflow-hidden">
       {/* Sidebar */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-50 w-56 bg-surface border-r border-border flex flex-col transition-transform duration-200',
+        'fixed inset-y-0 left-0 z-50 w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col transition-transform duration-200',
         'lg:static lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full',
       )}>
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border flex-shrink-0">
-          <div className="w-6 h-6 bg-ink rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-3.5 h-3.5 text-surface" strokeWidth={2.5} />
+        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border flex-shrink-0">
+          <div className="w-6 h-6 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
+            <TrendingUp className="w-3.5 h-3.5 text-surface dark:text-dark-surface" strokeWidth={2.5} />
           </div>
-          <span className="font-semibold text-sm tracking-tight">SimTrader</span>
+          <span className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
         </div>
 
         {/* Live simulation timer */}
@@ -100,11 +101,11 @@ export default function DashboardLayout() {
               className={({ isActive }) => clsx(
                 'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group',
                 isActive
-                  ? 'bg-ink text-surface'
-                  : 'text-ink-secondary hover:bg-surface-secondary hover:text-ink',
+                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink',
               )}
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
+              <Icon className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
               <span className="flex-1">{label}</span>
               <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
             </NavLink>
@@ -112,21 +113,26 @@ export default function DashboardLayout() {
         </nav>
 
         {/* User footer */}
-        <div className="border-t border-border p-3">
-          <div className="flex items-center gap-2.5 mb-2 px-1">
-            <div className="w-7 h-7 rounded-full bg-ink flex items-center justify-center flex-shrink-0">
-              <span className="text-[10px] font-semibold text-surface">
+        <div className="border-t border-border dark:border-dark-border p-3 space-y-2">
+          {/* Theme toggle */}
+          <div className="flex items-center justify-center py-1">
+            <ThemeToggle />
+          </div>
+
+          <div className="flex items-center gap-2.5 px-1">
+            <div className="w-7 h-7 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-semibold text-surface dark:text-dark-surface">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-ink truncate">{user?.firstName} {user?.lastName}</p>
-              <p className="text-[10px] text-ink-tertiary truncate">{user?.email}</p>
+              <p className="text-xs font-medium text-ink dark:text-dark-ink truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary truncate">{user?.email}</p>
             </div>
           </div>
           <button
             onClick={() => logoutMutation.mutate()}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded text-xs text-ink-secondary hover:bg-surface-secondary hover:text-danger transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 rounded text-xs text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-danger dark:hover:text-dark-danger transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sign out
@@ -137,7 +143,7 @@ export default function DashboardLayout() {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-ink/20 lg:hidden"
+          className="fixed inset-0 z-40 bg-ink/20 dark:bg-dark-ink/20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -145,15 +151,15 @@ export default function DashboardLayout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar — mobile only */}
-        <header className="lg:hidden flex items-center gap-3 px-4 h-14 border-b border-border bg-surface flex-shrink-0">
-          <button onClick={() => setSidebarOpen(true)} className="p-1 text-ink-secondary hover:text-ink">
+        <header className="lg:hidden flex items-center gap-3 px-4 h-14 border-b border-border dark:border-dark-border bg-surface dark:bg-dark-surface flex-shrink-0">
+          <button onClick={() => setSidebarOpen(true)} className="p-1 text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink">
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-ink rounded-sm flex items-center justify-center">
-              <TrendingUp className="w-3 h-3 text-surface" strokeWidth={2.5} />
+            <div className="w-5 h-5 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
+              <TrendingUp className="w-3 h-3 text-surface dark:text-dark-surface" strokeWidth={2.5} />
             </div>
-            <span className="font-semibold text-sm">SimTrader</span>
+            <span className="font-semibold text-sm text-ink dark:text-dark-ink">SimTrader</span>
           </div>
         </header>
 

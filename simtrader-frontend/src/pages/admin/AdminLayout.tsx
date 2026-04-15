@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
 import { authApi } from '@/api'
+import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, Users, PlayCircle,
@@ -28,16 +29,16 @@ export default function AdminLayout() {
   })
 
   return (
-    <div className="flex h-screen bg-surface overflow-hidden">
+    <div className="flex h-screen bg-surface dark:bg-dark-surface overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-56 bg-surface border-r border-border flex flex-col flex-shrink-0">
+      <aside className="w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col flex-shrink-0">
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border">
-          <div className="w-6 h-6 bg-ink rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-3.5 h-3.5 text-surface" strokeWidth={2.5} />
+        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border">
+          <div className="w-6 h-6 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
+            <TrendingUp className="w-3.5 h-3.5 text-surface dark:text-dark-surface" strokeWidth={2.5} />
           </div>
-          <span className="font-semibold text-sm tracking-tight">SimTrader</span>
-          <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded bg-ink text-surface">
+          <span className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
+          <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded bg-ink dark:bg-dark-ink text-surface dark:text-dark-surface">
             Admin
           </span>
         </div>
@@ -52,8 +53,8 @@ export default function AdminLayout() {
               className={({ isActive }) => clsx(
                 'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group',
                 isActive
-                  ? 'bg-ink text-surface'
-                  : 'text-ink-secondary hover:bg-surface-secondary hover:text-ink',
+                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink',
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
@@ -64,21 +65,26 @@ export default function AdminLayout() {
         </nav>
 
         {/* User footer */}
-        <div className="border-t border-border p-3">
-          <div className="flex items-center gap-2.5 mb-2 px-1">
-            <div className="w-7 h-7 rounded-full bg-ink flex items-center justify-center flex-shrink-0">
-              <span className="text-[10px] font-semibold text-surface">
+        <div className="border-t border-border dark:border-dark-border p-3 space-y-2">
+          {/* Theme toggle */}
+          <div className="flex items-center justify-center py-1">
+            <ThemeToggle />
+          </div>
+
+          <div className="flex items-center gap-2.5 px-1">
+            <div className="w-7 h-7 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-semibold text-surface dark:text-dark-surface">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-ink truncate">{user?.firstName} {user?.lastName}</p>
-              <p className="text-[10px] text-ink-tertiary truncate">Administrator</p>
+              <p className="text-xs font-medium text-ink dark:text-dark-ink truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary truncate">Administrator</p>
             </div>
           </div>
           <button
             onClick={() => logoutMutation.mutate()}
-            className="flex items-center gap-2 w-full px-3 py-2 rounded text-xs text-ink-secondary hover:bg-surface-secondary hover:text-danger transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 rounded text-xs text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-danger dark:hover:text-dark-danger transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sign out
@@ -87,7 +93,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-auto bg-surface-secondary">
+      <main className="flex-1 overflow-auto bg-surface-secondary dark:bg-dark-surface-secondary">
         <Outlet />
       </main>
     </div>

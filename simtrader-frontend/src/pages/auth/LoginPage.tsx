@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
-import { Button, Input, Alert } from '@/components/ui'
+import { Button, Input, Alert, ThemeToggle } from '@/components/ui'
 import { Eye, EyeOff, TrendingUp } from 'lucide-react'
 
 export default function LoginPage() {
@@ -30,14 +30,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-secondary flex">
+    <div className="min-h-screen bg-surface-secondary dark:bg-dark-surface-secondary flex">
       {/* Left panel — branding */}
-      <div className="hidden lg:flex w-[480px] flex-shrink-0 bg-ink flex-col justify-between p-12">
+      <div className="hidden lg:flex w-[480px] flex-shrink-0 bg-ink dark:bg-dark-ink flex-col justify-between p-12">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-surface rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-ink" strokeWidth={2.5} />
+          <div className="w-7 h-7 bg-surface dark:bg-dark-surface rounded-sm flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-ink dark:text-dark-ink" strokeWidth={2.5} />
           </div>
-          <span className="text-surface font-semibold tracking-tight">SimTrader</span>
+          <span className="text-surface dark:text-dark-surface font-semibold tracking-tight">SimTrader</span>
         </div>
 
         <div className="space-y-6">
@@ -55,19 +55,24 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-6 relative">
+        {/* Theme toggle — top right */}
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+
         <div className="w-full max-w-sm animate-fade-up">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2 mb-10">
-            <div className="w-7 h-7 bg-ink rounded-sm flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-surface" strokeWidth={2.5} />
+            <div className="w-7 h-7 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-surface dark:text-dark-surface" strokeWidth={2.5} />
             </div>
-            <span className="font-semibold tracking-tight">SimTrader</span>
+            <span className="font-semibold tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-ink tracking-tight">Sign in</h1>
-            <p className="text-sm text-ink-secondary mt-1">
+            <h1 className="text-2xl font-semibold text-ink dark:text-dark-ink tracking-tight">Sign in</h1>
+            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-1">
               Enter your credentials to access your account
             </p>
           </div>
@@ -109,7 +114,7 @@ export default function LoginPage() {
             />
 
             <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-xs text-accent hover:underline">
+              <Link to="/forgot-password" className="text-xs text-accent dark:text-dark-accent hover:underline">
                 Forgot password?
               </Link>
             </div>

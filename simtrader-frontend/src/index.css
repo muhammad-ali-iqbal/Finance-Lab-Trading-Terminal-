@@ -14,6 +14,7 @@
 
   body {
     @apply bg-surface text-ink font-sans text-sm;
+    @apply dark:bg-dark-surface dark:text-dark-ink;
     min-height: 100dvh;
   }
 
@@ -22,6 +23,8 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { @apply bg-border-strong rounded-full; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-ink-disabled; }
+  .dark ::-webkit-scrollbar-thumb { @apply bg-dark-border-strong; }
+  .dark ::-webkit-scrollbar-thumb:hover { @apply bg-dark-ink-disabled; }
 
   /* Focus ring — institutional blue */
   :focus-visible {
@@ -31,6 +34,7 @@
 
   input, textarea, select {
     @apply text-sm text-ink placeholder:text-ink-disabled;
+    @apply dark:text-dark-ink dark:placeholder:text-dark-ink-disabled;
   }
 }
 
@@ -48,6 +52,17 @@
     animation: shimmer 1.8s infinite linear;
   }
 
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      theme('colors.dark-surface.tertiary') 25%,
+      theme('colors.dark-surface.secondary') 50%,
+      theme('colors.dark-surface.tertiary') 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+
   /* Number formatting — monospace for prices */
   .num {
     @apply font-mono tabular-nums;
@@ -59,7 +74,7 @@
   .price-flat { @apply text-ink-secondary; }
 }
 
-/* AG Grid — institutional theme override */
+/* AG Grid — institutional theme override (light) */
 .ag-theme-simtrader {
   --ag-background-color: #FFFFFF;
   --ag-foreground-color: #0F0F0E;
@@ -91,4 +106,26 @@
 
 .ag-theme-simtrader .ag-row {
   border-bottom: 1px solid #F2F1EF;
+}
+
+/* AG Grid — dark mode override */
+.dark .ag-theme-simtrader {
+  --ag-background-color: #0F0F0E;
+  --ag-foreground-color: #F2F1EF;
+  --ag-border-color: #2C2C29;
+  --ag-row-hover-color: #1A1A18;
+  --ag-selected-row-background-color: #1A5CFF15;
+  --ag-header-background-color: #1A1A18;
+  --ag-header-foreground-color: #A8A8A3;
+  --ag-odd-row-background-color: #0F0F0E;
+  --ag-range-selection-border-color: #4D88FF;
+  --ag-input-focus-border-color: #4D88FF;
+}
+
+.dark .ag-theme-simtrader .ag-header-cell-text {
+  color: #5A5A55;
+}
+
+.dark .ag-theme-simtrader .ag-row {
+  border-bottom: 1px solid #2C2C29;
 }
