@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
 )
 
@@ -260,7 +261,7 @@ type submitOrderRequest struct {
 func (h *Handler) SubmitOrder(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	claims := middleware.GetClaims(c)
@@ -268,33 +269,33 @@ func (h *Handler) SubmitOrder(c *fiber.Ctx) error {
 
 	var req submitOrderRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 
 	// ── Validation ────────────────────────────────────────────────
 	if req.Symbol == "" {
-		return badRequest(c, "symbol is required")
+		return httputil.BadRequest(c, "symbol is required")
 	}
 	if req.Side != "buy" && req.Side != "sell" {
-		return badRequest(c, "side must be 'buy' or 'sell'")
+		return httputil.BadRequest(c, "side must be 'buy' or 'sell'")
 	}
 	if req.Type != "market" && req.Type != "limit" && req.Type != "stop" {
-		return badRequest(c, "type must be 'market', 'limit', or 'stop'")
+		return httputil.BadRequest(c, "type must be 'market', 'limit', or 'stop'")
 	}
 	if req.Quantity <= 0 {
-		return badRequest(c, "quantity must be greater than 0")
+		return httputil.BadRequest(c, "quantity must be greater than 0")
 	}
 	if req.Type == "limit" && req.LimitPrice == nil {
-		return badRequest(c, "limitPrice is required for limit orders")
+		return httputil.BadRequest(c, "limitPrice is required for limit orders")
 	}
 	if req.Type == "stop" && req.StopPrice == nil {
-		return badRequest(c, "stopPrice is required for stop orders")
+		return httputil.BadRequest(c, "stopPrice is required for stop orders")
 	}
 	if req.LimitPrice != nil && *req.LimitPrice <= 0 {
-		return badRequest(c, "limitPrice must be positive")
+		return httputil.BadRequest(c, "limitPrice must be positive")
 	}
 	if req.StopPrice != nil && *req.StopPrice <= 0 {
-		return badRequest(c, "stopPrice must be positive")
+		return httputil.BadRequest(c, "stopPrice must be positive")
 	}
 
 	// ── Check simulation is active ────────────────────────────────
@@ -303,7 +304,7 @@ func (h *Handler) SubmitOrder(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if status != "active" {
-		return badRequest(c, fmt.Sprintf("simulation is %s — orders can only be placed in active simulations", status))
+		return httputil.BadRequest(c, fmt.Sprintf("simulation is %s — orders can only be placed in active simulations", status))
 	}
 
 	// ── Get portfolio ID ──────────────────────────────────────────
@@ -329,7 +330,7 @@ func (h *Handler) SubmitOrder(c *fiber.Ctx) error {
 	}
 
 	if err := h.repo.Insert(c.Context(), order); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Market orders will be picked up by the engine on the next clock tick.
@@ -342,7 +343,7 @@ func (h *Handler) SubmitOrder(c *fiber.Ctx) error {
 func (h *Handler) ListOrders(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	claims := middleware.GetClaims(c)
@@ -350,7 +351,7 @@ func (h *Handler) ListOrders(c *fiber.Ctx) error {
 
 	orders, err := h.repo.List(c.Context(), simID, userID)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	if orders == nil {
@@ -365,7 +366,7 @@ func (h *Handler) ListOrders(c *fiber.Ctx) error {
 func (h *Handler) CancelOrder(c *fiber.Ctx) error {
 	orderID, err := uuid.Parse(c.Params("orderID"))
 	if err != nil {
-		return badRequest(c, "invalid order ID")
+		return httputil.BadRequest(c, "invalid order ID")
 	}
 
 	claims := middleware.GetClaims(c)
@@ -383,28 +384,18 @@ func (h *Handler) CancelOrder(c *fiber.Ctx) error {
 func (h *Handler) GetOrderBook(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	symbol := c.Params("symbol")
 	if symbol == "" {
-		return badRequest(c, "symbol is required")
+		return httputil.BadRequest(c, "symbol is required")
 	}
 
 	book, err := h.repo.GetOrderBook(c.Context(), simID, symbol)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(book)
-}
-
-func badRequest(c *fiber.Ctx, msg string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": msg})
-}
-
-func internalError(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Something went wrong. Please try again.",
-	})
 }

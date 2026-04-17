@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
 	"github.com/simtrader/backend/internal/types"
 )
@@ -61,7 +62,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 func (h *Handler) ListSimulations(c *fiber.Ctx) error {
 	sims, err := h.repo.List(c.Context())
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(fiber.Map{"simulations": sims})
 }
@@ -74,7 +75,7 @@ func (h *Handler) GetActiveSimulation(c *fiber.Ctx) error {
 				"error": "No active simulation. Your instructor hasn't started one yet.",
 			})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(sim)
 }
@@ -82,14 +83,14 @@ func (h *Handler) GetActiveSimulation(c *fiber.Ctx) error {
 func (h *Handler) GetSimulation(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 	sim, err := h.repo.GetByID(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(sim)
 }
@@ -97,11 +98,11 @@ func (h *Handler) GetSimulation(c *fiber.Ctx) error {
 func (h *Handler) GetSymbols(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 	symbols, err := h.repo.GetSymbols(c.Context(), id)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(fiber.Map{"symbols": symbols})
 }
@@ -109,12 +110,12 @@ func (h *Handler) GetSymbols(c *fiber.Ctx) error {
 func (h *Handler) GetTickHistory(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 	symbol := c.Params("symbol")
 	ticks, err := h.repo.GetTicksForSymbol(c.Context(), id, symbol)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(fiber.Map{"ticks": ticks})
 }
@@ -203,10 +204,10 @@ func (h *Handler) CreateSimulation(c *fiber.Ctx) error {
 
 	var req createSimRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.Name == "" {
-		return badRequest(c, "name is required")
+		return httputil.BadRequest(c, "name is required")
 	}
 	if req.SpeedMultiplier <= 0 {
 		req.SpeedMultiplier = 60.0 // default: 1 wall second = 1 sim minute
@@ -225,7 +226,7 @@ func (h *Handler) CreateSimulation(c *fiber.Ctx) error {
 	}
 
 	if err := h.repo.Create(c.Context(), sim); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(sim)
@@ -236,7 +237,7 @@ func (h *Handler) CreateSimulation(c *fiber.Ctx) error {
 func (h *Handler) UploadCSV(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -244,20 +245,20 @@ func (h *Handler) UploadCSV(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if sim.Status != StatusDraft {
-		return badRequest(c, "can only upload CSV to a simulation in draft status")
+		return httputil.BadRequest(c, "can only upload CSV to a simulation in draft status")
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		return badRequest(c, "file is required (field name: 'file')")
+		return httputil.BadRequest(c, "file is required (field name: 'file')")
 	}
 	if file.Size > 50*1024*1024 { // 50MB max
-		return badRequest(c, "file too large (max 50MB)")
+		return httputil.BadRequest(c, "file too large (max 50MB)")
 	}
 
 	f, err := file.Open()
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	defer f.Close()
 
@@ -279,7 +280,7 @@ func (h *Handler) UploadCSV(c *fiber.Ctx) error {
 func (h *Handler) UpdateSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -287,7 +288,7 @@ func (h *Handler) UpdateSimulation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if sim.Status != StatusDraft {
-		return badRequest(c, "can only edit a simulation in draft status")
+		return httputil.BadRequest(c, "can only edit a simulation in draft status")
 	}
 
 	var req struct {
@@ -295,17 +296,17 @@ func (h *Handler) UpdateSimulation(c *fiber.Ctx) error {
 		Description *string `json:"description"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 
 	if req.Name != nil {
 		if err := h.repo.UpdateName(c.Context(), simID, *req.Name); err != nil {
-			return internalError(c)
+			return httputil.InternalError(c)
 		}
 	}
 	if req.Description != nil {
 		if err := h.repo.UpdateDescription(c.Context(), simID, *req.Description); err != nil {
-			return internalError(c)
+			return httputil.InternalError(c)
 		}
 	}
 
@@ -317,7 +318,7 @@ func (h *Handler) UpdateSimulation(c *fiber.Ctx) error {
 func (h *Handler) DeleteSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -325,11 +326,11 @@ func (h *Handler) DeleteSimulation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if sim.Status == StatusActive {
-		return badRequest(c, "cannot delete an active simulation. Pause it first.")
+		return httputil.BadRequest(c, "cannot delete an active simulation. Pause it first.")
 	}
 
 	if err := h.repo.Delete(c.Context(), simID); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(fiber.Map{"message": "Simulation deleted."})
@@ -340,7 +341,7 @@ func (h *Handler) DeleteSimulation(c *fiber.Ctx) error {
 func (h *Handler) ReuploadCSV(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -348,20 +349,20 @@ func (h *Handler) ReuploadCSV(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if sim.Status == StatusActive {
-		return badRequest(c, "cannot replace CSV data while simulation is running. Pause it first.")
+		return httputil.BadRequest(c, "cannot replace CSV data while simulation is running. Pause it first.")
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		return badRequest(c, "file is required (field name: 'file')")
+		return httputil.BadRequest(c, "file is required (field name: 'file')")
 	}
 	if file.Size > 50*1024*1024 { // 50MB max
-		return badRequest(c, "file too large (max 50MB)")
+		return httputil.BadRequest(c, "file too large (max 50MB)")
 	}
 
 	f, err := file.Open()
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	defer f.Close()
 
@@ -381,7 +382,7 @@ func (h *Handler) ReuploadCSV(c *fiber.Ctx) error {
 func (h *Handler) StartSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -389,18 +390,18 @@ func (h *Handler) StartSimulation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 	}
 	if sim.Status != StatusDraft && sim.Status != StatusPaused {
-		return badRequest(c, "simulation must be in draft or paused status to start")
+		return httputil.BadRequest(c, "simulation must be in draft or paused status to start")
 	}
 
 	// Check no other simulation is currently active
 	active, err := h.repo.GetActive(c.Context())
 	if err == nil && active != nil && active.ID != simID {
-		return badRequest(c, "another simulation is already active. Complete or pause it first.")
+		return httputil.BadRequest(c, "another simulation is already active. Complete or pause it first.")
 	}
 
 	// Mark active in DB
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusActive); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Create and start the clock
@@ -422,7 +423,7 @@ func (h *Handler) StartSimulation(c *fiber.Ctx) error {
 func (h *Handler) PauseSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	if clock, ok := Registry.Get(simID); ok {
@@ -431,7 +432,7 @@ func (h *Handler) PauseSimulation(c *fiber.Ctx) error {
 	}
 
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusPaused); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(fiber.Map{"message": "Simulation paused."})
@@ -445,7 +446,7 @@ func (h *Handler) ResumeSimulation(c *fiber.Ctx) error {
 func (h *Handler) CompleteSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	if clock, ok := Registry.Get(simID); ok {
@@ -454,7 +455,7 @@ func (h *Handler) CompleteSimulation(c *fiber.Ctx) error {
 	}
 
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusCompleted); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(fiber.Map{"message": "Simulation marked as completed."})
@@ -467,7 +468,7 @@ func (h *Handler) CompleteSimulation(c *fiber.Ctx) error {
 func (h *Handler) GetProgress(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	sim, err := h.repo.GetByID(c.Context(), simID)
@@ -475,7 +476,7 @@ func (h *Handler) GetProgress(c *fiber.Ctx) error {
 		if errors.Is(err, ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Simulation not found."})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	firstTime, err := h.repo.GetFirstSimTime(c.Context(), simID)
@@ -539,7 +540,7 @@ func (h *Handler) GetProgress(c *fiber.Ctx) error {
 func (h *Handler) RestartSimulation(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	// Stop the current clock if running
@@ -550,23 +551,23 @@ func (h *Handler) RestartSimulation(c *fiber.Ctx) error {
 
 	// Reset current_sim_time to NULL so the clock starts from the beginning
 	if err := h.repo.ResetSimTime(c.Context(), simID); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Set status back to draft so StartSimulation can proceed
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusDraft); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Immediately start again
 	sim, err := h.repo.GetByID(c.Context(), simID)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	_ = sim
 
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusActive); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	clock := NewClock(simID, h.repo, h.orderEngine)
@@ -600,13 +601,3 @@ func (h *Handler) ensurePortfolio(ctx context.Context, simID, userID uuid.UUID, 
 
 // json helper (used for WebSocket messages internally)
 var _ = json.Marshal
-
-func badRequest(c *fiber.Ctx, msg string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": msg})
-}
-
-func internalError(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Something went wrong. Please try again.",
-	})
-}

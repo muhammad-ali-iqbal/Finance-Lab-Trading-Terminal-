@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
 )
 
@@ -73,7 +74,7 @@ func (h *Handler) GetMyProfile(c *fiber.Ctx) error {
 	claims := middleware.GetClaims(c)
 	uid, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	u, err := h.repo.GetByID(c.Context(), uid)
@@ -81,7 +82,7 @@ func (h *Handler) GetMyProfile(c *fiber.Ctx) error {
 		if errors.Is(err, ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found."})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(u.ToPublicProfile())
@@ -96,22 +97,22 @@ func (h *Handler) UpdateMyProfile(c *fiber.Ctx) error {
 
 	var req updateProfileRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.FirstName == "" || req.LastName == "" {
-		return badRequest(c, "first name and last name are required")
+		return httputil.BadRequest(c, "first name and last name are required")
 	}
 
 	// We do a targeted UPDATE rather than a full model save.
 	// This prevents accidental overwrites of fields we didn't intend to change.
 	query := `UPDATE users SET first_name=$2, last_name=$3, updated_at=NOW() WHERE id=$1`
 	if _, err := h.repo.db.Exec(c.Context(), query, uid, req.FirstName, req.LastName); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	u, err := h.repo.GetByID(c.Context(), uid)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 	return c.JSON(u.ToPublicProfile())
 }
@@ -125,15 +126,15 @@ func (h *Handler) ChangeMyPassword(c *fiber.Ctx) error {
 
 	var req changePasswordRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.CurrentPassword == "" || len(req.NewPassword) < 8 {
-		return badRequest(c, "current password required; new password must be 8+ characters")
+		return httputil.BadRequest(c, "current password required; new password must be 8+ characters")
 	}
 
 	u, err := h.repo.GetByID(c.Context(), uid)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Verify current password via the interface (auth.Service satisfies this).
@@ -145,7 +146,7 @@ func (h *Handler) ChangeMyPassword(c *fiber.Ctx) error {
 
 	// Direct update for authenticated password change (not reset flow)
 	if err := h.repo.ResetPassword(c.Context(), uid, req.NewPassword); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// Revoke all other sessions — forces re-login on other devices.
@@ -166,7 +167,7 @@ func (h *Handler) ListUsers(c *fiber.Ctx) error {
 
 	users, err := h.repo.List(c.Context(), role)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	profiles := make([]PublicProfile, 0, len(users))
@@ -183,10 +184,10 @@ func (h *Handler) ListUsers(c *fiber.Ctx) error {
 func (h *Handler) InviteStudent(c *fiber.Ctx) error {
 	var req inviteRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.Email == "" {
-		return badRequest(c, "email is required")
+		return httputil.BadRequest(c, "email is required")
 	}
 
 	u, err := h.verifier.InviteStudent(c.Context(), req.Email)
@@ -215,7 +216,7 @@ func (h *Handler) InviteStudent(c *fiber.Ctx) error {
 func (h *Handler) GetUser(c *fiber.Ctx) error {
 	uid, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid user ID")
+		return httputil.BadRequest(c, "invalid user ID")
 	}
 
 	u, err := h.repo.GetByID(c.Context(), uid)
@@ -223,7 +224,7 @@ func (h *Handler) GetUser(c *fiber.Ctx) error {
 		if errors.Is(err, ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found."})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(u.ToPublicProfile())
@@ -245,20 +246,20 @@ func (h *Handler) UnblockUser(c *fiber.Ctx) error {
 func (h *Handler) setUserStatus(c *fiber.Ctx, status Status) error {
 	uid, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid user ID")
+		return httputil.BadRequest(c, "invalid user ID")
 	}
 
 	// Prevent admin from blocking themselves.
 	claims := middleware.GetClaims(c)
 	if claims.UserID == uid.String() {
-		return badRequest(c, "you cannot change your own account status")
+		return httputil.BadRequest(c, "you cannot change your own account status")
 	}
 
 	if err := h.repo.SetStatus(c.Context(), uid, status); err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found."})
 		}
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	// If blocking, immediately revoke all sessions so the student can't
@@ -273,14 +274,3 @@ func (h *Handler) setUserStatus(c *fiber.Ctx, status Status) error {
 	})
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-func badRequest(c *fiber.Ctx, msg string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": msg})
-}
-
-func internalError(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Something went wrong. Please try again.",
-	})
-}

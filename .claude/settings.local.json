@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(sed -n '250,260p' simtrader/internal/auth/handler.go)",
+      "Bash(sed -n '402,415p' simtrader/internal/order/handler.go)",
+      "Bash(sed -n '604,615p' simtrader/internal/simulation/handler.go)",
+      "Bash(sed -n '278,290p' simtrader/internal/user/handler.go)",
+      "Bash(sed -n '217,230p' simtrader/internal/portfolio/portfolio.go)"
+    ]
+  }
+}

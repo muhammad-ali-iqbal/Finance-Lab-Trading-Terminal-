@@ -40,9 +40,9 @@ export default function PortfolioPage() {
     <div className="p-6 space-y-6 max-w-6xl">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-ink tracking-tight">Portfolio</h1>
-        <p className="text-sm text-ink-secondary mt-0.5">
-          Simulation: <span className="text-ink font-medium">{simulation?.name ?? '—'}</span>
+        <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Portfolio</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">
+          Simulation: <span className="text-ink dark:text-dark-ink font-medium">{simulation?.name ?? '—'}</span>
         </p>
       </div>
 
@@ -73,9 +73,9 @@ export default function PortfolioPage() {
 
       {/* Positions table */}
       <Card padding="none">
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink">Positions</h2>
-          <span className="text-xs text-ink-tertiary">{portfolio.positions?.length ?? 0} holdings</span>
+        <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Positions</h2>
+          <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">{portfolio.positions?.length ?? 0} holdings</span>
         </div>
 
         {!portfolio.positions?.length ? (
@@ -88,26 +88,26 @@ export default function PortfolioPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-surface-secondary">
+                <tr className="border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
                   {['Symbol', 'Qty', 'Avg Cost', 'Current', 'Market Value', 'P&L', 'P&L %'].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-ink-tertiary whitespace-nowrap">
+                    <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary whitespace-nowrap">
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border dark:divide-dark-border">
                 {portfolio.positions.map(pos => {
                   const up = pos.unrealizedPnL >= 0
                   return (
-                    <tr key={pos.symbol} className="hover:bg-surface-secondary transition-colors">
+                    <tr key={pos.symbol} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
                       <td className="px-4 py-3">
-                        <span className="font-semibold text-ink font-mono">{pos.symbol}</span>
+                        <span className="font-semibold text-ink dark:text-dark-ink font-mono">{pos.symbol}</span>
                       </td>
-                      <td className="px-4 py-3 font-mono text-ink">{pos.quantity.toLocaleString()}</td>
-                      <td className="px-4 py-3 font-mono text-ink">{fmtCurrency(pos.averageCost)}</td>
-                      <td className="px-4 py-3 font-mono text-ink">{fmtCurrency(pos.currentPrice)}</td>
-                      <td className="px-4 py-3 font-mono text-ink">{fmtCurrency(pos.marketValue)}</td>
+                      <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{pos.quantity.toLocaleString()}</td>
+                      <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{fmtCurrency(pos.averageCost)}</td>
+                      <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{fmtCurrency(pos.currentPrice)}</td>
+                      <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{fmtCurrency(pos.marketValue)}</td>
                       <td className={clsx('px-4 py-3 font-mono font-medium', up ? 'text-success' : 'text-danger')}>
                         {up ? '+' : ''}{fmtCurrency(pos.unrealizedPnL)}
                       </td>
@@ -122,9 +122,9 @@ export default function PortfolioPage() {
                 })}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-border bg-surface-secondary">
-                  <td colSpan={4} className="px-4 py-3 text-xs font-medium text-ink-secondary">Total</td>
-                  <td className="px-4 py-3 font-mono font-semibold text-ink">
+                <tr className="border-t-2 border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+                  <td colSpan={4} className="px-4 py-3 text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Total</td>
+                  <td className="px-4 py-3 font-mono font-semibold text-ink dark:text-dark-ink">
                     {fmtCurrency(portfolio.totalMarketValue)}
                   </td>
                   <td className={clsx('px-4 py-3 font-mono font-semibold', pnlPositive ? 'text-success' : 'text-danger')}>

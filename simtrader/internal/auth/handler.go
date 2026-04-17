@@ -11,6 +11,7 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/user"
 )
 
@@ -80,10 +81,10 @@ type authResponse struct {
 func (h *Handler) Login(c *fiber.Ctx) error {
 	var req loginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.Email == "" || req.Password == "" {
-		return badRequest(c, "email and password are required")
+		return httputil.BadRequest(c, "email and password are required")
 	}
 
 	tokens, u, err := h.service.Login(c.Context(), req.Email, req.Password)
@@ -105,17 +106,17 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 func (h *Handler) CompleteRegistration(c *fiber.Ctx) error {
 	var req registerRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 
 	if req.InviteToken == "" {
-		return badRequest(c, "invite token is required")
+		return httputil.BadRequest(c, "invite token is required")
 	}
 	if req.FirstName == "" || req.LastName == "" {
-		return badRequest(c, "first name and last name are required")
+		return httputil.BadRequest(c, "first name and last name are required")
 	}
 	if len(req.Password) < 8 {
-		return badRequest(c, "password must be at least 8 characters")
+		return httputil.BadRequest(c, "password must be at least 8 characters")
 	}
 
 	tokens, u, err := h.service.CompleteRegistration(
@@ -139,10 +140,10 @@ func (h *Handler) CompleteRegistration(c *fiber.Ctx) error {
 func (h *Handler) RefreshTokens(c *fiber.Ctx) error {
 	var req refreshRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.RefreshToken == "" {
-		return badRequest(c, "refresh token is required")
+		return httputil.BadRequest(c, "refresh token is required")
 	}
 
 	tokens, u, err := h.service.RefreshTokens(c.Context(), req.RefreshToken)
@@ -163,7 +164,7 @@ func (h *Handler) RefreshTokens(c *fiber.Ctx) error {
 func (h *Handler) Logout(c *fiber.Ctx) error {
 	var req logoutRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 
 	// Best-effort logout — even if token not found, return success.
@@ -179,10 +180,10 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 func (h *Handler) ForgotPassword(c *fiber.Ctx) error {
 	var req forgotPasswordRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.Email == "" {
-		return badRequest(c, "email is required")
+		return httputil.BadRequest(c, "email is required")
 	}
 
 	// Service always returns nil to prevent email enumeration.
@@ -199,13 +200,13 @@ func (h *Handler) ForgotPassword(c *fiber.Ctx) error {
 func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	var req resetPasswordRequest
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return httputil.BadRequest(c, "invalid request body")
 	}
 	if req.Token == "" {
-		return badRequest(c, "reset token is required")
+		return httputil.BadRequest(c, "reset token is required")
 	}
 	if len(req.NewPassword) < 8 {
-		return badRequest(c, "password must be at least 8 characters")
+		return httputil.BadRequest(c, "password must be at least 8 characters")
 	}
 
 	if err := h.service.ResetPassword(c.Context(), req.Token, req.NewPassword); err != nil {
@@ -248,8 +249,4 @@ func mapAuthError(c *fiber.Ctx, err error) error {
 			"error": "Something went wrong. Please try again.",
 		})
 	}
-}
-
-func badRequest(c *fiber.Ctx, message string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": message})
 }

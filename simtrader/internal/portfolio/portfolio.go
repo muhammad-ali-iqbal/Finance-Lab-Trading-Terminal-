@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
 )
 
@@ -189,7 +190,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW fiber.Handler) {
 func (h *Handler) GetPortfolio(c *fiber.Ctx) error {
 	simID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return badRequest(c, "invalid simulation ID")
+		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
 	claims := middleware.GetClaims(c)
@@ -203,23 +204,13 @@ func (h *Handler) GetPortfolio(c *fiber.Ctx) error {
 
 	// Auto-create portfolio on first visit (idempotent)
 	if err := h.repo.EnsureExists(c.Context(), simID, userID, startingCash); err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	portfolio, err := h.repo.Get(c.Context(), simID, userID)
 	if err != nil {
-		return internalError(c)
+		return httputil.InternalError(c)
 	}
 
 	return c.JSON(portfolio)
-}
-
-func badRequest(c *fiber.Ctx, msg string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": msg})
-}
-
-func internalError(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Something went wrong. Please try again.",
-	})
 }
