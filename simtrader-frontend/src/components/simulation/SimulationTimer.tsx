@@ -39,10 +39,10 @@ function formatSimTime(isoString: string | null): string {
 
 function statusColor(status: SimulationStatus) {
   switch (status) {
-    case 'active':    return 'bg-success'
-    case 'paused':    return 'bg-warning'
-    case 'completed': return 'bg-ink-disabled'
-    default:          return 'bg-ink-disabled'
+    case 'active':    return 'bg-success dark:bg-dark-success'
+    case 'paused':    return 'bg-warning dark:bg-dark-warning'
+    case 'completed': return 'bg-ink-disabled dark:bg-dark-ink-disabled'
+    default:          return 'bg-ink-disabled dark:bg-dark-ink-disabled'
   }
 }
 
@@ -67,8 +67,8 @@ export function SimulationTimer({
   if (!progress || !progress.hasData) {
     if (compact) return null
     return (
-      <div className="rounded-lg border border-border bg-surface-secondary px-4 py-3">
-        <p className="text-xs text-ink-tertiary">No price data uploaded yet</p>
+      <div className="rounded-lg border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary px-4 py-3">
+        <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">No price data uploaded yet</p>
       </div>
     )
   }
@@ -86,20 +86,20 @@ export function SimulationTimer({
         <div className="flex items-center gap-2">
           <span className={clsx(
             'w-1.5 h-1.5 rounded-full flex-shrink-0',
-            isActive ? 'animate-pulse_dot bg-success' : isPaused ? 'bg-warning' : 'bg-ink-disabled'
+            isActive ? 'animate-pulse_dot bg-success dark:bg-dark-success' : isPaused ? 'bg-warning dark:bg-dark-warning' : 'bg-ink-disabled dark:bg-dark-ink-disabled'
           )} />
-          <div className="flex-1 h-1.5 bg-surface-tertiary rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-surface-tertiary dark:bg-dark-surface-tertiary rounded-full overflow-hidden">
             <div
               className={clsx('h-full rounded-full transition-all duration-700', statusColor(progress.status))}
               style={{ width: `${pct}%` }}
             />
           </div>
-          <span className="text-[10px] font-mono text-ink-tertiary w-8 text-right">
+          <span className="text-[10px] font-mono text-ink-tertiary dark:text-dark-ink-tertiary w-8 text-right">
             {Math.round(pct)}%
           </span>
         </div>
         {/* Time labels */}
-        <div className="flex justify-between text-[10px] text-ink-tertiary font-mono px-3">
+        <div className="flex justify-between text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary font-mono px-3">
           <span>{formatTime(progress.elapsedMinutes)}</span>
           <span>{formatTime(progress.remainingMinutes)} left</span>
         </div>
@@ -109,28 +109,28 @@ export function SimulationTimer({
 
   // ── Full version ─────────────────────────────────────────────────────────
   return (
-    <div className="rounded-lg border border-border bg-surface overflow-hidden">
+    <div className="rounded-lg border border-border dark:border-dark-border bg-surface dark:bg-dark-surface overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface-secondary">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
         <div className="flex items-center gap-2">
           <span className={clsx(
             'w-2 h-2 rounded-full',
-            isActive    ? 'animate-pulse_dot bg-success' :
-            isPaused    ? 'bg-warning' :
-            isCompleted ? 'bg-ink-disabled' : 'bg-ink-disabled'
+            isActive    ? 'animate-pulse_dot bg-success dark:bg-dark-success' :
+            isPaused    ? 'bg-warning dark:bg-dark-warning' :
+            isCompleted ? 'bg-ink-disabled dark:bg-dark-ink-disabled' : 'bg-ink-disabled dark:bg-dark-ink-disabled'
           )} />
-          <span className="text-xs font-semibold text-ink capitalize">
+          <span className="text-xs font-semibold text-ink dark:text-dark-ink capitalize">
             {isCompleted ? 'Simulation complete' : progress.status}
           </span>
         </div>
-        <span className="text-xs font-mono text-ink-tertiary">
+        <span className="text-xs font-mono text-ink-tertiary dark:text-dark-ink-tertiary">
           {Math.round(pct)}% complete
         </span>
       </div>
 
       {/* Progress bar */}
       <div className="px-4 pt-4 pb-2">
-        <div className="relative h-2.5 bg-surface-tertiary rounded-full overflow-hidden">
+        <div className="relative h-2.5 bg-surface-tertiary dark:bg-dark-surface-tertiary rounded-full overflow-hidden">
           <div
             className={clsx(
               'h-full rounded-full transition-all duration-700',
@@ -152,20 +152,20 @@ export function SimulationTimer({
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-3 divide-x divide-border border-t border-border mt-2">
+      <div className="grid grid-cols-3 divide-x divide-border dark:divide-dark-border border-t border-border dark:border-dark-border mt-2">
         <div className="px-4 py-3 text-center">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary mb-0.5">Elapsed</p>
-          <p className="text-sm font-mono font-semibold text-ink">{formatTime(progress.elapsedMinutes)}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mb-0.5">Elapsed</p>
+          <p className="text-sm font-mono font-semibold text-ink dark:text-dark-ink">{formatTime(progress.elapsedMinutes)}</p>
         </div>
         <div className="px-4 py-3 text-center">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary mb-0.5">Total</p>
-          <p className="text-sm font-mono font-semibold text-ink">{formatTime(progress.totalMinutes)}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mb-0.5">Total</p>
+          <p className="text-sm font-mono font-semibold text-ink dark:text-dark-ink">{formatTime(progress.totalMinutes)}</p>
         </div>
         <div className="px-4 py-3 text-center">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary mb-0.5">Remaining</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mb-0.5">Remaining</p>
           <p className={clsx(
             'text-sm font-mono font-semibold',
-            isCompleted ? 'text-ink-tertiary' : 'text-ink'
+            isCompleted ? 'text-ink-tertiary dark:text-dark-ink-tertiary' : 'text-ink dark:text-dark-ink'
           )}>
             {isCompleted ? '0m' : formatTime(progress.remainingMinutes)}
           </p>
@@ -174,19 +174,19 @@ export function SimulationTimer({
 
       {/* Simulated time display (optional) */}
       {showSimTime && (
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-surface-secondary">
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
           <div className="flex items-center gap-4 text-xs">
-            <span className="text-ink-tertiary">
-              Open <span className="font-mono text-ink ml-1">{formatSimTime(progress.firstSimTime)}</span>
+            <span className="text-ink-tertiary dark:text-dark-ink-tertiary">
+              Open <span className="font-mono text-ink dark:text-dark-ink ml-1">{formatSimTime(progress.firstSimTime)}</span>
             </span>
-            <span className="text-ink-tertiary">
-              Now <span className="font-mono font-medium text-ink ml-1">{formatSimTime(progress.currentSimTime)}</span>
+            <span className="text-ink-tertiary dark:text-dark-ink-tertiary">
+              Now <span className="font-mono font-medium text-ink dark:text-dark-ink ml-1">{formatSimTime(progress.currentSimTime)}</span>
             </span>
-            <span className="text-ink-tertiary">
-              Close <span className="font-mono text-ink ml-1">{formatSimTime(progress.lastSimTime)}</span>
+            <span className="text-ink-tertiary dark:text-dark-ink-tertiary">
+              Close <span className="font-mono text-ink dark:text-dark-ink ml-1">{formatSimTime(progress.lastSimTime)}</span>
             </span>
           </div>
-          <span className="text-[10px] text-ink-tertiary">
+          <span className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary">
             {progress.speedMultiplier}× speed
           </span>
         </div>

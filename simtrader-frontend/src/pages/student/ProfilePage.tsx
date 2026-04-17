@@ -39,13 +39,13 @@ export function ProfilePage() {
   return (
     <div className="p-6 max-w-xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-ink tracking-tight">Profile</h1>
-        <p className="text-sm text-ink-secondary mt-0.5">Manage your account details</p>
+        <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Profile</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">Manage your account details</p>
       </div>
 
       {/* Profile info */}
       <Card>
-        <h2 className="text-sm font-semibold text-ink mb-4">Personal information</h2>
+        <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-4">Personal information</h2>
         <form
           onSubmit={(e: FormEvent) => { e.preventDefault(); updateProfile.mutate() }}
           className="space-y-4"
@@ -61,7 +61,7 @@ export function ProfilePage() {
           <Input label="Email" value={user?.email ?? ''} disabled hint="Email cannot be changed. Contact your instructor if needed." />
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-xs text-ink-tertiary capitalize">Role: {user?.role}</span>
+            <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary capitalize">Role: {user?.role}</span>
             <Button type="submit" size="sm" loading={updateProfile.isPending}>Save changes</Button>
           </div>
         </form>
@@ -71,7 +71,7 @@ export function ProfilePage() {
 
       {/* Change password */}
       <Card>
-        <h2 className="text-sm font-semibold text-ink mb-4">Change password</h2>
+        <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-4">Change password</h2>
         <form
           onSubmit={(e: FormEvent) => {
             e.preventDefault()

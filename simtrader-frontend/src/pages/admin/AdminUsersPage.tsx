@@ -31,11 +31,11 @@ function InviteModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-4">
-      <div className="bg-surface rounded-xl border border-border shadow-modal w-full max-w-sm">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-ink">Invite student</h2>
-          <button onClick={onClose} className="text-ink-tertiary hover:text-ink">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 dark:bg-dark-ink/20 p-4">
+      <div className="bg-surface dark:bg-dark-surface rounded-xl border border-border dark:border-dark-border shadow-modal w-full max-w-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Invite student</h2>
+          <button onClick={onClose} className="text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -43,11 +43,11 @@ function InviteModal({ onClose }: { onClose: () => void }) {
         <div className="p-5">
           {success ? (
             <div className="text-center py-4 space-y-2">
-              <div className="w-10 h-10 bg-success-muted rounded-full flex items-center justify-center mx-auto">
-                <Mail className="w-5 h-5 text-success" />
+              <div className="w-10 h-10 bg-success-muted dark:bg-dark-success-muted rounded-full flex items-center justify-center mx-auto">
+                <Mail className="w-5 h-5 text-success dark:text-dark-success" />
               </div>
-              <p className="text-sm font-medium text-ink">Invite sent!</p>
-              <p className="text-xs text-ink-secondary">
+              <p className="text-sm font-medium text-ink dark:text-dark-ink">Invite sent!</p>
+              <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">
                 {email} will receive a registration link. In dev mode, check the server console for the token.
               </p>
               <div className="pt-2 flex gap-2">
@@ -103,24 +103,24 @@ function UserRow({ user }: { user: User }) {
     : user.email
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors">
+    <div className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
       {/* Avatar */}
-      <div className="w-8 h-8 rounded-full bg-ink flex items-center justify-center flex-shrink-0">
-        <span className="text-[11px] font-semibold text-surface">{initials}</span>
+      <div className="w-8 h-8 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
+        <span className="text-[11px] font-semibold text-surface dark:text-dark-surface">{initials}</span>
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-medium text-ink truncate">{displayName}</p>
+          <p className="text-sm font-medium text-ink dark:text-dark-ink truncate">{displayName}</p>
           {user.status === 'pending' && (
-            <span className="flex items-center gap-0.5 text-[10px] text-warning">
+            <span className="flex items-center gap-0.5 text-[10px] text-warning dark:text-dark-warning">
               <Clock className="w-3 h-3" />
               pending
             </span>
           )}
         </div>
-        <p className="text-xs text-ink-tertiary truncate">{user.email}</p>
+        <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary truncate">{user.email}</p>
       </div>
 
       {/* Status badge */}
@@ -164,7 +164,7 @@ function UserRow({ user }: { user: User }) {
       )}
 
       {user.role === 'admin' && (
-        <span className="text-xs text-ink-tertiary flex-shrink-0">Admin</span>
+        <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0">Admin</span>
       )}
     </div>
   )
@@ -208,8 +208,8 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-ink tracking-tight">Students</h1>
-          <p className="text-sm text-ink-secondary mt-0.5">
+          <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Students</h1>
+          <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">
             {students.length} student{students.length !== 1 ? 's' : ''} registered
           </p>
         </div>
@@ -221,15 +221,15 @@ export default function AdminUsersPage() {
 
       {/* Filters + search */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <div className="flex gap-1 p-1 bg-surface-secondary rounded-lg border border-border">
+        <div className="flex gap-1 p-1 bg-surface-secondary dark:bg-dark-surface-secondary rounded-lg border border-border dark:border-dark-border">
           {(['all', 'active', 'pending', 'blocked'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded text-xs font-medium capitalize transition-all ${
                 filter === f
-                  ? 'bg-surface text-ink shadow-sm border border-border'
-                  : 'text-ink-secondary hover:text-ink'
+                  ? 'bg-surface dark:bg-dark-surface text-ink dark:text-dark-ink shadow-sm border border-border dark:border-dark-border'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink'
               }`}
             >
               {f} {counts[f] > 0 && <span className="ml-1 opacity-60">({counts[f]})</span>}
@@ -248,10 +248,10 @@ export default function AdminUsersPage() {
       {/* User table */}
       <Card padding="none">
         {/* Table header */}
-        <div className="grid grid-cols-[1fr_auto_auto] px-4 py-2.5 border-b border-border bg-surface-secondary">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">Student</span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary mr-16">Status</span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">Actions</span>
+        <div className="grid grid-cols-[1fr_auto_auto] px-4 py-2.5 border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary">Student</span>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mr-16">Status</span>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary">Actions</span>
         </div>
 
         {isLoading ? (
@@ -267,7 +267,7 @@ export default function AdminUsersPage() {
             }
           />
         ) : (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border dark:divide-dark-border">
             {filtered.map(user => (
               <UserRow key={user.id} user={user} />
             ))}
@@ -284,7 +284,7 @@ export default function AdminUsersPage() {
             { label: 'Blocked', value: counts.blocked, variant: 'danger'  as const },
           ].map(s => (
             <Card key={s.label} className="flex items-center justify-between" padding="sm">
-              <span className="text-xs text-ink-secondary">{s.label}</span>
+              <span className="text-xs text-ink-secondary dark:text-dark-ink-secondary">{s.label}</span>
               <Badge variant={s.variant}>{s.value}</Badge>
             </Card>
           ))}

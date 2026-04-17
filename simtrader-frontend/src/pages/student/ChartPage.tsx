@@ -21,7 +21,7 @@ import {
 import { simulationApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
 import { useTheme } from '@/context/ThemeContext'
-import { Spinner, Badge, ThemeToggle } from '@/components/ui'
+import { Spinner, Badge } from '@/components/ui'
 import type { PriceTick, SimulationTick } from '@/types'
 import clsx from 'clsx'
 import { Activity, ChevronDown, BarChart2, TrendingUp } from 'lucide-react'
@@ -287,7 +287,7 @@ export default function ChartPage() {
     return () => {
       observer.disconnect()
     }
-  }, [isDark, chartType, t, selectedSymbol])
+  }, [isDark, chartType, t])
 
   // Rebuild chart when theme or chart type changes
   useEffect(() => {
@@ -492,9 +492,6 @@ export default function ChartPage() {
           />
           {connected ? 'Live' : 'Offline'}
         </div>
-
-        {/* Dark mode toggle */}
-        <ThemeToggle />
       </div>
 
       {/* ── Price ticker bar ─────────────────────────────────────────────────── */}

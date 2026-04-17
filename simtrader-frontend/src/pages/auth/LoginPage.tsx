@@ -41,15 +41,15 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-6">
-          <p className="font-display text-4xl text-surface leading-snug italic">
+          <p className="font-display text-4xl text-surface dark:text-dark-surface leading-snug italic">
             Learn markets by<br />participating in them.
           </p>
-          <p className="text-sm text-surface/50 leading-relaxed max-w-xs">
+          <p className="text-sm text-surface/50 dark:text-dark-surface/50 leading-relaxed max-w-xs">
             A controlled simulation environment for understanding order types, portfolio mechanics, and market microstructure.
           </p>
         </div>
 
-        <div className="text-xs text-surface/30">
+        <div className="text-xs text-surface/30 dark:text-dark-surface/30">
           © {new Date().getFullYear()} SimTrader Academic Platform
         </div>
       </div>
@@ -124,9 +124,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-xs text-ink-tertiary text-center mt-6">
+          <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary text-center mt-6">
             Don't have an account?{' '}
-            <span className="text-ink-secondary">
+            <span className="text-ink-secondary dark:text-dark-ink-secondary">
               Contact your instructor to receive an invite link.
             </span>
           </p>

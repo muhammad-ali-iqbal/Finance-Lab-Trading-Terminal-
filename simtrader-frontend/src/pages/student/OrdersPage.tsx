@@ -32,8 +32,8 @@ export function OrdersPage() {
   return (
     <div className="p-6 max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-ink tracking-tight">My Orders</h1>
-        <p className="text-sm text-ink-secondary mt-0.5">All orders you've placed in this simulation</p>
+        <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">My Orders</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">All orders you've placed in this simulation</p>
       </div>
 
       <Card padding="none">
@@ -49,37 +49,37 @@ export function OrdersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-surface-secondary">
+                <tr className="border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
                   {['Time', 'Symbol', 'Side', 'Type', 'Qty', 'Price', 'Filled', 'Fill Price', 'Status', ''].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-ink-tertiary whitespace-nowrap">
+                    <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary whitespace-nowrap">
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border dark:divide-dark-border">
                 {data.orders.map(order => (
-                  <tr key={order.id} className="hover:bg-surface-secondary transition-colors">
-                    <td className="px-4 py-3 text-xs text-ink-tertiary font-mono whitespace-nowrap">
+                  <tr key={order.id} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
+                    <td className="px-4 py-3 text-xs text-ink-tertiary dark:text-dark-ink-tertiary font-mono whitespace-nowrap">
                       {new Date(order.createdAt).toLocaleTimeString()}
                     </td>
-                    <td className="px-4 py-3 font-mono font-semibold text-ink">{order.symbol}</td>
+                    <td className="px-4 py-3 font-mono font-semibold text-ink dark:text-dark-ink">{order.symbol}</td>
                     <td className="px-4 py-3">
                       <Badge variant={order.side === 'buy' ? 'success' : 'danger'}>
                         {order.side.toUpperCase()}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-secondary capitalize">{order.type}</td>
-                    <td className="px-4 py-3 font-mono text-ink">{order.quantity.toLocaleString()}</td>
-                    <td className="px-4 py-3 font-mono text-ink">
+                    <td className="px-4 py-3 text-xs text-ink-secondary dark:text-dark-ink-secondary capitalize">{order.type}</td>
+                    <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{order.quantity.toLocaleString()}</td>
+                    <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
                       {order.limitPrice != null ? `$${fmt(order.limitPrice)}`
                         : order.stopPrice != null ? `$${fmt(order.stopPrice)}`
                         : 'Market'}
                     </td>
-                    <td className="px-4 py-3 font-mono text-ink">
+                    <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
                       {order.filledQuantity > 0 ? order.filledQuantity.toLocaleString() : '—'}
                     </td>
-                    <td className="px-4 py-3 font-mono text-ink">
+                    <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
                       {order.averageFillPrice != null ? `$${fmt(order.averageFillPrice)}` : '—'}
                     </td>
                     <td className="px-4 py-3">

@@ -106,8 +106,8 @@ function SimulationCard({ sim }: { sim: Simulation }) {
   const canReupload = sim.status === 'paused' || sim.status === 'completed'
 
   const borderColor =
-    sim.status === 'active'    ? 'border-success/40' :
-    sim.status === 'paused'    ? 'border-warning/40' : 'border-border'
+    sim.status === 'active'    ? 'border-success/40 dark:border-dark-success/40' :
+    sim.status === 'paused'    ? 'border-warning/40 dark:border-dark-warning/40' : 'border-border dark:border-dark-border'
 
   return (
     <div className={`border rounded-lg overflow-hidden ${borderColor}`}>
@@ -117,22 +117,22 @@ function SimulationCard({ sim }: { sim: Simulation }) {
       )}
 
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-surface">
+      <div className="flex items-center gap-3 px-4 py-3 bg-surface dark:bg-dark-surface">
         <button
           onClick={() => setExpanded(e => !e)}
-          className="p-0.5 text-ink-tertiary hover:text-ink flex-shrink-0"
+          className="p-0.5 text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink flex-shrink-0"
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-ink truncate">{sim.name}</p>
+          <p className="text-sm font-semibold text-ink dark:text-dark-ink truncate">{sim.name}</p>
           {sim.description && (
-            <p className="text-xs text-ink-tertiary truncate">{sim.description}</p>
+            <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary truncate">{sim.description}</p>
           )}
         </div>
 
-        <span className="text-xs text-ink-tertiary hidden sm:block flex-shrink-0">
+        <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary hidden sm:block flex-shrink-0">
           {sim.speedMultiplier}× · PKR {(sim.startingCash ?? 100000).toLocaleString()}
         </span>
         <StatusBadge status={sim.status} />
@@ -210,7 +210,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
 
       {/* Expanded detail */}
       {expanded && (
-        <div className="border-t border-border bg-surface-secondary px-4 py-4 space-y-4">
+        <div className="border-t border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary px-4 py-4 space-y-4">
 
           {/* ── Timer ── */}
           {hasTimer && (
@@ -225,9 +225,9 @@ function SimulationCard({ sim }: { sim: Simulation }) {
               { label: 'Starting cash', value: `PKR ${(sim.startingCash ?? 100000).toLocaleString()}` },
               { label: 'Created',       value: new Date(sim.createdAt).toLocaleDateString() },
             ].map(item => (
-              <div key={item.label} className="bg-surface rounded border border-border px-3 py-2">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary">{item.label}</p>
-                <p className="text-sm font-medium text-ink mt-0.5">{item.value}</p>
+              <div key={item.label} className="bg-surface dark:bg-dark-surface rounded border border-border dark:border-dark-border px-3 py-2">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary">{item.label}</p>
+                <p className="text-sm font-medium text-ink dark:text-dark-ink mt-0.5">{item.value}</p>
               </div>
             ))}
           </div>
@@ -235,7 +235,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
           {/* CSV upload (draft only) */}
           {isDraft && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-ink-secondary">Upload price data (CSV)</p>
+              <p className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Upload price data (CSV)</p>
               <div className="flex items-center gap-3 flex-wrap">
                 <input
                   ref={fileInputRef}
@@ -253,8 +253,8 @@ function SimulationCard({ sim }: { sim: Simulation }) {
                   <Upload className="w-3.5 h-3.5" />
                   {uploading ? 'Uploading…' : 'Choose CSV file'}
                 </Button>
-                <span className="text-xs text-ink-tertiary">
-                  Run <code className="bg-surface-tertiary px-1 rounded">bloomberg_to_simtrader.py</code> first
+                <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
+                  Run <code className="bg-surface-tertiary dark:bg-dark-surface-tertiary px-1 rounded">bloomberg_to_simtrader.py</code> first
                 </span>
               </div>
               {uploadMsg && (
@@ -273,7 +273,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
           {/* CSV re-upload (paused or completed) */}
           {canReupload && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-ink-secondary">Replace price data (CSV)</p>
+              <p className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Replace price data (CSV)</p>
               <div className="flex items-center gap-3 flex-wrap">
                 <input
                   ref={reuploadRef}
@@ -291,7 +291,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
                   <Upload className="w-3.5 h-3.5" />
                   {uploading ? 'Uploading…' : 'Upload new CSV'}
                 </Button>
-                <span className="text-xs text-ink-tertiary">
+                <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
                   This replaces all existing price data. Use this to correct or update the simulation data.
                 </span>
               </div>
@@ -306,9 +306,9 @@ function SimulationCard({ sim }: { sim: Simulation }) {
 
           {/* Restart note */}
           {(sim.status === 'active' || sim.status === 'paused') && (
-            <p className="text-xs text-ink-tertiary flex items-center gap-1.5">
+            <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary flex items-center gap-1.5">
               <RotateCcw className="w-3 h-3 flex-shrink-0" />
-              Use <strong className="text-ink-secondary font-medium">↺</strong> to restart the clock from market open.
+              Use <strong className="text-ink-secondary dark:text-dark-ink-secondary font-medium">↺</strong> to restart the clock from market open.
               Student portfolios and orders are preserved.
             </p>
           )}
@@ -337,11 +337,11 @@ function CreateModal({ onClose }: { onClose: () => void }) {
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-4">
-      <div className="bg-surface rounded-xl border border-border shadow-modal w-full max-w-md">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-ink">New simulation</h2>
-          <button onClick={onClose} className="text-ink-tertiary hover:text-ink"><X className="w-4 h-4" /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 dark:bg-dark-ink/20 p-4">
+      <div className="bg-surface dark:bg-dark-surface rounded-xl border border-border dark:border-dark-border shadow-modal w-full max-w-md">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">New simulation</h2>
+          <button onClick={onClose} className="text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink"><X className="w-4 h-4" /></button>
         </div>
         <form onSubmit={(e: FormEvent) => { e.preventDefault(); create.mutate() }} className="p-5 space-y-4">
           {create.isError && (
@@ -376,11 +376,11 @@ function EditModal({ sim, onClose }: { sim: Simulation; onClose: () => void }) {
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-4">
-      <div className="bg-surface rounded-xl border border-border shadow-modal w-full max-w-md">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-ink">Edit simulation</h2>
-          <button onClick={onClose} className="text-ink-tertiary hover:text-ink"><X className="w-4 h-4" /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 dark:bg-dark-ink/20 p-4">
+      <div className="bg-surface dark:bg-dark-surface rounded-xl border border-border dark:border-dark-border shadow-modal w-full max-w-md">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Edit simulation</h2>
+          <button onClick={onClose} className="text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink"><X className="w-4 h-4" /></button>
         </div>
         <form
           onSubmit={(e: FormEvent) => { e.preventDefault(); update.mutate() }}
@@ -437,8 +437,8 @@ export default function AdminSimulationsPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-ink tracking-tight">Simulations</h1>
-          <p className="text-sm text-ink-secondary mt-0.5">
+          <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Simulations</h1>
+          <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">
             Create simulations, upload Bloomberg PSX data, control playback
           </p>
         </div>
@@ -459,7 +459,7 @@ export default function AdminSimulationsPage() {
         <div className="space-y-6">
           {groups.map(group => (
             <div key={group.label}>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-tertiary mb-2">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mb-2">
                 {group.label} ({group.items.length})
               </h2>
               <div className="space-y-2">
@@ -470,8 +470,8 @@ export default function AdminSimulationsPage() {
         </div>
       )}
 
-      <Card className="mt-8 bg-surface-secondary" padding="md">
-        <p className="text-xs font-semibold text-ink-secondary uppercase tracking-wider mb-3">How to run</p>
+      <Card className="mt-8 bg-surface-secondary dark:bg-dark-surface-secondary" padding="md">
+        <p className="text-xs font-semibold text-ink-secondary dark:text-dark-ink-secondary uppercase tracking-wider mb-3">How to run</p>
         <ol className="space-y-2">
           {[
             'Create a new simulation with name, speed, and starting cash',
@@ -483,8 +483,8 @@ export default function AdminSimulationsPage() {
             'Edit name/description or delete drafts before starting',
             'Replace CSV data on paused or completed simulations if needed',
           ].map((step, i) => (
-            <li key={i} className="flex gap-2.5 text-xs text-ink-secondary">
-              <span className="w-4 h-4 rounded-full bg-ink text-surface text-[10px] font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+            <li key={i} className="flex gap-2.5 text-xs text-ink-secondary dark:text-dark-ink-secondary">
+              <span className="w-4 h-4 rounded-full bg-ink dark:bg-dark-ink text-surface dark:text-dark-surface text-[10px] font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
               {step}
             </li>
           ))}

@@ -30,24 +30,24 @@ export default function AdminSettingsPage() {
   return (
     <div className="p-8 max-w-xl">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-ink tracking-tight">Settings</h1>
-        <p className="text-sm text-ink-secondary mt-0.5">Manage your admin account</p>
+        <h1 className="text-xl font-semibold text-ink dark:text-dark-ink tracking-tight">Settings</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-0.5">Manage your admin account</p>
       </div>
 
       {/* Profile info */}
       <Card className="mb-5">
-        <h2 className="text-sm font-semibold text-ink mb-3">Account</h2>
+        <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-3">Account</h2>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-ink flex items-center justify-center">
-            <span className="text-sm font-semibold text-surface">
+          <div className="w-10 h-10 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center">
+            <span className="text-sm font-semibold text-surface dark:text-dark-surface">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </span>
           </div>
           <div>
-            <p className="text-sm font-medium text-ink">{user?.firstName} {user?.lastName}</p>
-            <p className="text-xs text-ink-secondary">{user?.email}</p>
+            <p className="text-sm font-medium text-ink dark:text-dark-ink">{user?.firstName} {user?.lastName}</p>
+            <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">{user?.email}</p>
           </div>
-          <span className="ml-auto text-xs font-medium px-2 py-1 rounded bg-ink text-surface">
+          <span className="ml-auto text-xs font-medium px-2 py-1 rounded bg-ink dark:bg-dark-ink text-surface dark:text-dark-surface">
             Admin
           </span>
         </div>
@@ -55,7 +55,7 @@ export default function AdminSettingsPage() {
 
       {/* Change password */}
       <Card>
-        <h2 className="text-sm font-semibold text-ink mb-4">Change password</h2>
+        <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-4">Change password</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {success && <Alert variant="success" message="Password updated successfully." />}
           {changePw.isError && (

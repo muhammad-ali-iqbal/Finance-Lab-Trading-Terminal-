@@ -30,6 +30,11 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-surface dark:bg-dark-surface overflow-hidden">
+      {/* Theme toggle — fixed top-right like sign-in page */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Sidebar */}
       <aside className="w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col flex-shrink-0">
         {/* Logo */}
@@ -66,11 +71,6 @@ export default function AdminLayout() {
 
         {/* User footer */}
         <div className="border-t border-border dark:border-dark-border p-3 space-y-2">
-          {/* Theme toggle */}
-          <div className="flex items-center justify-center py-1">
-            <ThemeToggle />
-          </div>
-
           <div className="flex items-center gap-2.5 px-1">
             <div className="w-7 h-7 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-semibold text-surface dark:text-dark-surface">

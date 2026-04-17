@@ -172,7 +172,7 @@ export function Spinner({ size = 'md', className }: SpinnerProps) {
 // ── Divider ──────────────────────────────────────────────────────────────────
 
 export function Divider({ className }: { className?: string }) {
-  return <hr className={clsx('border-border', className)} />
+  return <hr className={clsx('border-border dark:border-dark-border', className)} />
 }
 
 // ── Stat card ────────────────────────────────────────────────────────────────

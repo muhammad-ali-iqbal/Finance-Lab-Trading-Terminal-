@@ -27,8 +27,8 @@ export default function AdminOverviewPage() {
   return (
     <div className="p-8 max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink tracking-tight">Overview</h1>
-        <p className="text-sm text-ink-secondary mt-1">
+        <h1 className="text-2xl font-semibold text-ink dark:text-dark-ink tracking-tight">Overview</h1>
+        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-1">
           SimTrader Admin Dashboard
         </p>
       </div>
@@ -46,12 +46,12 @@ export default function AdminOverviewPage() {
 
       {/* Active simulation banner */}
       {activeSim ? (
-        <Card className="mb-6 border-success/30 bg-success-muted/30">
+        <Card className="mb-6 border-success/30 bg-success-muted/30 dark:border-dark-success/30 dark:bg-dark-success-muted/30">
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse_dot" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-ink">{activeSim.name}</p>
-              <p className="text-xs text-ink-secondary">
+              <p className="text-sm font-semibold text-ink dark:text-dark-ink">{activeSim.name}</p>
+              <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">
                 Simulation is live · {activeSim.speedMultiplier}× speed
               </p>
             </div>
@@ -66,14 +66,14 @@ export default function AdminOverviewPage() {
       ) : (
         <Card className="mb-6 border-dashed">
           <div className="flex items-center gap-3">
-            <PlayCircle className="w-5 h-5 text-ink-disabled" />
+            <PlayCircle className="w-5 h-5 text-ink-disabled dark:text-dark-ink-disabled" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-ink-secondary">No active simulation</p>
-              <p className="text-xs text-ink-tertiary">Start a simulation so students can begin trading</p>
+              <p className="text-sm font-medium text-ink-secondary dark:text-dark-ink-secondary">No active simulation</p>
+              <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">Start a simulation so students can begin trading</p>
             </div>
             <button
               onClick={() => navigate('/admin/simulations')}
-              className="text-xs text-accent font-medium hover:underline"
+              className="text-xs text-accent dark:text-dark-accent font-medium hover:underline"
             >
               Go to Simulations →
             </button>
@@ -88,14 +88,14 @@ export default function AdminOverviewPage() {
           onClick={() => navigate('/admin/simulations')}
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-accent-muted flex items-center justify-center">
-              <PlayCircle className="w-5 h-5 text-accent" />
+            <div className="w-9 h-9 rounded-lg bg-accent-muted dark:bg-dark-accent-muted flex items-center justify-center">
+              <PlayCircle className="w-5 h-5 text-accent dark:text-dark-accent" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-ink">Simulations</p>
-              <p className="text-xs text-ink-secondary">Create, upload data, start & pause</p>
+              <p className="text-sm font-semibold text-ink dark:text-dark-ink">Simulations</p>
+              <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">Create, upload data, start & pause</p>
             </div>
-            <ArrowRight className="w-4 h-4 text-ink-tertiary ml-auto" />
+            <ArrowRight className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary ml-auto" />
           </div>
         </Card>
 
@@ -104,14 +104,14 @@ export default function AdminOverviewPage() {
           onClick={() => navigate('/admin/users')}
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-surface-tertiary flex items-center justify-center">
-              <Users className="w-5 h-5 text-ink-secondary" />
+            <div className="w-9 h-9 rounded-lg bg-surface-tertiary dark:bg-dark-surface-tertiary flex items-center justify-center">
+              <Users className="w-5 h-5 text-ink-secondary dark:text-dark-ink-secondary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-ink">Students</p>
-              <p className="text-xs text-ink-secondary">Invite, block, manage accounts</p>
+              <p className="text-sm font-semibold text-ink dark:text-dark-ink">Students</p>
+              <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">Invite, block, manage accounts</p>
             </div>
-            <ArrowRight className="w-4 h-4 text-ink-tertiary ml-auto" />
+            <ArrowRight className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary ml-auto" />
           </div>
         </Card>
       </div>
@@ -119,15 +119,15 @@ export default function AdminOverviewPage() {
       {/* Recent simulations */}
       {sims.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-sm font-semibold text-ink mb-3">Recent simulations</h2>
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-3">Recent simulations</h2>
           <Card padding="none">
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border dark:divide-dark-border">
               {sims.slice(0, 5).map(sim => (
                 <div key={sim.id} className="flex items-center gap-3 px-4 py-3">
-                  <Activity className="w-4 h-4 text-ink-tertiary flex-shrink-0" />
+                  <Activity className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink truncate">{sim.name}</p>
-                    <p className="text-xs text-ink-tertiary">
+                    <p className="text-sm font-medium text-ink dark:text-dark-ink truncate">{sim.name}</p>
+                    <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
                       {new Date(sim.createdAt).toLocaleDateString()}
                     </p>
                   </div>
