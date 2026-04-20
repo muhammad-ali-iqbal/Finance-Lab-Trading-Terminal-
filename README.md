@@ -754,7 +754,7 @@ MIT License — See LICENSE file for details.
 
 ## 🙏 Acknowledgments
 
-- **Bloomberg LP** — For PSX data access via Terminal
+- **Refinitiv by LSEG** — For PSX data access via Terminal
 - **TradingView** — For lightweight-charts library
 - **Go Team** — For the excellent standard library and tooling
 - **React & Vite** — For modern frontend development experience
@@ -771,7 +771,7 @@ MIT License — See LICENSE file for details.
 
 <div align="center">
 
-**Built with ❤️ for financial education**
+**Built for IBA Finance Lab - Muhammad Ali Iqbal**
 
 [⬆ Back to Top](#simtrader--stock-market-simulation-platform)
 

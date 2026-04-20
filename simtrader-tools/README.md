@@ -1,177 +1,185 @@
 # SimTrader Data Preparation Guide
-## Bloomberg PSX → SimTrader CSV
+
+Convert PSX intraday data into SimTrader CSV format, validate it, and upload it to a simulation.
 
 ---
 
-## What you need installed
-- Python 3.10+ (no extra libraries needed — all standard library)
-- Bloomberg Terminal access with PSX data subscription
+## Requirements
+
+- Python 3.10+ (no third-party libraries needed)
+- PSX intraday data exported as tab-separated `.txt` files (one file per symbol)
 
 ---
 
-## Step 1 — Choose your PSX symbols
+## Scripts
 
-Pick 20–25 stocks from KSE. Recommended spread for teaching:
-
-| Category | Examples | Why |
-|---|---|---|
-| Large cap / liquid | LUCK, ENGRO, HBL, UBL, MCB | Tight spreads, good for market orders |
-| Mid cap | OGDC, PPL, PSO, HUBC | Moderate volatility |
-| Volatile / high beta | SYS, TRG, AVN | Good for limit/stop order lessons |
-| Defensive | NESTLE, COLG, SRVI | Low volatility, teaches position sizing |
+| Script | Purpose |
+|---|---|
+| `psx_to_simtrader.py` | Convert PSX export files to SimTrader CSV |
+| `validate_simtrader_csv.py` | Validate the output before uploading |
 
 ---
 
-## Step 2 — Pull data from Bloomberg for each symbol
+## Step 1 — Export data from PSX / your data provider
 
-**On the Bloomberg Terminal:**
+Export 1-minute intraday data for each symbol. The expected file format is tab-separated with this header:
 
-1. Type the ticker: `LUCK PA Equity` → press **Enter**
-2. Type `IOHLC` → press **Enter** — opens Intraday OHLC Table
-3. Set **Period** = `1` (1-minute bars)
-4. Set **Range** = your chosen date (e.g. `04/01/26` to `04/01/26`)
-5. Wait for data to load — you should see rows like:
-   ```
-   09:30 - 09:31   254.19   +.40   254.08   256.18   254.00   1527   776,409
-   09:31 - 09:32   253.95   -.24   254.08   254.46   253.82   467    88,799
-   ```
-6. Click anywhere in the table → **Ctrl+A** to select all rows
-7. **Ctrl+C** to copy
-8. Open Notepad (or any text editor)
-9. **Ctrl+V** to paste
-10. Save as `LUCK.txt` in a folder called `raw/`
+```
+Exchange Date   Exchange Time   Local Date   Local Time   Close   Net   %Chg   Open   Low   High   Volume   Trade Price
+06-Apr-2026     09:30           06-Apr-2026  09:30        338.50  ...
+```
 
-**Repeat for every symbol.**
+- One file per symbol, named after the symbol: `PSO.PK.txt`, `LUCK.PK.txt`, etc.
+- The exchange suffix (`.PK`, `.KAR`) is stripped automatically — `PSO.PK.txt` becomes symbol `PSO`.
+- Rows can be in any order (newest-first is fine).
+- Multiple dates in one file are supported — the `--date` flag filters to the one you want.
 
-Your `raw/` folder should look like:
+Place all files in a folder:
+
 ```
 raw/
-  LUCK.txt
-  ENGRO.txt
-  HBL.txt
-  UBL.txt
-  MCB.txt
-  OGDC.txt
-  PPL.txt
-  PSO.txt
-  HUBC.txt
-  SYS.txt
-  TRG.txt
-  ... (all 20-25 symbols)
+  PSO.PK.txt
+  LUCK.PK.txt
+  ENGRO.PK.txt
+  HBL.PK.txt
+  ...
 ```
 
 ---
 
-## Step 3 — Run the converter
+## Step 2 — Run the converter
 
+**Single symbol:**
 ```bash
-python bloomberg_to_simtrader.py \
-  --input-dir ./raw \
-  --output simulation_2026_04_01.csv \
-  --date 2026-04-01
+python psx_to_simtrader.py -f raw/PSO.PK.txt -o simulation.csv -d 2026-04-03
+```
+
+**Whole directory (recommended for multi-symbol simulations):**
+```bash
+python psx_to_simtrader.py -i ./raw -o simulation.csv -d 2026-04-03
 ```
 
 **Expected output:**
 ```
-SimTrader Bloomberg Converter
-Date: 2026-04-01  |  Input: raw  |  Output: simulation_2026_04_01.csv
-Found 20 symbol file(s)
+PSX to SimTrader  |  2026-04-03  |  3 file(s)  ->  simulation.csv
 
-Processing LUCK...
-  Parsed 357 bars
-  [INFO] LUCK: forward-filled 3 missing bars
-  ✓ LUCK: 360 bars ready
+PSO  (PSO.PK.txt)
+  Parsed 207 bars
+  Forward-filled 153 missing bar(s)  (360/360 total)
+  OK
 
-Processing ENGRO...
+LUCK  (LUCK.PK.txt)
   Parsed 360 bars
-  ✓ ENGRO: 360 bars ready
-...
-=======================================================
-✓ Output written to: simulation_2026_04_01.csv
-  Symbols:    20 (AVN, COLG, ENGRO, HBL, HUBC, LUCK, ...)
-  Total rows: 7,200
-  Date:       2026-04-01
-✓ All symbols processed successfully.
-=======================================================
+  OK
+
+ENGRO  (ENGRO.PK.txt)
+  Parsed 312 bars
+  Forward-filled 48 missing bar(s)  (360/360 total)
+  OK
+
+==================================================
+Output  : simulation.csv
+Symbols : 3  (ENGRO, LUCK, PSO)
+Rows    : 1,080
+==================================================
+Next: validate then upload via the SimTrader admin panel.
 ```
+
+**Flags:**
+
+| Flag | Description |
+|---|---|
+| `-f / --input-file` | Single `.txt` file |
+| `-i / --input-dir` | Directory of `.txt` files (one per symbol) |
+| `-o / --output` | Output CSV path |
+| `-d / --date` | Trading date to extract (`YYYY-MM-DD`) |
+| `--no-fill` | Skip forward-fill of missing bars |
 
 ---
 
-## Step 4 — Validate before uploading
+## Step 3 — Validate before uploading
 
 ```bash
-python validate_simtrader_csv.py simulation_2026_04_01.csv
+python validate_simtrader_csv.py simulation.csv
 ```
 
-**Expected output:**
+**Expected output (passing):**
 ```
-Validating: simulation_2026_04_01.csv
+Validating: simulation.csv
 =======================================================
-Rows read:  7,200
+Rows read:  1,080
 
-Symbols (20):  AVN, COLG, ENGRO, HBL, HUBC, LUCK, ...
-Bars per symbol range: 360–360
-Total rows: 7,200
+Symbols (3):  ENGRO, LUCK, PSO
+Bars per symbol range: 360-360
+Total rows: 1,080
 
-✓ Validation PASSED — safe to upload to SimTrader.
+PASSED -- safe to upload to SimTrader.
 =======================================================
 ```
 
-If you see any errors, fix them before uploading.
+**If validation fails**, fix the reported errors before uploading. Common issues are listed in the Troubleshooting section below.
 
 ---
 
-## Step 5 — Upload to SimTrader
+## Step 4 — Upload to SimTrader
 
-Log in as admin → Simulation Management → New Simulation → Upload CSV.
+1. Log in as **admin**
+2. Go to **Simulation Management**
+3. Create a new simulation or select an existing draft
+4. Click **Upload CSV** and select your file
+
+---
+
+## Output format reference
+
+The SimTrader CSV format expected by the backend:
+
+```
+timestamp,symbol,open,high,low,close,volume
+2026-04-03T04:30:00Z,PSO,338.99,340.00,338.50,339.88,33284
+2026-04-03T04:30:00Z,LUCK,100.50,101.20,100.10,100.80,12000
+```
+
+- Timestamps are UTC (PSX session 09:30-15:29 PKT = 04:30-10:29 UTC)
+- All symbols share the same set of timestamps (360 bars per symbol per day)
+- Rows sorted by timestamp, then symbol
+
+---
+
+## PSX session reference
+
+| | PKT (local) | UTC (stored in DB) |
+|---|---|---|
+| Market open | 09:30 | 04:30 |
+| Market close | 15:29 | 10:29 |
+| Total bars | 360 per symbol | 360 per symbol |
 
 ---
 
 ## Choosing a good simulation date
 
-Pick a date with market interest — makes for better teaching moments:
-
-| Date type | Effect on simulation |
+| Date type | Teaching value |
 |---|---|
-| Normal day | Clean, predictable — good for intro sessions |
-| Earnings announcement day | One stock moves sharply — teaches event-driven trading |
-| Market-wide selloff | All stocks fall — teaches portfolio risk |
+| Normal day | Clean, predictable -- good for intro sessions |
+| Earnings announcement day | One stock moves sharply -- teaches event-driven trading |
+| Market-wide selloff | All stocks fall -- teaches portfolio risk |
 | High volatility day (KSE-100 swings >1%) | Good for stop-loss lessons |
 | Low volatility day | Good for limit order patience lessons |
 
-You can prepare multiple simulation files for different teaching scenarios and switch between them in the admin panel.
-
----
-
-## PSX session times
-
-| | PKT (local) | UTC (stored in DB) |
-|---|---|---|
-| Market open | 09:30 | 04:30 |
-| Market close | 15:30 | 10:30 |
-| Total bars | 360 per symbol | 360 per symbol |
+Prepare multiple CSV files for different scenarios and switch between them in the admin panel.
 
 ---
 
 ## Troubleshooting
 
-**"No valid bars found for SYMBOL"**
-→ The Bloomberg paste format may differ. Open the .txt file and check:
-- Does it have the `HH:MM - HH:MM` time range pattern?
-- Are the columns in the right order?
-- Is there extra header text that wasn't filtered?
+**"No data for YYYY-MM-DD -- check --date or file contents"**
+The date you passed to `--date` has no rows in that file. Verify the date exists in the export and matches the `DD-Mon-YYYY` format in the file (e.g. `03-Apr-2026`).
 
-**"Timestamp out of order"**
-→ You may have pasted Bloomberg data in reverse order (newest first).
-The Intraday OHLC Table sometimes sorts descending by default.
-In Bloomberg, look for a sort button and set to Ascending before copying.
+**"Forward-filled N missing bar(s)"**
+Normal for less liquid stocks. Missing minutes within the session are filled by carrying the previous close forward as a flat bar with volume=0. Students see these as flat candles.
 
-**"high < max(open, close)"**
-→ Bloomberg occasionally exports a bad tick.
-The converter skips these automatically and logs a warning.
-If many rows are skipped, the raw data may have quality issues.
+**Bars per symbol range shows a mismatch in validation**
+One symbol has fewer bars than others. This is usually fine if you ran the converter with forward-fill enabled (the default). If the count is much lower than 360, the source file may have incomplete data for that date.
 
-**Volume is 0 for many bars**
-→ Normal for less liquid PSX stocks in off-peak minutes.
-The forward-fill step creates bars with volume=0 for missing periods.
-Students see these as flat candles — no price movement.
+**"high < max(open, close)" errors in validation**
+The source data has inconsistent OHLC values. The converter clamps high/low automatically (`high = max(high, open, close)`), so this should not appear in converter output. If it does, the source file may be corrupted.

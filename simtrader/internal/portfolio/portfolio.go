@@ -109,18 +109,19 @@ func (r *Repository) Get(ctx context.Context, simID, userID uuid.UUID) (*Portfol
 		return nil, err
 	}
 
-	// 3. Enrich positions with latest price from price_ticks
-	// We use the most recent tick for each symbol in the simulation.
+	// 3. Enrich positions with the latest price the clock has actually played.
+	// We cap at current_sim_time so future (unplayed) ticks are never used.
 	for i := range positions {
 		var latestClose float64
 		err := r.db.QueryRow(ctx, `
 			SELECT close FROM price_ticks
 			WHERE simulation_id=$1 AND symbol=$2
+			  AND sim_time <= (SELECT current_sim_time FROM simulations WHERE id=$1)
 			ORDER BY sim_time DESC LIMIT 1`,
 			simID, positions[i].Symbol,
 		).Scan(&latestClose)
 		if err != nil {
-			// If no tick yet, use average cost as current price
+			// No played tick yet — use average cost as a neutral placeholder
 			latestClose = positions[i].AverageCost
 		}
 		positions[i].CurrentPrice = latestClose

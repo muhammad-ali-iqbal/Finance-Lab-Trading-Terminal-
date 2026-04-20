@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -425,4 +426,46 @@ func (r *Repository) ResetSimTime(ctx context.Context, simID uuid.UUID) error {
 		simID,
 	)
 	return err
+}
+
+// ResetStudentData wipes all orders, transactions, positions, and portfolios for
+// a simulation so students start fresh on restart.
+func (r *Repository) ResetStudentData(ctx context.Context, simID uuid.UUID) error {
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("begin tx: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	tx1, err := tx.Exec(ctx,
+		`DELETE FROM transactions WHERE portfolio_id IN (SELECT id FROM portfolios WHERE simulation_id = $1)`,
+		simID,
+	)
+	if err != nil {
+		return fmt.Errorf("delete transactions: %w", err)
+	}
+
+	ord, err := tx.Exec(ctx,
+		`DELETE FROM orders WHERE simulation_id = $1`,
+		simID,
+	)
+	if err != nil {
+		return fmt.Errorf("delete orders: %w", err)
+	}
+
+	pf, err := tx.Exec(ctx,
+		`DELETE FROM portfolios WHERE simulation_id = $1`,
+		simID,
+	)
+	if err != nil {
+		return fmt.Errorf("delete portfolios: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit: %w", err)
+	}
+
+	log.Printf("[reset] sim=%s wiped — transactions=%d orders=%d portfolios=%d",
+		simID, tx1.RowsAffected(), ord.RowsAffected(), pf.RowsAffected())
+	return nil
 }

@@ -171,7 +171,7 @@ export default function OrderEntryPage() {
                 </div>
                 {symbol && currentPrice !== undefined && (
                   <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
-                    Last price: <span className="font-mono font-medium text-ink dark:text-dark-ink">${fmt(currentPrice)}</span>
+                    Last price: <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(currentPrice)}</span>
                   </p>
                 )}
               </div>
@@ -252,13 +252,13 @@ export default function OrderEntryPage() {
                 <div className="rounded border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary p-3 space-y-1.5">
                   <div className="flex justify-between text-xs">
                     <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Estimated {side === 'buy' ? 'cost' : 'proceeds'}</span>
-                    <span className="font-mono font-medium text-ink dark:text-dark-ink">${fmt(estimatedValue)}</span>
+                    <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(estimatedValue)}</span>
                   </div>
                   {side === 'buy' && (
                     <div className="flex justify-between text-xs">
                       <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Available cash</span>
                       <span className={clsx('font-mono font-medium', canAfford ? 'text-ink dark:text-dark-ink' : 'text-danger dark:text-dark-danger')}>
-                        ${fmt(portfolio?.cashBalance ?? 0)}
+                        PKR {fmt(portfolio?.cashBalance ?? 0)}
                       </span>
                     </div>
                   )}
@@ -324,7 +324,7 @@ export default function OrderEntryPage() {
                     </div>
                     <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5 font-mono">
                       {order.quantity.toLocaleString()} shares
-                      {order.limitPrice != null && ` @ $${fmt(order.limitPrice)}`}
+                      {order.limitPrice != null && ` @ PKR ${fmt(order.limitPrice)}`}
                     </p>
                   </div>
 
@@ -332,7 +332,7 @@ export default function OrderEntryPage() {
                     <OrderStatusBadge status={order.status} />
                     {order.averageFillPrice && (
                       <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary font-mono mt-0.5">
-                        filled @ ${fmt(order.averageFillPrice)}
+                        filled @ PKR {fmt(order.averageFillPrice)}
                       </p>
                     )}
                   </div>

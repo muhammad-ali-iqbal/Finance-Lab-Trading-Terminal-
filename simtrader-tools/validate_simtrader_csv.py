@@ -155,24 +155,24 @@ def _report(errors, warnings, rows, symbols_seen=None, bar_counts=None):
     if symbols_seen:
         print(f"Symbols ({len(symbols_seen)}):  {', '.join(sorted(symbols_seen.keys()))}")
     if bar_counts:
-        print(f"Bars per symbol range: {min(bar_counts.values())}–{max(bar_counts.values())}")
+        print(f"Bars per symbol range: {min(bar_counts.values())}-{max(bar_counts.values())}")
     print(f"Total rows: {len(rows):,}")
     print()
 
     if warnings:
         print(f"Warnings ({len(warnings)}):")
         for w in warnings:
-            print(f"  ⚠  {w}")
+            print(f"  [WARN]  {w}")
         print()
 
     if errors:
         print(f"Errors ({len(errors)}) — fix these before uploading:")
         for e in errors:
-            print(f"  ✗  {e}")
+            print(f"  [ERR]  {e}")
         print()
-        print("✗ Validation FAILED — do not upload this file.")
+        print("FAILED -- do not upload this file.")
     else:
-        print("✓ Validation PASSED — safe to upload to SimTrader.")
+        print("PASSED -- safe to upload to SimTrader.")
 
     print("=" * 55 + "\n")
 

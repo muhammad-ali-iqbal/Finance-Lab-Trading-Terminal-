@@ -72,15 +72,15 @@ export function OrdersPage() {
                     <td className="px-4 py-3 text-xs text-ink-secondary dark:text-dark-ink-secondary capitalize">{order.type}</td>
                     <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{order.quantity.toLocaleString()}</td>
                     <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
-                      {order.limitPrice != null ? `$${fmt(order.limitPrice)}`
-                        : order.stopPrice != null ? `$${fmt(order.stopPrice)}`
+                      {order.limitPrice != null ? `PKR ${fmt(order.limitPrice)}`
+                        : order.stopPrice != null ? `PKR ${fmt(order.stopPrice)}`
                         : 'Market'}
                     </td>
                     <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
                       {order.filledQuantity > 0 ? order.filledQuantity.toLocaleString() : '—'}
                     </td>
                     <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
-                      {order.averageFillPrice != null ? `$${fmt(order.averageFillPrice)}` : '—'}
+                      {order.averageFillPrice != null ? `PKR ${fmt(order.averageFillPrice)}` : '—'}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={order.status} />

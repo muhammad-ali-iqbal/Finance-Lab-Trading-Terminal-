@@ -1,9 +1,10 @@
 // src/components/layout/DashboardLayout.tsx
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
 import { authApi, simulationApi } from '@/api'
+import { useSimulationSocket } from '@/hooks/useSimulationSocket'
 import { SimulationTimer } from '@/components/simulation/SimulationTimer'
 import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
@@ -12,7 +13,7 @@ import {
   User, LogOut, Menu, X, ChevronRight, Activity
 } from 'lucide-react'
 
-// Compact sidebar widget — fetches active sim and shows live timer
+// Compact sidebar widget — reads active sim from shared React Query cache
 function SimulationSidebarWidget() {
   const { data: sim } = useQuery({
     queryKey: ['simulation', 'active'],
@@ -20,6 +21,7 @@ function SimulationSidebarWidget() {
     retry: false,
     refetchInterval: 15000,
   })
+
 
   if (!sim) {
     return (
@@ -56,12 +58,46 @@ const navItems = [
   { to: '/dashboard/profile', icon: User,           label: 'Profile'      },
 ]
 
+// Detects simulation restarts (simulationTime jumping backwards) and flushes
+// all cached simulation data so every student page shows a clean state.
+//
+// Uses removeQueries (not invalidateQueries) because the backend wipes the
+// entire simulation state and we want the cache completely gone, not just
+// marked stale. Then refetchQueries forces active subscribers to refetch
+// immediately rather than waiting for the next poll interval.
+function useRestartDetector(simulationId: string | null) {
+  const qc = useQueryClient()
+  const { simulationTime } = useSimulationSocket({ simulationId })
+  const prevRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!simulationTime || !simulationId) return
+    const prev = prevRef.current
+    if (prev && simulationTime < prev) {
+      console.log('[restart] detected — clearing caches', { prev, now: simulationTime })
+      qc.removeQueries({ queryKey: ['portfolio', simulationId] })
+      qc.removeQueries({ queryKey: ['orders',    simulationId] })
+      qc.refetchQueries({ queryKey: ['portfolio', simulationId] })
+      qc.refetchQueries({ queryKey: ['orders',    simulationId] })
+    }
+    prevRef.current = simulationTime
+  }, [simulationTime, simulationId, qc])
+}
+
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const { user, logout } = useAuthStore(s => ({
     user: s.user, logout: s.logout
   }))
+
+  const { data: sim } = useQuery({
+    queryKey: ['simulation', 'active'],
+    queryFn: simulationApi.getActive,
+    retry: false,
+    refetchInterval: 15000,
+  })
+  useRestartDetector(sim?.id ?? null)
 
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logout(),

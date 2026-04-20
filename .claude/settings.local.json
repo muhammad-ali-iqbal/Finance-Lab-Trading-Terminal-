@@ -11,7 +11,23 @@
       "Bash(python -c \"import graphify\")",
       "Bash(pip install *)",
       "Bash(python -c \"import sys; open\\('.graphify_python', 'w'\\).write\\(sys.executable\\)\")",
-      "Bash(python -c \" import json from graphify.detect import detect from pathlib import Path result = detect\\(Path\\('.'\\)\\) print\\(json.dumps\\(result\\)\\) \")"
+      "Bash(python -c \" import json from graphify.detect import detect from pathlib import Path result = detect\\(Path\\('.'\\)\\) print\\(json.dumps\\(result\\)\\) \")",
+      "Bash(python csv_to_simtrader.py --input-file AAPL.csv --output test_output.csv --date 2026-04-13 --tz utc)",
+      "Bash(mkdir -p test_data)",
+      "Bash(cp AAPL.csv test_data/AAPL.csv)",
+      "Bash(cp AAPL.csv test_data/ENGRO.csv)",
+      "Bash(python csv_to_simtrader.py --input-dir ./test_data --output test_multi.csv --date 2026-04-13 --tz utc --no-session-filter)",
+      "Bash(xargs grep *)",
+      "Bash(python psx_to_simtrader.py -f raw/PSO.PK.txt -o test_out.csv -d 2026-04-03)",
+      "Bash(python validate_simtrader_csv.py test_out.csv)",
+      "Bash(rm test_out.csv)",
+      "Bash(python psx_to_simtrader.py -i ./raw -o simulation_2026_04_03.csv -d 2026-04-03)",
+      "Bash(python validate_simtrader_csv.py simulation_2026_04_03.csv)",
+      "Bash(go build *)",
+      "Bash(npx tsc *)",
+      "Bash(grep -n \"func.*List\\\\|orders.*user_id\\\\|func.*h\\\\\\\\.repo\\\\\\\\.List\\\\|h\\\\\\\\.repo \" \"C:/Users/maiqbal/OneDrive - Institute of Business Administration/Desktop/Finance-Lab-Trading-Terminal-/simtrader/internal/order/handler.go\")",
+      "Bash(grep -n \"repo\\\\s*\\\\*\\\\|type Handler struct\\\\|h\\\\\\\\.repo\\\\\\\\.\" \"C:/Users/maiqbal/OneDrive - Institute of Business Administration/Desktop/Finance-Lab-Trading-Terminal-/simtrader/internal/simulation/handler.go\")",
+      "Bash(grep *)"
     ]
   }
 }

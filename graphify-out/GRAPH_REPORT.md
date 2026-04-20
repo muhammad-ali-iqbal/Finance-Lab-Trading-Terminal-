@@ -1,7 +1,8 @@
 # Graph Report - .  (2026-04-20)
 
 ## Corpus Check
-- Corpus is ~45,479 words - fits in a single context window. You may not need a graph.
+- 59 files · ~46,447 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 - 367 nodes · 602 edges · 67 communities detected
@@ -11,24 +12,24 @@
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Community 0|Community 0]]
 - [[_COMMUNITY_Community 1|Community 1]]
-- [[_COMMUNITY_Simulation Engine|Simulation Engine]]
-- [[_COMMUNITY_Authentication|Authentication]]
-- [[_COMMUNITY_Backend Architecture|Backend Architecture]]
-- [[_COMMUNITY_Authentication|Authentication]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
 - [[_COMMUNITY_Community 6|Community 6]]
 - [[_COMMUNITY_Community 7|Community 7]]
-- [[_COMMUNITY_Trading System|Trading System]]
+- [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 10|Community 10]]
 - [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
-- [[_COMMUNITY_Simulation Engine|Simulation Engine]]
-- [[_COMMUNITY_Simulation Engine|Simulation Engine]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
 - [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 17|Community 17]]
 - [[_COMMUNITY_Community 18|Community 18]]
-- [[_COMMUNITY_Trading System|Trading System]]
+- [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
 - [[_COMMUNITY_Community 22|Community 22]]
@@ -36,8 +37,8 @@
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
-- [[_COMMUNITY_Trading System|Trading System]]
-- [[_COMMUNITY_Trading System|Trading System]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
 - [[_COMMUNITY_Community 30|Community 30]]
 - [[_COMMUNITY_Community 31|Community 31]]
@@ -56,23 +57,23 @@
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
-- [[_COMMUNITY_Trading System|Trading System]]
-- [[_COMMUNITY_Trading System|Trading System]]
-- [[_COMMUNITY_Simulation Engine|Simulation Engine]]
-- [[_COMMUNITY_Real-time Systems|Real-time Systems]]
-- [[_COMMUNITY_Simulation Engine|Simulation Engine]]
-- [[_COMMUNITY_Frontend Architecture|Frontend Architecture]]
-- [[_COMMUNITY_Authentication|Authentication]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
 - [[_COMMUNITY_Community 56|Community 56]]
-- [[_COMMUNITY_Frontend Architecture|Frontend Architecture]]
+- [[_COMMUNITY_Community 57|Community 57]]
 - [[_COMMUNITY_Community 58|Community 58]]
-- [[_COMMUNITY_Backend Architecture|Backend Architecture]]
+- [[_COMMUNITY_Community 59|Community 59]]
 - [[_COMMUNITY_Community 60|Community 60]]
 - [[_COMMUNITY_Community 61|Community 61]]
 - [[_COMMUNITY_Community 62|Community 62]]
-- [[_COMMUNITY_Data Layer|Data Layer]]
+- [[_COMMUNITY_Community 63|Community 63]]
 - [[_COMMUNITY_Community 64|Community 64]]
 - [[_COMMUNITY_Community 65|Community 65]]
 - [[_COMMUNITY_Community 66|Community 66]]
@@ -118,19 +119,19 @@ Nodes (11): GetClaims(), Handler, BadRequest(), InternalError(), mapAuthError(),
 Cohesion: 0.08
 Nodes (14): Mailer, NoOpMailer, Service, TokenPair, scanUser(), generateSecureToken(), hashPassword(), hashToken() (+6 more)
 
-### Community 2 - "Simulation Engine"
+### Community 2 - "Community 2"
 Cohesion: 0.09
 Nodes (8): NewClock(), NewRepository(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry, Repository
 
-### Community 3 - "Authentication"
+### Community 3 - "Community 3"
 Cohesion: 0.09
 Nodes (14): extractBearerToken(), RequireAuth(), RequireRole(), jsonErrorHandler(), main(), TokenParser, set(), RequireAuth() (+6 more)
 
-### Community 4 - "Backend Architecture"
+### Community 4 - "Community 4"
 Cohesion: 0.1
 Nodes (24): Admin Route Prefix Convention, Go Backend Architecture, Bloomberg to SimTrader CSV Conversion Tool, Directory Structure and Project Layout, React Frontend Architecture, Go 1.22+ with Fiber v2, Insufficient Resources WebSocket Issue, Invite-Only Registration Pattern (+16 more)
 
-### Community 5 - "Authentication"
+### Community 5 - "Community 5"
 Cohesion: 0.09
 Nodes (19): authResponse, forgotPasswordRequest, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest, NewHandler() (+11 more)
 
@@ -142,7 +143,7 @@ Nodes (5): Close(), Connect(), NewEngine(), Engine, OrderRepository
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
-### Community 8 - "Trading System"
+### Community 8 - "Community 8"
 Cohesion: 0.19
 Nodes (5): Handler, Portfolio, Position, Repository, SimRepo
 
@@ -166,11 +167,11 @@ Nodes (5): Config, getEnv(), Load(), parseDuration(), requireEnv()
 Cohesion: 0.47
 Nodes (3): handleFileUpload(), handleReupload(), invalidate()
 
-### Community 14 - "Simulation Engine"
+### Community 14 - "Community 14"
 Cohesion: 0.5
 Nodes (3): Simulation, Status, TickBroadcast
 
-### Community 15 - "Simulation Engine"
+### Community 15 - "Community 15"
 Cohesion: 0.5
 Nodes (0): 
 
@@ -186,7 +187,7 @@ Nodes (0):
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 19 - "Trading System"
+### Community 19 - "Community 19"
 Cohesion: 1.0
 Nodes (2): fmt(), fmtCurrency()
 
@@ -218,11 +219,11 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 27 - "Trading System"
+### Community 27 - "Community 27"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 28 - "Trading System"
+### Community 28 - "Community 28"
 Cohesion: 1.0
 Nodes (0): 
 
@@ -298,31 +299,31 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 47 - "Trading System"
+### Community 47 - "Community 47"
 Cohesion: 1.0
 Nodes (1): Portfolio Management System (Auto P&L)
 
-### Community 48 - "Trading System"
+### Community 48 - "Community 48"
 Cohesion: 1.0
 Nodes (1): Order Management System
 
-### Community 49 - "Simulation Engine"
+### Community 49 - "Community 49"
 Cohesion: 1.0
 Nodes (1): Admin Dashboard & Simulation Controls
 
-### Community 50 - "Real-time Systems"
+### Community 50 - "Community 50"
 Cohesion: 1.0
 Nodes (1): Real-Time WebSocket Integration
 
-### Community 51 - "Simulation Engine"
+### Community 51 - "Community 51"
 Cohesion: 1.0
 Nodes (1): SimulationTimer Component
 
-### Community 52 - "Frontend Architecture"
+### Community 52 - "Community 52"
 Cohesion: 1.0
 Nodes (1): Frontend Infrastructure (React+TS+Vite+Tailwind)
 
-### Community 53 - "Authentication"
+### Community 53 - "Community 53"
 Cohesion: 1.0
 Nodes (1): Authentication & User Management (Invite Flow)
 
@@ -338,7 +339,7 @@ Nodes (1): SimTrader Monorepo (3-component structure)
 Cohesion: 1.0
 Nodes (1): Security Feature Set (short-lived tokens, rotation, bcrypt)
 
-### Community 57 - "Frontend Architecture"
+### Community 57 - "Community 57"
 Cohesion: 1.0
 Nodes (1): Frontend Design System (Button, Card, Badge, StatCard)
 
@@ -346,7 +347,7 @@ Nodes (1): Frontend Design System (Button, Card, Badge, StatCard)
 Cohesion: 1.0
 Nodes (1): Admin+Student Session Workflow
 
-### Community 59 - "Backend Architecture"
+### Community 59 - "Community 59"
 Cohesion: 1.0
 Nodes (1): Railway Deployment (Backend)
 
@@ -362,7 +363,7 @@ Nodes (1): Module Pattern (modelâ†’repositoryâ†’serviceâ†’handler
 Cohesion: 1.0
 Nodes (1): Mailer (SMTP + NoOp Dev Mode)
 
-### Community 63 - "Data Layer"
+### Community 63 - "Community 63"
 Cohesion: 1.0
 Nodes (1): Database Migrations (SQL schema + seed admin)
 
@@ -395,9 +396,9 @@ Nodes (1): Light/Dark Mode Toggle UI Component
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 26`** (2 nodes): `fmt()`, `ChartPageold.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trading System`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
+- **Thin community `Community 27`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trading System`** (2 nodes): `fmt()`, `OrdersPage.tsx`
+- **Thin community `Community 28`** (2 nodes): `fmt()`, `OrdersPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 29`** (2 nodes): `AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01)`, `Bloomberg â†’ SimTrader CSV Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -435,19 +436,19 @@ Nodes (1): Light/Dark Mode Toggle UI Component
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 46`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trading System`** (1 nodes): `Portfolio Management System (Auto P&L)`
+- **Thin community `Community 47`** (1 nodes): `Portfolio Management System (Auto P&L)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trading System`** (1 nodes): `Order Management System`
+- **Thin community `Community 48`** (1 nodes): `Order Management System`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Simulation Engine`** (1 nodes): `Admin Dashboard & Simulation Controls`
+- **Thin community `Community 49`** (1 nodes): `Admin Dashboard & Simulation Controls`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Real-time Systems`** (1 nodes): `Real-Time WebSocket Integration`
+- **Thin community `Community 50`** (1 nodes): `Real-Time WebSocket Integration`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Simulation Engine`** (1 nodes): `SimulationTimer Component`
+- **Thin community `Community 51`** (1 nodes): `SimulationTimer Component`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Frontend Architecture`** (1 nodes): `Frontend Infrastructure (React+TS+Vite+Tailwind)`
+- **Thin community `Community 52`** (1 nodes): `Frontend Infrastructure (React+TS+Vite+Tailwind)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Authentication`** (1 nodes): `Authentication & User Management (Invite Flow)`
+- **Thin community `Community 53`** (1 nodes): `Authentication & User Management (Invite Flow)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 54`** (1 nodes): `QWEN.md â€” SimTrader Context for Qwen Code`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -455,11 +456,11 @@ Nodes (1): Light/Dark Mode Toggle UI Component
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 56`** (1 nodes): `Security Feature Set (short-lived tokens, rotation, bcrypt)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Frontend Architecture`** (1 nodes): `Frontend Design System (Button, Card, Badge, StatCard)`
+- **Thin community `Community 57`** (1 nodes): `Frontend Design System (Button, Card, Badge, StatCard)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 58`** (1 nodes): `Admin+Student Session Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Backend Architecture`** (1 nodes): `Railway Deployment (Backend)`
+- **Thin community `Community 59`** (1 nodes): `Railway Deployment (Backend)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 60`** (1 nodes): `Role-Based Access Control (Admin/Student)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -467,7 +468,7 @@ Nodes (1): Light/Dark Mode Toggle UI Component
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 62`** (1 nodes): `Mailer (SMTP + NoOp Dev Mode)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Data Layer`** (1 nodes): `Database Migrations (SQL schema + seed admin)`
+- **Thin community `Community 63`** (1 nodes): `Database Migrations (SQL schema + seed admin)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 64`** (1 nodes): `PSX Session Details (09:30-15:30 PKT, 360 bars)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -479,11 +480,11 @@ Nodes (1): Light/Dark Mode Toggle UI Component
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Authentication` to `Community 0`, `Community 1`, `Simulation Engine`, `Authentication`, `Community 6`, `Community 11`, `Community 12`?**
+- **Why does `main()` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 11`, `Community 12`?**
   _High betweenness centrality (0.107) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Trading System`, `Simulation Engine`, `Authentication`?**
+- **Why does `Status` connect `Community 0` to `Community 8`, `Community 2`, `Community 3`?**
   _High betweenness centrality (0.080) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 6` to `Community 0`, `Community 1`, `Simulation Engine`, `Authentication`, `Trading System`?**
+- **Why does `Close()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 8`?**
   _High betweenness centrality (0.056) - this node is a cross-community bridge._
 - **Are the 30 inferred relationships involving `BadRequest()` (e.g. with `.Login()` and `.CompleteRegistration()`) actually correct?**
   _`BadRequest()` has 30 INFERRED edges - model-reasoned connections that need verification._

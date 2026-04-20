@@ -103,4 +103,11 @@ export const simulationApi = {
     })
     return data
   },
+
+  getTicks: async (simId: string, symbol: string) => {
+    const { data } = await client.get<{ ticks: import('@/types').PriceTick[] }>(
+      `/simulations/${simId}/ticks/${symbol}`
+    )
+    return data.ticks
+  },
 }

@@ -198,7 +198,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
               onClick={() => {
                 if (confirm(
                   'Restart the simulation clock from market open?\n\n' +
-                  'Student portfolios and order history are preserved — only the clock resets.'
+                  'All student orders, portfolios, and positions will be cleared. Students start fresh.'
                 )) restart.mutate()
               }}
             >
@@ -309,7 +309,7 @@ function SimulationCard({ sim }: { sim: Simulation }) {
             <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary flex items-center gap-1.5">
               <RotateCcw className="w-3 h-3 flex-shrink-0" />
               Use <strong className="text-ink-secondary dark:text-dark-ink-secondary font-medium">↺</strong> to restart the clock from market open.
-              Student portfolios and orders are preserved.
+              Student portfolios, orders, and positions are cleared on restart.
             </p>
           )}
         </div>

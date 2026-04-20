@@ -158,11 +158,14 @@ export default function ChartPage() {
   const [lastTick, setLastTick] = useState<PriceTick | null>(null)
   const [prevClose, setPrevClose] = useState<number | null>(null)
 
-  const chartContainerRef = useRef<HTMLDivElement>(null)
-  const chartRef    = useRef<IChartApi | null>(null)
-  const candleRef   = useRef<ISeriesApi<'Candlestick'> | null>(null)
-  const lineRef     = useRef<ISeriesApi<'Line'> | null>(null)
-  const volumeRef   = useRef<ISeriesApi<'Histogram'> | null>(null)
+  const chartContainerRef   = useRef<HTMLDivElement>(null)
+  const chartRef            = useRef<IChartApi | null>(null)
+  const candleRef           = useRef<ISeriesApi<'Candlestick'> | null>(null)
+  const lineRef             = useRef<ISeriesApi<'Line'> | null>(null)
+  const volumeRef           = useRef<ISeriesApi<'Histogram'> | null>(null)
+  // Ref so buildChart always reads the current symbol without being in its dep array
+  const selectedSymbolRef   = useRef<string | null>(null)
+  selectedSymbolRef.current = selectedSymbol
 
   // Cached OHLCV data per symbol so we can rebuild after chart type switch
   const historyRef  = useRef<Record<string, { time: number; open: number; high: number; low: number; close: number; volume: number }[]>>({})
@@ -254,9 +257,10 @@ export default function ChartPage() {
       lineRef.current = lineSeries
     }
 
-    // Replay cached history for the selected symbol
-    if (selectedSymbol && historyRef.current[selectedSymbol]) {
-      const bars = historyRef.current[selectedSymbol]
+    // Replay cached history for the selected symbol (uses ref so closure is never stale)
+    const sym = selectedSymbolRef.current
+    if (sym && historyRef.current[sym]?.length) {
+      const bars = historyRef.current[sym]
       if (chartType === 'candlestick' && candleRef.current) {
         candleRef.current.setData(bars.map(b => ({
           time: b.time as unknown as import('lightweight-charts').Time,
@@ -304,32 +308,36 @@ export default function ChartPage() {
     }
   }, [isDark, chartType]) // eslint-disable-line
 
-  // When selected symbol changes, replay its history without full rebuild
+  // When selected symbol changes: reset price ticker and replay cached history.
+  // The setData calls here only fire when historyRef already has data (i.e. user
+  // switches to a symbol they already viewed). Initial data load is handled by
+  // the tickHistory query effect below, which avoids the setData([]) wipe.
   useEffect(() => {
     if (!selectedSymbol || !chartRef.current) return
+
     const bars = historyRef.current[selectedSymbol] ?? []
-
-    if (chartType === 'candlestick' && candleRef.current) {
-      candleRef.current.setData(bars.map(b => ({
-        time: b.time as unknown as import('lightweight-charts').Time,
-        open: b.open, high: b.high, low: b.low, close: b.close,
-      })))
-    } else if (lineRef.current) {
-      lineRef.current.setData(bars.map(b => ({
-        time: b.time as unknown as import('lightweight-charts').Time,
-        value: b.close,
-      })))
+    if (bars.length > 0) {
+      if (chartType === 'candlestick' && candleRef.current) {
+        candleRef.current.setData(bars.map(b => ({
+          time: b.time as unknown as import('lightweight-charts').Time,
+          open: b.open, high: b.high, low: b.low, close: b.close,
+        })))
+      } else if (lineRef.current) {
+        lineRef.current.setData(bars.map(b => ({
+          time: b.time as unknown as import('lightweight-charts').Time,
+          value: b.close,
+        })))
+      }
+      if (volumeRef.current) {
+        volumeRef.current.setData(bars.map(b => ({
+          time: b.time as unknown as import('lightweight-charts').Time,
+          value: b.volume,
+          color: b.close >= b.open ? t.volUp : t.volDown,
+        })))
+      }
+      chartRef.current.timeScale().fitContent()
     }
-    if (volumeRef.current) {
-      volumeRef.current.setData(bars.map(b => ({
-        time: b.time as unknown as import('lightweight-charts').Time,
-        value: b.volume,
-        color: b.close >= b.open ? t.volUp : t.volDown,
-      })))
-    }
-    if (bars.length > 0) chartRef.current.timeScale().fitContent()
 
-    // Reset price display
     setLastTick(null)
     setPrevClose(null)
   }, [selectedSymbol]) // eslint-disable-line
@@ -403,6 +411,74 @@ export default function ChartPage() {
       setSelectedSymbol(symbols[0])
     }
   }, [symbols, selectedSymbol])
+
+  // ── Fetch tick history from API ───────────────────────────────────────────
+  // refetchOnMount:true + staleTime:0 → always re-fetches when returning to
+  // this page so the chart restores up to the current sim position.
+  // refetchOnWindowFocus:false → prevents spurious mid-session refetches that
+  // caused the previous "whites out" regression.
+  const { data: tickHistory } = useQuery({
+    queryKey: ['ticks', simulation?.id, selectedSymbol],
+    queryFn: () => simulationApi.getTicks(simulation!.id, selectedSymbol!),
+    enabled: !!simulation?.id && !!selectedSymbol,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  })
+
+  // Populate historyRef + chart when API history arrives.
+  // We filter to simulationTime so we don't reveal future (unplayed) ticks.
+  // simulationTime is read from the closure at effect-run time — intentionally
+  // NOT in deps so this doesn't re-run on every live tick.
+  useEffect(() => {
+    if (!tickHistory || !selectedSymbol || !chartRef.current) return
+
+    // Cutoff: only show bars the simulation has already played
+    const cutoffMs = simulationTime
+      ? new Date(simulationTime).getTime() + 60_000 // +1 min tolerance for clock lag
+      : Infinity
+
+    const bars = tickHistory
+      .filter(tick => new Date(tick.timestamp).getTime() <= cutoffMs)
+      .map(tick => ({
+        time:   Math.floor(new Date(tick.timestamp).getTime() / 1000),
+        open:   tick.open,
+        high:   tick.high,
+        low:    tick.low,
+        close:  tick.close,
+        volume: tick.volume,
+      }))
+
+    // Merge with any live ticks already buffered in historyRef
+    const existing = historyRef.current[selectedSymbol] ?? []
+    const barTimes = new Set(bars.map(b => b.time))
+    const merged   = [...bars, ...existing.filter(b => !barTimes.has(b.time))]
+    merged.sort((a, b) => a.time - b.time)
+    historyRef.current[selectedSymbol] = merged
+
+    if (merged.length === 0) return
+
+    if (chartType === 'candlestick' && candleRef.current) {
+      candleRef.current.setData(merged.map(b => ({
+        time:  b.time as unknown as import('lightweight-charts').Time,
+        open:  b.open, high: b.high, low: b.low, close: b.close,
+      })))
+    } else if (lineRef.current) {
+      lineRef.current.setData(merged.map(b => ({
+        time:  b.time as unknown as import('lightweight-charts').Time,
+        value: b.close,
+      })))
+    }
+    if (volumeRef.current) {
+      volumeRef.current.setData(merged.map(b => ({
+        time:  b.time as unknown as import('lightweight-charts').Time,
+        value: b.volume,
+        color: b.close >= b.open ? t.volUp : t.volDown,
+      })))
+    }
+    chartRef.current.timeScale().fitContent()
+  }, [tickHistory]) // eslint-disable-line
 
   // ── Derived UI state ──────────────────────────────────────────────────────
 
@@ -552,9 +628,16 @@ export default function ChartPage() {
 
       {/* ── Chart area ───────────────────────────────────────────────────────── */}
       <div className="flex-1 min-h-0 relative" style={{ background: t.bg }}>
-        {/* Loading / error states */}
-        {!simulation && !simLoading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
+        {/*
+          Chart container is ALWAYS rendered so chartContainerRef.current is never
+          null when buildChart() runs. Overlay messages sit on top via absolute
+          positioning when the chart shouldn't be visible yet.
+        */}
+        <div ref={chartContainerRef} className="w-full h-full" />
+
+        {/* Overlay: no simulation */}
+        {!simulation && !simLoading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: t.bg }}>
             <Activity className="w-8 h-8" style={{ color: t.textTertiary }} />
             <p className="text-sm text-center max-w-xs" style={{ color: t.textSecondary }}>
               No active simulation found.{' '}
@@ -563,21 +646,25 @@ export default function ChartPage() {
               </span>
             </p>
           </div>
-        ) : !connected && symbols.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
+        )}
+
+        {/* Overlay: connecting */}
+        {simulation && !connected && symbols.length === 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: t.bg }}>
             <Spinner size="lg" />
             <p className="text-sm" style={{ color: t.textSecondary }}>
               Connecting to simulation…
             </p>
           </div>
-        ) : !selectedSymbol ? (
-          <div className="flex items-center justify-center h-full">
+        )}
+
+        {/* Overlay: no symbol selected yet */}
+        {simulation && connected && !selectedSymbol && (
+          <div className="absolute inset-0 flex items-center justify-center" style={{ background: t.bg }}>
             <p className="text-sm" style={{ color: t.textSecondary }}>
               Select a symbol from the dropdown above to view its chart
             </p>
           </div>
-        ) : (
-          <div ref={chartContainerRef} className="w-full h-full" />
         )}
       </div>
     </div>

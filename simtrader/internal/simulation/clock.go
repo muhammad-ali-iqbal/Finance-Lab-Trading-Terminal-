@@ -108,7 +108,8 @@ func (c *Clock) Start(parentCtx context.Context) error {
 	return nil
 }
 
-// Stop halts the clock goroutine gracefully.
+// Stop halts the clock goroutine and disconnects all WebSocket clients so
+// they reconnect and re-register with whichever clock is active next.
 func (c *Clock) Stop() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -116,7 +117,19 @@ func (c *Clock) Stop() {
 		c.cancelFn()
 	}
 	c.running = false
-	log.Printf("[clock] simulation %s stopped", c.simID)
+
+	// Close every client connection. This causes the read loop to return,
+	// which triggers the deferred RemoveClient and a clean disconnect. The
+	// frontend's reconnect logic then hooks it up to the new clock.
+	disconnected := len(c.clients)
+	for _, cl := range c.clients {
+		if cl.conn != nil {
+			_ = cl.conn.Close()
+		}
+	}
+	c.clients = make(map[uuid.UUID]*Client)
+
+	log.Printf("[clock] simulation %s stopped (%d clients disconnected)", c.simID, disconnected)
 }
 
 // IsRunning reports whether the clock is currently active.

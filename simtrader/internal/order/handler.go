@@ -156,7 +156,7 @@ func (r *OrderRepository) GetOrderBook(ctx context.Context, simID uuid.UUID, sym
 	}
 	defer bidRows.Close()
 
-	var bids []OrderBookLevel
+	bids := make([]OrderBookLevel, 0)
 	for bidRows.Next() {
 		var l OrderBookLevel
 		if err := bidRows.Scan(&l.Price, &l.Quantity, &l.OrderCount); err != nil {
@@ -181,7 +181,7 @@ func (r *OrderRepository) GetOrderBook(ctx context.Context, simID uuid.UUID, sym
 	}
 	defer askRows.Close()
 
-	var asks []OrderBookLevel
+	asks := make([]OrderBookLevel, 0)
 	for askRows.Next() {
 		var l OrderBookLevel
 		if err := askRows.Scan(&l.Price, &l.Quantity, &l.OrderCount); err != nil {

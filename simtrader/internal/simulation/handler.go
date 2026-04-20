@@ -399,6 +399,16 @@ func (h *Handler) StartSimulation(c *fiber.Ctx) error {
 		return httputil.BadRequest(c, "another simulation is already active. Complete or pause it first.")
 	}
 
+	// Fresh start from draft: wipe any leftover student data from a previous run
+	if sim.Status == StatusDraft {
+		if err := h.repo.ResetStudentData(c.Context(), simID); err != nil {
+			return httputil.InternalError(c)
+		}
+		if err := h.repo.ResetSimTime(c.Context(), simID); err != nil {
+			return httputil.InternalError(c)
+		}
+	}
+
 	// Mark active in DB
 	if err := h.repo.UpdateStatus(c.Context(), simID, StatusActive); err != nil {
 		return httputil.InternalError(c)
@@ -547,6 +557,11 @@ func (h *Handler) RestartSimulation(c *fiber.Ctx) error {
 	if clock, ok := Registry.Get(simID); ok {
 		clock.Stop()
 		Registry.Remove(simID)
+	}
+
+	// Wipe all student orders, transactions, positions, and portfolios
+	if err := h.repo.ResetStudentData(c.Context(), simID); err != nil {
+		return httputil.InternalError(c)
 	}
 
 	// Reset current_sim_time to NULL so the clock starts from the beginning
