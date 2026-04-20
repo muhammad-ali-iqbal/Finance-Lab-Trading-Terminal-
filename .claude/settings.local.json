@@ -7,7 +7,11 @@
       "Bash(sed -n '604,615p' simtrader/internal/simulation/handler.go)",
       "Bash(sed -n '278,290p' simtrader/internal/user/handler.go)",
       "Bash(sed -n '217,230p' simtrader/internal/portfolio/portfolio.go)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python -c \"import graphify\")",
+      "Bash(pip install *)",
+      "Bash(python -c \"import sys; open\\('.graphify_python', 'w'\\).write\\(sys.executable\\)\")",
+      "Bash(python -c \" import json from graphify.detect import detect from pathlib import Path result = detect\\(Path\\('.'\\)\\) print\\(json.dumps\\(result\\)\\) \")"
     ]
   }
 }
