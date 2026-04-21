@@ -72,6 +72,106 @@
   .price-up   { @apply text-success; }
   .price-down { @apply text-danger; }
   .price-flat { @apply text-ink-secondary; }
+
+  /* ── Glassmorphism ──────────────────────────────────────────────────────── */
+  /* Frosted-glass surface — semi-transparent + backdrop blur. Falls back to a
+     solid surface on browsers without backdrop-filter support. */
+  .glass {
+    background-color: rgba(255, 255, 255, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: theme('boxShadow.glass');
+  }
+  .dark .glass {
+    background-color: rgba(26, 26, 24, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: theme('boxShadow.dark-glass');
+  }
+  @supports (backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px)) {
+    .glass {
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      backdrop-filter: blur(16px) saturate(180%);
+    }
+  }
+
+  /* Stronger glass — for sidebars and persistent chrome.
+     Still needs to be readable behind body text, so it keeps the highest alpha. */
+  .glass-panel {
+    background-color: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .dark .glass-panel {
+    background-color: rgba(15, 15, 14, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  @supports (backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px)) {
+    .glass-panel {
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      backdrop-filter: blur(22px) saturate(180%);
+    }
+  }
+
+  /* Subtle glass — for cards layered on top of existing surfaces */
+  .glass-subtle {
+    background-color: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(228, 228, 224, 0.5);
+    box-shadow: theme('boxShadow.card');
+  }
+  .dark .glass-subtle {
+    background-color: rgba(26, 26, 24, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: theme('boxShadow.dark-card');
+  }
+  @supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+    .glass-subtle {
+      -webkit-backdrop-filter: blur(12px) saturate(160%);
+      backdrop-filter: blur(12px) saturate(160%);
+    }
+  }
+
+  /* Floating glass pill — theme toggle wrapper, fixed positioned chrome */
+  .glass-pill {
+    background-color: rgba(255, 255, 255, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(15,15,14,0.08);
+  }
+  .dark .glass-pill {
+    background-color: rgba(26, 26, 24, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  @supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+    .glass-pill {
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      backdrop-filter: blur(12px) saturate(180%);
+    }
+  }
+
+  /* Ambient background — soft radial gradients that give glass elements
+     something to diffuse. Sits behind the full app shell. */
+  .ambient-bg {
+    position: relative;
+    background-color: theme('colors.surface.secondary');
+  }
+  .ambient-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 70% 60% at 10% 0%,  rgba(26, 92, 255, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 95% 100%, rgba(139, 26, 42, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 40% at 50% 55%, rgba(20, 160, 107, 0.04) 0%, transparent 70%);
+    z-index: 0;
+  }
+  .dark .ambient-bg { background-color: theme('colors.dark-surface.DEFAULT'); }
+  .dark .ambient-bg::before {
+    background-image:
+      radial-gradient(ellipse 70% 60% at 10% 0%,  rgba(77, 136, 255, 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 95% 100%, rgba(196, 82, 106, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 40% at 50% 55%, rgba(20, 160, 107, 0.06) 0%, transparent 70%);
+  }
+  .ambient-bg > * { position: relative; z-index: 1; }
 }
 
 /* AG Grid — institutional theme override (light) */

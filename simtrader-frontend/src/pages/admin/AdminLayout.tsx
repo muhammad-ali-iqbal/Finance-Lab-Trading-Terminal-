@@ -29,14 +29,14 @@ export default function AdminLayout() {
   })
 
   return (
-    <div className="flex h-screen bg-surface dark:bg-dark-surface overflow-hidden">
+    <div className="flex h-screen ambient-bg overflow-hidden">
       {/* Theme toggle — fixed top-right like sign-in page */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50 glass-pill p-0.5">
         <ThemeToggle />
       </div>
 
       {/* Sidebar */}
-      <aside className="w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col flex-shrink-0">
+      <aside className="w-56 glass-panel border-r border-border/60 dark:border-dark-border/60 flex flex-col flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border">
           <img
@@ -99,7 +99,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-auto bg-surface-secondary dark:bg-dark-surface-secondary">
+      <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>

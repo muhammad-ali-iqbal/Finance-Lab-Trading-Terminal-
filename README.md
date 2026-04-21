@@ -7,772 +7,441 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791?logo=postgresql)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## 🎯 Overview
+## Overview
 
-**SimTrader** is a full-stack stock market simulation platform designed for educational purposes. It enables instructors to create realistic trading environments where students can:
+**SimTrader** is a full-stack stock market simulation platform built for classroom use at the IBA Finance Lab. Instructors create trading simulations with historical PSX data; students trade in real-time against each other.
 
-- Practice buying and selling stocks using **Market**, **Limit**, and **Stop** orders
-- Monitor real-time portfolio performance with P&L tracking
-- Analyze live candlestick charts using historical PSX data
-- View order book depth (bids/asks) for market microstructure lessons
-- Learn risk management through simulated market conditions
-
-The platform uses **real historical data** from the Pakistan Stock Exchange, converted from Bloomberg Terminal exports, providing students with authentic market scenarios.
-
----
-
-## 🏗️ Architecture
-
-SimTrader is a monorepo consisting of three main components:
-
-```
-simtrader-simulation/
-├── simtrader/                # Go backend API (port 8080)
-├── simtrader-frontend/       # React + TypeScript SPA (port 5173)
-└── simtrader-tools/          # Python data preparation toolkit
-```
-
-### System Flow
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  Student Browser                            │
-│              simtrader-frontend (:5173)                     │
-│                                                             │
-│  ┌──────────┐  ┌────────┐  ┌───────┐  ┌──────────┐          |
-│  │Portfolio │  │ Trading│  │ Charts│  │Order Book│          │
-│  └────┬─────┘  └───┬────┘  └───┬───┘  └────┬─────┘          │
-└───────┼────────────┼───────────┼─────────────┼──────────────┘
-        │            │           │             │
-        └────────────┴───────────┼─────────────┘
-                                 │
-                    HTTP REST + WebSocket API
-                                 │
-┌────────────────────────────────┼───────────────────────────┐
-│        simtrader Backend (:8080)                           │
-│                                                            │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │       Go Fiber HTTP Server + WebSocket Hub           │  │
-│  └─────────────────────┬────────────────────────────────┘  │
-│                        │                                   │
-│    ┌───────────────────┼───────────────────┐               │
-│    │       Business Logic Layer            │               │
-│    │  auth │ user │ simulation │ order │ portfolio         │
-│    └───────────────────┬───────────────────┘               │
-│                        │                                   │
-│                 ┌──────┴──────┐                            │
-│                 │ PostgreSQL  │                            │
-│                 │  Database   │                            │
-│                 └─────────────┘                            │
-└────────────────────────────────────────────────────────────┘
-                                 ▲
-                                 │
-                    simtrader-tools/
-              (Bloomberg PSX data → CSV upload)
-```
+Students can:
+- Place **Market**, **Limit**, and **Stop** orders
+- Monitor live portfolio performance (equity, P&L, positions)
+- Analyze candlestick charts driven by real historical data
+- View live order book depth (bids/asks)
+- Compete via a real-time leaderboard
 
 ---
 
-## 📦 Components
+## Architecture
+
+```
+Finance-Lab-Trading-Terminal-/
+├── simtrader/            # Go backend API (port 8080)
+├── simtrader-frontend/   # React + TypeScript SPA (port 5173)
+└── simtrader-tools/      # Python data preparation scripts
+```
+
+### Request flow
+
+```
+Browser (student/admin)
+        │
+        ├── HTTP REST  ──→  :5173 (Vite proxy)  ──→  :8080 (Go backend)
+        │
+        └── WebSocket  ─────────────────────────────→  :8080 (Go backend)
+                         (direct — bypasses Vite proxy)
+```
+
+The WebSocket connects **directly** to the Go backend on port 8080 using `window.location.hostname`. This avoids the unreliable WebSocket proxying in Vite's dev server and means port 8080 must be reachable by student devices.
+
+---
+
+## Components
 
 ### 1. Backend (`simtrader/`)
 
-A high-performance Go REST API built with **Go Fiber** that handles authentication, user management, simulation orchestration, order processing, and real-time WebSocket data broadcasting.
+Go REST + WebSocket API.
 
-**Tech Stack:**
-- **Framework:** Go Fiber v2
-- **Database:** PostgreSQL 16+ (pgx driver)
-- **Authentication:** JWT with rotating refresh tokens
-- **Security:** bcrypt (cost=12), SHA-256 token hashing
-- **WebSocket:** nhooyr.io/websocket
-- **Email:** SMTP via Resend (NoOp dev mode)
+| Technology | Role |
+|-----------|------|
+| Go Fiber v2 | HTTP framework |
+| PostgreSQL 16+ (pgx) | Database |
+| JWT (15min access / 7d refresh) | Authentication |
+| gofiber/contrib/websocket | WebSocket hub |
+| bcrypt cost=12 | Password hashing |
+| Resend SMTP | Email (dev: prints to console) |
 
-**Key Features:**
-- Role-based access control (Admin/Student)
-- Invite-only student registration
-- Secure authentication with short-lived tokens
-- Simulation management and real-time tick broadcasting
-- Order book depth and portfolio tracking
-
-📖 **[Backend Documentation](simtrader/README.md)**
-
----
+**Modules:** auth · user · simulation · order · portfolio · httputil · middleware
 
 ### 2. Frontend (`simtrader-frontend/`)
 
-A modern React single-page application providing a professional trading dashboard with real-time data visualization, order entry, portfolio tracking, and charting.
+React SPA with dark/light mode and IBA branding.
 
-**Tech Stack:**
-- **Framework:** React 18 + TypeScript
-- **Build Tool:** Vite 5
-- **Styling:** Tailwind CSS 3
-- **State Management:** Zustand + TanStack React Query
-- **Charts:** TradingView lightweight-charts
-- **Data Grid:** AG Grid Community
-- **Routing:** React Router DOM v6
+| Technology | Role |
+|-----------|------|
+| React 18 + TypeScript | UI framework |
+| Vite 5 | Dev server + build |
+| Tailwind CSS 3 | Styling (IBA maroon accent) |
+| Zustand | Auth state |
+| TanStack React Query | Server state / cache |
+| lightweight-charts v4 | Candlestick + line charts |
+| React Router v6 | Client-side routing |
 
-**Dashboard Features:**
-- **Portfolio** — Total equity, positions, unrealized P&L
-- **Order Entry** — Buy/sell with Market, Limit, Stop orders
-- **Charts** — Real-time candlestick OHLCV visualization
-- **Order Book** — Depth of market (bids/asks)
-- **Orders** — Order history with status tracking
-- **Profile** — User settings and password management
+**Student pages:** Overview · Portfolio · Trade · Chart · Order Book · Orders · Profile
 
-**Real-time Data:**
-- WebSocket connection with automatic reconnection
-- Exponential backoff strategy (up to 10 attempts)
-- Live price map updates for all symbols
-
-📖 **[Frontend Documentation](simtrader-frontend/README.md)** *(if exists)*
-
----
+**Admin pages:** Overview · Simulations · Students · Settings
 
 ### 3. Data Tools (`simtrader-tools/`)
 
-A Python toolkit for converting Bloomberg Terminal PSX data exports into SimTrader-compatible CSV format for simulation uploads.
-
-**Tech Stack:**
-- Python 3.10+ (standard library only)
-
-**Workflow:**
-1. Export 1-minute OHLC bars from Bloomberg for 20-25 PSX stocks
-2. Save as text files in `raw/` directory
-3. Run converter: `python bloomberg_to_simtrader.py --input-dir ./raw --output sim.csv --date 2026-04-01`
-4. Validate: `python validate_simtrader_csv.py sim.csv`
-5. Upload CSV via admin panel
-
-**PSX Session Details:**
-- Market hours: 09:30-15:30 PKT (04:30-10:30 UTC)
-- 360 one-minute bars per symbol per day
-- Automatic forward-fill for missing bars
-
-**Recommended Stock Categories:**
-
-| Category | Examples | Teaching Purpose |
-|----------|----------|------------------|
-| **Large Cap** | LUCK, ENGRO, HBL, UBL, MCB | Tight spreads, market orders |
-| **Mid Cap** | OGDC, PPL, PSO, HUBC | Moderate volatility |
-| **Volatile** | SYS, TRG, AVN | High beta for limit/stop lessons |
-| **Defensive** | NESTLE, COLG, SRVI | Low volatility, position sizing |
-
-📖 **[Tools Documentation](simtrader-tools/README.md)**
+Python scripts to convert PSX intraday exports to SimTrader CSV format.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Go | 1.22+ | https://go.dev/dl/ |
-| Node.js | 18+ | https://nodejs.org/ |
-| PostgreSQL | 16+ | https://www.postgresql.org/download/ |
-| Python | 3.10+ | https://www.python.org/downloads/ |
-| make | any | Pre-installed (macOS/Linux); Git Bash (Windows) |
+| Tool | Version |
+|------|---------|
+| Go | 1.22+ |
+| Node.js | 18+ |
+| PostgreSQL | 16+ |
+| Python | 3.10+ |
 
----
-
-### Backend Setup
+### Backend setup
 
 ```bash
 cd simtrader
 
-# Install dependencies
-make tidy
-
-# Configure environment
+# Configure
 cp .env.example .env
-# Edit .env and fill in:
-#   DATABASE_URL=postgresql://user:password@localhost:5432/simtrader
-#   JWT_ACCESS_SECRET=<openssl rand -hex 64>
-#   JWT_REFRESH_SECRET=<openssl rand -hex 64>
+# Fill in: DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
 
 # Create database
 psql -U postgres -c "CREATE DATABASE simtrader;"
 
 # Run migrations
 make migrate
-```
 
-**Start the backend server** (keep this running in a terminal):
-
-```bash
+# Start server  (Windows: double-click run.bat)
 go run ./cmd/server/main.go
 ```
 
-Server starts at **http://localhost:8080**
+Server starts at **http://localhost:8080**. Default admin: `admin@simtrader.app` / `ChangeMe123!` — change on first login.
 
-**Default Admin Credentials:**
-- Email: `admin@simtrader.app`
-- Password: `ChangeMe123!`
-
-⚠️ **Change this password immediately after first login.**
-
----
-
-### Frontend Setup
+### Frontend setup
 
 ```bash
 cd simtrader-frontend
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
 ```
 
-Frontend starts at **http://localhost:5173**
-
-The Vite dev server proxies API requests (`/api/*`) and WebSocket connections to the backend at `:8080`, eliminating CORS issues during development.
+Frontend starts at **http://localhost:5173** and listens on all network interfaces automatically (LAN access included). API requests proxy through to `:8080`; WebSocket connects directly to `:8080`.
 
 ---
 
-### 📋 Session Workflow (Admin + Students)
+## LAN / Campus Demo Setup
 
-This section describes the end-to-end flow for running a SimTrading session in a lab environment.
+To let students on the same WiFi connect from their own devices:
 
-#### Step 1: Admin Login
-1. Open a browser window (Chrome Profile 1)
-2. Navigate to `http://localhost:5173`
-3. Login with admin credentials
-
-#### Step 2: Invite Students
-1. Go to **Admin → Students** (`/admin/users`)
-2. Click **Invite student**
-3. Enter the student's email (e.g., `student@iba.edu.pk`)
-4. Click **Send invite**
-
-**⚠️ Important:** The invite token is printed in the **Go backend terminal console** (not emailed in dev mode). Look for:
-```
-[DEV EMAIL] Invite to student@iba.edu.pk → token: 608de6c4fb71ac7762a39bc755361875dea7e58e3ec8a45b666bc91097246d5d
-```
-
-#### Step 3: Student Registration
-Each student needs their own browser profile (or incognito window) to maintain separate sessions:
-
-1. **Open a new Chrome profile** (or incognito window)
-2. Navigate to:
+1. Find your machine's LAN IP (e.g. `10.2.104.37`)
+2. Open port 8080 in Windows Firewall (one-time):
    ```
-   http://localhost:5173/register?token=<TOKEN_FROM_CONSOLE>
+   netsh advfirewall firewall add rule name="SimTrader Backend" dir=in action=allow protocol=TCP localport=8080
    ```
-   Replace `<TOKEN_FROM_CONSOLE>` with the actual token from step 2.
-3. Fill in **First name**, **Last name**, and **Password** (8+ chars with number and letter)
-4. Click **Create account**
-5. Student is redirected to their dashboard
+3. Students open: `http://10.2.104.37:5173`
+4. WebSocket auto-connects to `ws://10.2.104.37:8080` — no config needed
 
-**Repeat for each student** — one browser profile per student.
-
-#### Step 4: Create & Start a Simulation
-1. Back in the **Admin** browser, go to **Simulations** (`/admin/simulations`)
-2. Click **New simulation**
-3. Fill in name, speed multiplier, starting cash
-4. Upload the PSX CSV data file (prepared via `simtrader-tools/`)
-5. Click **Start** — the simulation status changes to `active`
-
-#### Step 5: Students Start Trading
-Once the simulation is active:
-- Students see **"Connected to simulation"** in their dashboard
-- Live candlestick charts appear on the **Chart** page
-- Order book depth populates on the **Order Book** page
-- Students can place **Market**, **Limit**, or **Stop** orders from the **Trade** page
-
-#### Multi-User Lab Setup
-For a classroom with 1 admin + N students:
-- **Admin**: Use Chrome Profile 1 (or normal window)
-- **Student 1**: Use Chrome Profile 2 (or incognito)
-- **Student 2**: Use Chrome Profile 3
-- **Student N**: Each in a separate profile/incognito window
-
-Each browser profile maintains an independent session. The WebSocket singleton ensures each tab uses exactly **one** connection regardless of how many components (Chart, OrderBook, OrderEntry) are active.
+The frontend already listens on all interfaces (`host: true` in vite.config.ts). The WebSocket URL is derived from `window.location.hostname` at runtime, so it works correctly from any device.
 
 ---
 
-### Data Preparation
+## Session Workflow
 
-```bash
-cd simtrader-tools
+### 1. Admin login
+Open `http://localhost:5173` and log in with admin credentials.
 
-# Convert Bloomberg data to SimTrader CSV
-python bloomberg_to_simtrader.py \
-  --input-dir ./raw \
-  --output simulation_2026_04_01.csv \
-  --date 2026-04-01
+### 2. Invite students
+1. Go to **Admin → Students**
+2. Click **Invite student**, enter the student's email
+3. The invite token prints to the **Go terminal console** (dev mode — no email sent):
+   ```
+   [DEV EMAIL] Invite to student@iba.edu.pk → token: 608de6c4fb71ac...
+   ```
 
-# Validate the output
-python validate_simtrader_csv.py simulation_2026_04_01.csv
-```
+### 3. Student registration
+Each student needs a separate browser profile (or incognito window):
 
-Upload the validated CSV through the admin panel to create a new simulation.
+1. Open a new Chrome profile
+2. Navigate to `http://localhost:5173/register?token=<TOKEN>`
+3. Fill in First name, Last name, Password (8+ chars, letter + number)
+4. Student lands on their dashboard
+
+### 4. Create & start a simulation
+1. Go to **Admin → Simulations**
+2. Click **New simulation**, set name / speed / starting cash
+3. Upload the PSX CSV (prepared via `simtrader-tools/`)
+4. Click **Start** — status changes to `active`
+
+### 5. Students trade
+- Dashboard shows live portfolio, leaderboard, recent orders
+- Chart page shows candlestick OHLCV updated in real time
+- Trade page accepts Market / Limit / Stop orders
+- Order Book shows live bids/asks depth
+
+### Multi-device classroom setup
+| Who | Setup |
+|-----|-------|
+| Instructor | Laptop, Chrome Profile 1 (admin) |
+| Student 1 | Any device at `http://<instructor-IP>:5173` |
+| Student 2 | Any device at `http://<instructor-IP>:5173` |
+| ... | Separate browser session per student |
 
 ---
 
-## 🔐 Security Features
-
-- **Short-lived access tokens** — 15-minute expiry minimizes exposure if stolen
-- **Refresh token rotation** — Single-use tokens prevent replay attacks
-- **Hashed refresh tokens** — SHA-256 hashes stored, raw tokens never touch DB
-- **bcrypt password hashing** — Cost factor 12 for deliberate slowness
-- **Vague error messages** — Login errors don't reveal if email exists
-- **Silent password resets** — Always returns 200, doesn't leak email registration status
-- **Instant session revocation** — Blocking a user immediately invalidates all active sessions
-- **Invite-only registration** — Admin-controlled student onboarding
-
----
-
-## 📊 API Endpoints
+## API Reference
 
 ### Authentication
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/login` | Login |
+| POST | `/api/auth/register` | Complete registration (invite token) |
+| POST | `/api/auth/refresh` | Rotate tokens |
+| POST | `/api/auth/logout` | Revoke session |
+| POST | `/api/auth/forgot-password` | Send reset email |
+| POST | `/api/auth/reset-password` | Set new password |
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/auth/login` | None | Student/admin login |
-| `POST` | `/api/auth/register` | None | Complete registration (invite link) |
-| `POST` | `/api/auth/refresh` | None | Get new access token |
-| `POST` | `/api/auth/logout` | None | Revoke refresh token |
-| `POST` | `/api/auth/forgot-password` | None | Send reset email |
-| `POST` | `/api/auth/reset-password` | None | Set new password |
+### Profile
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/me` | Get own profile |
+| PUT | `/api/me` | Update name |
+| PUT | `/api/me/password` | Change password |
 
-### User Management
+### Admin — Users
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/admin/users` | List all users |
+| POST | `/api/admin/users/invite` | Invite student |
+| POST | `/api/admin/users/:id/block` | Block student |
+| POST | `/api/admin/users/:id/unblock` | Unblock student |
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/api/me` | Student/Admin | Get own profile |
-| `PUT` | `/api/me` | Student/Admin | Update name |
-| `PUT` | `/api/me/password` | Student/Admin | Change password |
-| `GET` | `/api/admin/users` | Admin only | List all users |
-| `POST` | `/api/admin/users/invite` | Admin only | Invite a student |
-| `GET` | `/api/admin/users/:id` | Admin only | Get user details |
-| `POST` | `/api/admin/users/:id/block` | Admin only | Block student |
-| `POST` | `/api/admin/users/:id/unblock` | Admin only | Unblock student |
+### Admin — Simulations
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/admin/simulations` | Create simulation |
+| POST | `/api/admin/simulations/:id/upload` | Upload CSV |
+| PUT | `/api/admin/simulations/:id/upload` | Replace CSV |
+| POST | `/api/admin/simulations/:id/start` | Start |
+| POST | `/api/admin/simulations/:id/pause` | Pause |
+| POST | `/api/admin/simulations/:id/resume` | Resume |
+| POST | `/api/admin/simulations/:id/restart` | Restart from beginning |
+| POST | `/api/admin/simulations/:id/complete` | Mark complete |
 
-### Health Check
+### Student — Simulations
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/simulations` | List all |
+| GET | `/api/simulations/active` | Get active simulation |
+| GET | `/api/simulations/:id/progress` | Timer / progress data |
+| GET | `/api/simulations/:id/ticks/:symbol` | Historical OHLCV |
+| GET | `/api/simulations/:id/ws?token=...` | WebSocket (live ticks) |
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/health` | None | Health check (for UptimeRobot) |
-
----
-
-## 🗄️ Project Structure
-
-### Backend (`simtrader/`)
-
-```
-simtrader/
-├── cmd/
-│   └── server/
-│       └── main.go              ← Entry point
-├── internal/
-│   ├── auth/                    ← Authentication module
-│   │   ├── service.go           ← Login, JWT, invites, password reset
-│   │   ├── handler.go           ← HTTP handlers for /api/auth/*
-│   │   └── mailer.go            ← Email sending (SMTP + NoOp)
-│   ├── user/                    ← User management module
-│   │   ├── model.go             ← User struct + PublicProfile
-│   │   ├── repository.go        ← Database queries
-│   │   └── handler.go           ← HTTP handlers
-│   ├── middleware/
-│   │   └── auth.go              ← RequireAuth + RequireRole
-│   ├── config/
-│   │   └── config.go            ← Environment variable loading
-│   ├── db/
-│   │   └── db.go                ← PostgreSQL connection pool
-│   ├── simulation/              ← Simulation management
-│   ├── order/                   ← Order processing
-│   ├── portfolio/               ← Portfolio tracking
-│   └── types/                   ← Shared type definitions
-├── migrations/
-│   └── 001_create_users.sql     ← Database schema + seed admin
-├── scripts/
-│   └── hash_password.go         ← bcrypt hash generator
-├── .env.example
-├── go.mod
-├── Makefile                     ← make run/build/migrate/hash
-└── README.md
-```
-
-### Frontend (`simtrader-frontend/`)
-
-```
-simtrader-frontend/
-├── src/
-│   ├── main.tsx                 ← React entry point
-│   ├── App.tsx                  ← Router + QueryClient setup
-│   ├── api/
-│   │   ├── client.ts            ← Axios HTTP client
-│   │   └── index.ts             ← Typed API functions
-│   ├── store/
-│   │   └── auth.ts              ← Zustand auth store (localStorage)
-│   ├── hooks/
-│   │   └── useSimulationSocket.ts  ← WebSocket hook for ticks
-│   ├── components/
-│   │   ├── ui/                  ← Design system components
-│   │   │   └── index.tsx        ← Button, Input, Card, Badge, etc.
-│   │   ├── layout/
-│   │   │   └── DashboardLayout.tsx
-│   │   └── auth/
-│   │       └── RequireAuth.tsx  ← Route guard
-│   ├── pages/
-│   │   ├── auth/
-│   │   │   ├── LoginPage.tsx
-│   │   │   ├── RegisterPage.tsx
-│   │   │   └── ForgotPasswordPage.tsx
-│   │   └── student/
-│   │       ├── PortfolioPage.tsx
-│   │       ├── OrderEntryPage.tsx
-│   │       ├── ChartPage.tsx
-│   │       ├── OrderBookPage.tsx
-│   │       ├── OrdersPage.tsx
-│   │       └── ProfilePage.tsx
-│   ├── types/
-│   │   └── index.ts             ← TypeScript interfaces
-│   └── index.css                ← Global styles
-├── vite.config.ts               ← Vite config (proxy to :8080)
-├── tailwind.config.js           ← Tailwind CSS (institutional design tokens)
-├── tsconfig.json
-├── package.json
-└── .env.example
-```
-
-### Tools (`simtrader-tools/`)
-
-```
-simtrader-tools/
-├── raw/                         ← Bloomberg text files (one per stock)
-├── bloomberg_to_simtrader.py    ← Bloomberg → SimTrader converter
-├── validate_simtrader_csv.py    ← CSV validation script
-├── simulation_results.csv       ← Example output
-├── AAPL.csv                     ← Example CSV
-└── README.md                    ← Complete setup guide
-```
+### Student — Trading
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/simulations/:id/portfolio` | Portfolio + positions |
+| GET | `/api/simulations/:id/portfolio/history` | Equity curve data |
+| GET | `/api/simulations/:id/leaderboard` | Ranked leaderboard |
+| POST | `/api/simulations/:id/orders` | Submit order |
+| GET | `/api/simulations/:id/orders` | List own orders |
+| DELETE | `/api/simulations/:id/orders/:orderID` | Cancel pending order |
+| GET | `/api/simulations/:id/orderbook/:symbol` | Order book depth |
 
 ---
 
-## 🎨 Frontend Design System
+## Configuration
 
-The frontend features a professional, institutional-grade UI component library:
-
-**Components:**
-- **Button** — Variants: primary, secondary, ghost, danger; sizes: sm, md, lg
-- **Input** — With label, error, hint, left/right icons
-- **Card** — Configurable padding
-- **Badge** — Variants: default, success, danger, warning, accent, neutral
-- **StatCard** — Key-value display with optional delta (green/red)
-- **EmptyState** — No-data placeholder
-- **Alert** — Error, warning, success messages
-- **Spinner** — Animated loading indicator
-
-**Color Palette:**
-- **Accent:** Blue (#1A5CFF) for primary actions
-- **Success:** Green (#0D7A4E)
-- **Danger:** Red (#C8291A)
-- **Warning:** Amber (#B45309)
-- **Bid/Ask:** Green/Red for market data
-
-**Typography:**
-- Sans-serif: Geist
-- Mono: Geist Mono
-- Display: Instrument Serif
-
----
-
-## 🌐 Deployment
-
-### Backend (Railway)
-
-1. Create a new Railway project
-2. Add a PostgreSQL service (Railway auto-provides `DATABASE_URL`)
-3. Connect your Go service repository
-4. Set all environment variables from `.env.example`
-5. Railway auto-detects Go and runs `go build ./cmd/server/main.go`
-6. Run migrations via Railway's psql console: `\i migrations/001_create_users.sql`
-7. Monitor with UptimeRobot pinging `/health` endpoint
-
-### Frontend (Any Static Host)
-
-Build the production bundle:
-```bash
-npm run build
-```
-
-Deploy the `dist/` folder to:
-- Vercel, Netlify, Cloudflare Pages, or any CDN
-- Set `VITE_API_URL` to your backend URL
-- Set `VITE_WS_URL` to your backend WebSocket URL
-
----
-
-## 🛠️ Development Commands
-
-### Backend
-
-```bash
-make run          # Start dev server
-make build        # Compile binary to ./bin/server
-make migrate      # Run database migrations
-make hash p=xxx   # Generate bcrypt hash for password
-make tidy         # Download and tidy dependencies
-make lint         # Run go vet (static analysis)
-make clean        # Remove compiled binary
-```
-
-### Frontend
-
-```bash
-npm run dev       # Start Vite dev server (:5173)
-npm run build     # Build for production
-npm run preview   # Preview production build
-npm run lint      # Run ESLint
-```
-
-### Data Tools
-
-```bash
-# Convert Bloomberg data
-python bloomberg_to_simtrader.py --input-dir ./raw --output sim.csv --date 2026-04-01
-
-# Validate CSV
-python validate_simtrader_csv.py sim.csv
-```
-
----
-
-## 📚 Choosing Simulation Dates
-
-Select dates that create valuable teaching moments:
-
-| Date Type | Market Behavior | Teaching Use |
-|-----------|----------------|--------------|
-| **Normal day** | Clean, predictable | Introductory sessions |
-| **Earnings announcement** | One stock moves sharply | Event-driven trading |
-| **Market-wide selloff** | All stocks fall | Portfolio risk management |
-| **High volatility** (KSE-100 swings >1%) | Sharp price movements | Stop-loss lessons |
-| **Low volatility** | Flat price action | Limit order patience |
-
-Prepare multiple simulation files for different scenarios and switch between them in the admin panel.
-
----
-
-## 🔧 Configuration
-
-### Backend Environment Variables (`.env`)
+### Backend (`.env`)
 
 ```env
-# Server
 PORT=8080
-ENV=development   # development | production
+ENV=development          # development | production
 
-# Database
-DATABASE_URL=postgresql://user:password@host:5432/simtrader?sslmode=require
+DATABASE_URL=postgresql://user:password@localhost:5432/simtrader
 
-# JWT Secrets (generate with: openssl rand -hex 64)
-JWT_ACCESS_SECRET=replace_with_64_byte_random_hex
-JWT_REFRESH_SECRET=replace_with_different_64_byte_random_hex
+# Generate each with: openssl rand -hex 64
+JWT_ACCESS_SECRET=...
+JWT_REFRESH_SECRET=...
 
-# Token Expiry
 JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
+JWT_REFRESH_EXPIRY=168h
 
-# Email (leave blank for local dev — prints to console)
+# Email — blank for dev (tokens print to console)
 SMTP_HOST=smtp.resend.com
 SMTP_PORT=587
 SMTP_USER=resend
 SMTP_PASS=your_resend_api_key
 EMAIL_FROM=noreply@yourdomain.com
 
-# Frontend URL (for CORS and email links)
+# For CORS + email links
 FRONTEND_URL=http://localhost:5173
 ```
 
-### Frontend Environment Variables (`.env`)
+### Frontend (`.env.local`)
 
 ```env
-VITE_API_URL=               # API base URL (blank in dev; proxy handles it)
-VITE_WS_URL=ws://localhost:8080  # WebSocket URL for simulation ticks
+# Override if backend runs on a different port (default: 8080)
+# VITE_API_PORT=8080
+
+# Override full WS URL for production
+# VITE_WS_URL=wss://yourdomain.com
 ```
 
 ---
 
-## 🧪 Testing
+## Security
 
-*(Coming soon — test coverage is planned for future releases)*
+- **Short-lived access tokens** — 15-minute expiry
+- **Refresh token rotation** — single-use, replayed tokens rejected
+- **SHA-256 hashed refresh tokens** — raw tokens never stored in DB
+- **bcrypt cost=12** — intentionally slow password hashing
+- **Vague login errors** — doesn't reveal if email exists
+- **Silent password reset** — always returns 200
+- **Instant revocation** — blocking a user kills all their active sessions
+- **Invite-only registration** — no self-signup
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### WebSocket "Insufficient resources" Error
-**Symptom:** Browser console shows `WebSocket connection failed: Insufficient resources` with repeated reconnection attempts.
+### "Connecting to simulation..." never resolves
 
-**Cause:** Multiple components (Chart, OrderBook, OrderEntry) each opened separate WebSocket connections to the same simulation, exhausting the browser's connection limit.
+1. Check the Go backend is running: `http://localhost:8080/health`
+2. Check the simulation status is `active` in the admin panel
+3. Check port 8080 firewall rule is in place (for LAN access)
+4. Open browser DevTools → Console, look for:
+   ```
+   [ws-pool] Connecting to: ws://10.x.x.x:8080/api/simulations/.../ws?token=...
+   ```
+   If the URL is wrong, check `VITE_API_PORT` in `.env.local`
+5. Check the Go terminal for `[ws] user=... connected` — if absent, the WebSocket upgrade failed
 
-**Solution:** The frontend uses a **singleton WebSocket pool** — only one connection per simulation is created per browser tab, shared across all components.
+### WebSocket connects from localhost but not from mobile/other devices
 
-### Blank Page on `npm run dev`
-**Symptom:** The dev server starts but the browser shows a blank white page.
+Port 8080 is blocked by Windows Firewall. Add the rule:
+```
+netsh advfirewall firewall add rule name="SimTrader Backend" dir=in action=allow protocol=TCP localport=8080
+```
 
-**Cause:** TypeScript compilation errors prevent Vite from serving the app.
+### Port 8080 already in use on startup
 
-**Solution:**
+A previous server process is still running:
+```
+taskkill /F /IM server.exe /T
+taskkill /F /IM main.exe /T
+```
+
+### Admin panel returns 404 on simulation controls
+
+All admin simulation endpoints require the `/admin/` prefix:
+- `POST /api/admin/simulations/:id/start`
+- `POST /api/admin/simulations/:id/pause`
+- etc.
+
+### Invite token not received
+
+In dev mode, emails are not sent. Check the **Go terminal** for:
+```
+[DEV EMAIL] Invite to student@iba.edu.pk → token: <64-char-hex>
+```
+Use that token in: `http://localhost:5173/register?token=<TOKEN>`
+
+### "Portfolio not found" error on order submission
+
+The portfolio is created lazily on first visit to the Portfolio page. The student must load `/dashboard/portfolio` once before placing orders.
+
+### Blank page on `npm run dev`
+
+TypeScript compilation errors. Run `npm run build` to see them, fix, then restart.
+
+---
+
+## Development Commands
+
+### Backend
 ```bash
-cd simtrader-frontend
-npm run build   # Shows compilation errors
-```
-Fix the reported errors and restart the dev server.
-
-### Invite Token Not Received
-**Symptom:** After inviting a student, no email arrives.
-
-**Cause:** In development mode, emails are **not sent**. The invite token is printed to the **Go backend terminal console**.
-
-**Solution:** Check the terminal where `go run ./cmd/server/main.go` is running. Look for:
-```
-[DEV EMAIL] Invite to student@example.com → token: <64-char-hex-token>
-```
-The token is a random 64-character hex string. Use it in the registration URL:
-```
-http://localhost:5173/register?token=<TOKEN>
+make run          # Start dev server (:8080)
+make build        # Compile to ./bin/server
+make migrate      # Run DB migrations
+make hash p=xxx   # Generate bcrypt hash
+make tidy         # Download dependencies
 ```
 
-### 404 Not Found on Admin Endpoints
-**Symptom:** Admin panel shows 404 errors for user management or simulation control endpoints.
+Windows alternative: double-click `simtrader/run.bat`
 
-**Cause:** Frontend API client was calling wrong endpoints (missing `/admin/` prefix).
-
-**Correct endpoint prefixes:**
-- Admin user management: `POST /api/admin/users/invite`, `GET /api/admin/users`
-- Admin simulation control: `POST /api/admin/simulations/:id/start`, `pause`, `resume`, `restart`, `complete`
-- User profile: `PUT /api/me`, `PUT /api/me/password`
-
-**Solution:** Ensure frontend is rebuilt after any API route changes:
+### Frontend
 ```bash
-cd simtrader-frontend
-npm run build
+npm run dev       # Start Vite dev server (:5173, all interfaces)
+npm run build     # TypeScript check + production build
+npm run preview   # Preview production build
 ```
 
-### Simulation Shows "Connecting..."
-**Symptom:** Student dashboard shows "Connecting to simulation…" indefinitely.
+### Data Tools
+```bash
+cd simtrader-tools
 
-**Check these:**
-1. **Backend is running** on `:8080` — check `http://localhost:8080/health`
-2. **Simulation is active** — Admin must start the simulation first
-3. **Student is logged in** — WebSocket requires a valid auth token
-4. **Backend logs show `[clock] started`** — If not, no CSV was uploaded
-5. **Check Go terminal for `[ws] user=... connected`** — If missing, WebSocket upgrade failed
-
-### Simulation Controls Unresponsive (Pause/Restart/Start)
-**Symptom:** Clicking Start/Pause/Restart buttons does nothing. The status stays the same.
-
-**Cause:** Frontend was calling `/api/simulations/:id/start` instead of `/api/admin/simulations/:id/start`.
-
-**Solution:** All admin simulation control endpoints require the `/admin/` prefix. Fixed and rebuilt.
-
----
-
-## 📝 Development Log
-
-### Session: 2025-04-14 — WebSocket + Admin Routes Fix
-
-**Issues Fixed:**
-
-1. **Blank page on `npm run dev`** — 87 TypeScript compilation errors from missing API client modules
-   - Created `authApi`, `simulationApi`, `orderApi`, `portfolioApi`, `userApi` clients
-   - Fixed all import paths from `@/types` to `@/api`
-   - Fixed function call signatures to match backend API
-
-2. **WebSocket "Insufficient resources"** — Multiple WebSocket connections per tab
-   - Implemented singleton WebSocket pool (`useSimulationSocket` hook)
-   - Each browser tab now uses exactly 1 connection regardless of active components
-
-3. **WebSocket connection failure (code 1006)** — `nhooyr.io/websocket` incompatible with Fiber
-   - Replaced with `github.com/gofiber/contrib/websocket` (native fasthttp support)
-   - WebSocket now connects directly to Go backend (not through Vite proxy)
-
-4. **Admin endpoints returning 404** — Missing `/admin/` prefix on API routes
-   - Fixed user management: `/users/*` → `/api/admin/users/*`
-   - Fixed simulation control: `/simulations/:id/start` → `/api/admin/simulations/:id/start`
-   - Fixed user profile: `/users/profile` → `/api/me`, `/users/change-password` → `/api/me/password`
-
-5. **Registration flow broken** — Invite token not sent to backend
-   - Fixed `RegisterPage` to pass `inviteToken` from URL query param
-   - Fixed `RegisterInput` type to match backend: `{ inviteToken, firstName, lastName, password }`
-
-6. **Admin "Invite student" not working** — Wrong endpoint
-   - Fixed: `POST /users/invite` → `POST /api/admin/users/invite`
-
-7. **Simulation controls unresponsive** — Same root cause as #4 (missing `/admin/` prefix)
-   - Start, Pause, Resume, Restart, Complete now all hit correct admin endpoints
-
-8. **Updated README** — Added:
-   - Complete session workflow (admin login → invite → register → simulate)
-   - Multi-user lab setup instructions (Chrome profiles)
-   - Troubleshooting section for all discovered issues
-
-**Technologies:**
-- Backend: Go Fiber, `github.com/gofiber/contrib/websocket`, `bcrypt` (cost=12), SHA-256 token hashing
-- Frontend: React 18, TypeScript, Vite 5, WebSocket singleton pattern
-- Database: PostgreSQL 16+
-
----
-
-## 🤝 Contributing
-
-This project follows a modular architecture pattern. When adding new features:
-
-1. **Follow existing module structure** — Each domain (auth, user, simulation, etc.) has its own directory with `model.go`, `repository.go`, `service.go`, `handler.go`
-2. **Maintain consistency** — Mirror patterns used in existing modules
-3. **Document thoroughly** — Update this README and add inline comments
-4. **Test before merging** — Ensure all existing functionality works
-
-### Adding New Modules
-
-When implementing new backend modules (e.g., simulation clock), follow this pattern:
-
-```
-internal/
-  simulation/
-    model.go       ← Structs and domain types
-    repository.go  ← Database queries
-    service.go     ← Business logic, goroutines, broadcast
-    handler.go     ← HTTP + WebSocket handlers
+python psx_to_simtrader.py -i ./raw -o simulation.csv -d 2026-04-03
+python validate_simtrader_csv.py simulation.csv
 ```
 
 ---
 
-## 📝 License
+## Deployment
 
-MIT License — See LICENSE file for details.
+### Backend (Railway or any server)
+
+1. Set `ENV=production` in environment variables
+2. Set `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`
+3. Set `FRONTEND_URL` to your frontend domain (for CORS)
+4. Run migrations
+5. Build: `go build -o server ./cmd/server/main.go`
+
+### Frontend (Vercel / Netlify / Cloudflare Pages)
+
+```bash
+npm run build   # outputs to dist/
+```
+
+Set in your hosting environment:
+```
+VITE_WS_URL=wss://your-backend-domain.com
+```
 
 ---
 
-## 🙏 Acknowledgments
+## Data Preparation
 
-- **Refinitiv by LSEG** — For PSX data access via Terminal
-- **TradingView** — For lightweight-charts library
-- **Go Team** — For the excellent standard library and tooling
-- **React & Vite** — For modern frontend development experience
+See **[simtrader-tools/README.md](simtrader-tools/README.md)** for the full PSX data workflow.
+
+Quick reference:
+```bash
+cd simtrader-tools
+python psx_to_simtrader.py -i ./raw -o simulation.csv -d 2026-04-03
+python validate_simtrader_csv.py simulation.csv
+# Upload simulation.csv via Admin → Simulations → Upload CSV
+```
 
 ---
 
-## 📞 Support
+## Choosing Simulation Dates
 
-- **Issues:** Open a GitHub issue for bugs or feature requests
-- **Questions:** Check component-specific READMEs for detailed documentation
-- **Security:** Report security vulnerabilities via private email (do not open public issues)
+| Date type | Market behavior | Teaching value |
+|-----------|----------------|----------------|
+| Normal day | Clean, predictable | Intro sessions |
+| Earnings day | One stock moves sharply | Event-driven trading |
+| Market selloff | All stocks fall | Portfolio risk |
+| High volatility (KSE-100 >1% swing) | Sharp moves | Stop-loss lessons |
+| Low volatility | Flat price action | Limit order patience |
 
 ---
 
 <div align="center">
 
-**Built for IBA Finance Lab - Muhammad Ali Iqbal**
+**IBA Finance Lab — SimTrader**
 
-[⬆ Back to Top](#simtrader--stock-market-simulation-platform)
+[Back to top](#simtrader--stock-market-simulation-platform)
 
 </div>

@@ -1,4 +1,4 @@
-# SimTrader Data Preparation Guide
+# SimTrader Data Preparation
 
 Convert PSX intraday data into SimTrader CSV format, validate it, and upload it to a simulation.
 
@@ -6,7 +6,7 @@ Convert PSX intraday data into SimTrader CSV format, validate it, and upload it 
 
 ## Requirements
 
-- Python 3.10+ (no third-party libraries needed)
+- Python 3.10+ (standard library only — no pip installs needed)
 - PSX intraday data exported as tab-separated `.txt` files (one file per symbol)
 
 ---
@@ -14,49 +14,51 @@ Convert PSX intraday data into SimTrader CSV format, validate it, and upload it 
 ## Scripts
 
 | Script | Purpose |
-|---|---|
+|--------|---------|
 | `psx_to_simtrader.py` | Convert PSX export files to SimTrader CSV |
 | `validate_simtrader_csv.py` | Validate the output before uploading |
 
 ---
 
-## Step 1 — Export data from PSX / your data provider
+## Workflow
 
-Export 1-minute intraday data for each symbol. The expected file format is tab-separated with this header:
+### Step 1 — Export data from your PSX data provider
+
+Export 1-minute intraday data for each symbol. The expected format is tab-separated:
 
 ```
 Exchange Date   Exchange Time   Local Date   Local Time   Close   Net   %Chg   Open   Low   High   Volume   Trade Price
 06-Apr-2026     09:30           06-Apr-2026  09:30        338.50  ...
 ```
 
-- One file per symbol, named after the symbol: `PSO.PK.txt`, `LUCK.PK.txt`, etc.
-- The exchange suffix (`.PK`, `.KAR`) is stripped automatically — `PSO.PK.txt` becomes symbol `PSO`.
-- Rows can be in any order (newest-first is fine).
-- Multiple dates in one file are supported — the `--date` flag filters to the one you want.
+Notes:
+- One `.txt` file per symbol, named after the symbol: `PSO.PK.txt`, `LUCK.PK.txt`, etc.
+- The exchange suffix (`.PK`, `.KAR`) is stripped automatically — `PSO.PK.txt` → symbol `PSO`
+- Rows can be in any order (newest-first is fine)
+- Multiple dates per file are fine — use `--date` to select the one you want
 
-Place all files in a folder:
-
+Place all files in `raw/`:
 ```
-raw/
-  PSO.PK.txt
-  LUCK.PK.txt
-  ENGRO.PK.txt
-  HBL.PK.txt
-  ...
+simtrader-tools/
+└── raw/
+    ├── PSO.PK.txt
+    ├── LUCK.PK.txt
+    ├── ENGRO.PK.txt
+    └── HBL.PK.txt
 ```
 
 ---
 
-## Step 2 — Run the converter
+### Step 2 — Convert
 
-**Single symbol:**
-```bash
-python psx_to_simtrader.py -f raw/PSO.PK.txt -o simulation.csv -d 2026-04-03
-```
-
-**Whole directory (recommended for multi-symbol simulations):**
+**Whole directory (recommended):**
 ```bash
 python psx_to_simtrader.py -i ./raw -o simulation.csv -d 2026-04-03
+```
+
+**Single file:**
+```bash
+python psx_to_simtrader.py -f raw/PSO.PK.txt -o simulation.csv -d 2026-04-03
 ```
 
 **Expected output:**
@@ -88,16 +90,16 @@ Next: validate then upload via the SimTrader admin panel.
 **Flags:**
 
 | Flag | Description |
-|---|---|
+|------|-------------|
 | `-f / --input-file` | Single `.txt` file |
-| `-i / --input-dir` | Directory of `.txt` files (one per symbol) |
+| `-i / --input-dir` | Directory of `.txt` files |
 | `-o / --output` | Output CSV path |
 | `-d / --date` | Trading date to extract (`YYYY-MM-DD`) |
 | `--no-fill` | Skip forward-fill of missing bars |
 
 ---
 
-## Step 3 — Validate before uploading
+### Step 3 — Validate
 
 ```bash
 python validate_simtrader_csv.py simulation.csv
@@ -117,22 +119,23 @@ PASSED -- safe to upload to SimTrader.
 =======================================================
 ```
 
-**If validation fails**, fix the reported errors before uploading. Common issues are listed in the Troubleshooting section below.
+Fix any reported errors before uploading.
 
 ---
 
-## Step 4 — Upload to SimTrader
+### Step 4 — Upload
 
 1. Log in as **admin**
-2. Go to **Simulation Management**
-3. Create a new simulation or select an existing draft
+2. Go to **Admin → Simulations**
+3. Create a new simulation (or select a draft)
 4. Click **Upload CSV** and select your file
+5. Click **Start** to begin the simulation
 
 ---
 
-## Output format reference
+## Output Format
 
-The SimTrader CSV format expected by the backend:
+The SimTrader CSV format the backend expects:
 
 ```
 timestamp,symbol,open,high,low,close,volume
@@ -140,46 +143,59 @@ timestamp,symbol,open,high,low,close,volume
 2026-04-03T04:30:00Z,LUCK,100.50,101.20,100.10,100.80,12000
 ```
 
-- Timestamps are UTC (PSX session 09:30-15:29 PKT = 04:30-10:29 UTC)
-- All symbols share the same set of timestamps (360 bars per symbol per day)
+- Timestamps are **UTC** (PSX session 09:30–15:29 PKT = 04:30–10:29 UTC)
+- All symbols share the same 360 timestamps per session day
 - Rows sorted by timestamp, then symbol
 
 ---
 
-## PSX session reference
+## PSX Session Reference
 
 | | PKT (local) | UTC (stored in DB) |
-|---|---|---|
+|--|-------------|-------------------|
 | Market open | 09:30 | 04:30 |
 | Market close | 15:29 | 10:29 |
-| Total bars | 360 per symbol | 360 per symbol |
+| Bars per symbol | 360 | 360 |
 
 ---
 
-## Choosing a good simulation date
+## Recommended Symbols
 
-| Date type | Teaching value |
-|---|---|
-| Normal day | Clean, predictable -- good for intro sessions |
-| Earnings announcement day | One stock moves sharply -- teaches event-driven trading |
-| Market-wide selloff | All stocks fall -- teaches portfolio risk |
-| High volatility day (KSE-100 swings >1%) | Good for stop-loss lessons |
-| Low volatility day | Good for limit order patience lessons |
+| Category | Examples | Teaching Purpose |
+|----------|---------|-----------------|
+| Large cap | LUCK, ENGRO, HBL, UBL, MCB | Tight spreads, market order lessons |
+| Mid cap | OGDC, PPL, PSO, HUBC | Moderate volatility |
+| Volatile | SYS, TRG, AVN | High beta for stop-loss lessons |
+| Defensive | NESTLE, COLG, SRVI | Low volatility, position sizing |
 
-Prepare multiple CSV files for different scenarios and switch between them in the admin panel.
+Aim for 8–20 symbols per simulation. Too few limits diversification exercises; too many is overwhelming for students in a one-session demo.
+
+---
+
+## Choosing a Simulation Date
+
+| Date type | Market behavior | Teaching value |
+|-----------|----------------|----------------|
+| Normal day | Clean, predictable | Intro sessions |
+| Earnings announcement | One stock moves sharply | Event-driven trading |
+| Market-wide selloff | All stocks fall | Portfolio risk management |
+| High volatility (KSE-100 >1% swing) | Sharp moves | Stop-loss and limit orders |
+| Low volatility | Flat price action | Limit order patience |
+
+Prepare several CSV files for different scenarios and switch between them in the admin panel.
 
 ---
 
 ## Troubleshooting
 
-**"No data for YYYY-MM-DD -- check --date or file contents"**
-The date you passed to `--date` has no rows in that file. Verify the date exists in the export and matches the `DD-Mon-YYYY` format in the file (e.g. `03-Apr-2026`).
+**"No data for YYYY-MM-DD — check --date or file contents"**
+The date passed to `--date` has no rows in that file. Verify the date exists and matches the `DD-Mon-YYYY` format in the source file (e.g. `03-Apr-2026`).
 
 **"Forward-filled N missing bar(s)"**
-Normal for less liquid stocks. Missing minutes within the session are filled by carrying the previous close forward as a flat bar with volume=0. Students see these as flat candles.
+Normal for less liquid stocks. Missing minutes are filled by carrying the previous close forward as a flat bar with volume=0. Students see these as flat candles — expected behaviour.
 
 **Bars per symbol range shows a mismatch in validation**
-One symbol has fewer bars than others. This is usually fine if you ran the converter with forward-fill enabled (the default). If the count is much lower than 360, the source file may have incomplete data for that date.
+One symbol has fewer bars. This is fine if forward-fill is enabled (default). If the count is much lower than 360, the source file may have incomplete data for that date.
 
 **"high < max(open, close)" errors in validation**
-The source data has inconsistent OHLC values. The converter clamps high/low automatically (`high = max(high, open, close)`), so this should not appear in converter output. If it does, the source file may be corrupted.
+Inconsistent OHLC values in the source. The converter clamps automatically (`high = max(high, open, close)`). If this still appears in converter output, the source file is likely corrupted.

@@ -109,15 +109,15 @@ export default function DashboardLayout() {
   })
 
   return (
-    <div className="flex h-screen bg-surface dark:bg-dark-surface overflow-hidden">
+    <div className="flex h-screen ambient-bg overflow-hidden">
       {/* Theme toggle — fixed top-right like sign-in page */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50 glass-pill p-0.5">
         <ThemeToggle />
       </div>
 
       {/* Sidebar */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-50 w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col transition-transform duration-200',
+        'fixed inset-y-0 left-0 z-50 w-56 glass-panel border-r border-border/60 dark:border-dark-border/60 flex flex-col transition-transform duration-200',
         'lg:static lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full',
       )}>
@@ -194,7 +194,7 @@ export default function DashboardLayout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar — mobile only */}
-        <header className="lg:hidden flex items-center gap-3 px-4 h-14 border-b border-border dark:border-dark-border bg-surface dark:bg-dark-surface flex-shrink-0">
+        <header className="lg:hidden flex items-center gap-3 px-4 h-14 border-b border-border/60 dark:border-dark-border/60 glass-panel flex-shrink-0">
           <button onClick={() => setSidebarOpen(true)} className="p-1 text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink">
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

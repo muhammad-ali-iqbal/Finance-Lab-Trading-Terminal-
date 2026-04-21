@@ -114,6 +114,13 @@ export default {
         'dark-dropdown': '0 4px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3)',
         modal: '0 16px 48px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.08)',
         'dark-modal': '0 16px 48px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)',
+        // Glassmorphism — soft, diffused shadows that match frosted glass
+        glass: '0 8px 32px rgba(15,15,14,0.08), 0 1px 2px rgba(15,15,14,0.04), inset 0 1px 0 rgba(255,255,255,0.6)',
+        'dark-glass': '0 8px 32px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
+      },
+      backdropBlur: {
+        xs: '4px',
+        glass: '14px',
       },
       keyframes: {
         'fade-up': {

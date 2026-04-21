@@ -273,23 +273,27 @@ export default function OverviewPage() {
       {/* ── Stat cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
+          variant="glass"
           label="Total Account Value"
           value={fmtPKR(enriched.totalEquity)}
           mono
         />
         <StatCard
+          variant="glass"
           label="Unrealized P&L"
           value={(pnlUp ? '+' : '') + fmtPKR(enriched.unrealizedPnL)}
           delta={enriched.unrealizedPnL !== 0 ? (pnlUp ? Math.abs(enriched.unrealizedPnL / (enriched.totalEquity || 1) * 100) : -Math.abs(enriched.unrealizedPnL / (enriched.totalEquity || 1) * 100)) : 0}
           mono
         />
         <StatCard
+          variant="glass"
           label="Cash Balance"
           value={fmtPKR(enriched.cashBalance)}
           deltaLabel="Available"
           mono
         />
         <StatCard
+          variant="glass"
           label="Total Return"
           value={fmtPct(totalReturnPct)}
           delta={totalReturnPct}
@@ -312,7 +316,7 @@ export default function OverviewPage() {
         </Card>
 
         {/* Asset allocation */}
-        <Card padding="sm" className="lg:col-span-2">
+        <Card variant="glass" padding="sm" className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-3">Asset Allocation</h2>
           {donutSegments.length === 0 ? (
             <div className="flex items-center justify-center h-40 text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
@@ -414,7 +418,7 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Recent Activity */}
-        <Card padding="none">
+        <Card variant="glass" padding="none">
           <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center justify-between">
             <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Recent Activity</h2>
             <button
@@ -470,7 +474,7 @@ export default function OverviewPage() {
         </Card>
 
         {/* Leaderboard */}
-        <Card padding="none">
+        <Card variant="glass" padding="none">
           <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center gap-2">
             <Trophy className="w-4 h-4 text-warning" />
             <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Leaderboard</h2>

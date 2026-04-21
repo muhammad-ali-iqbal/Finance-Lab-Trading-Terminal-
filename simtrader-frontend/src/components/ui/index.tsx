@@ -111,15 +111,19 @@ interface CardProps {
   children: ReactNode
   className?: string
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  variant?: 'solid' | 'glass'
   onClick?: () => void
 }
 
-export function Card({ children, className, padding = 'md', onClick }: CardProps) {
+export function Card({ children, className, padding = 'md', variant = 'solid', onClick }: CardProps) {
   const paddings = { none: '', sm: 'p-3', md: 'p-4', lg: 'p-6' }
+  const base = variant === 'glass'
+    ? 'glass-subtle rounded-lg'
+    : 'bg-surface border border-border rounded-lg shadow-card dark:bg-dark-surface dark:border-dark-border dark:shadow-dark-card'
   return (
     <div
       onClick={onClick}
-      className={clsx('bg-surface border border-border rounded-lg shadow-card dark:bg-dark-surface dark:border-dark-border dark:shadow-dark-card', paddings[padding], className, onClick && 'cursor-pointer')}
+      className={clsx(base, paddings[padding], className, onClick && 'cursor-pointer')}
     >
       {children}
     </div>
@@ -183,12 +187,13 @@ interface StatCardProps {
   delta?: number       // positive = green, negative = red
   deltaLabel?: string
   mono?: boolean
+  variant?: 'solid' | 'glass'
   className?: string
 }
 
-export function StatCard({ label, value, delta, deltaLabel, mono, className }: StatCardProps) {
+export function StatCard({ label, value, delta, deltaLabel, mono, variant = 'solid', className }: StatCardProps) {
   return (
-    <Card className={clsx('flex flex-col gap-1', className)}>
+    <Card variant={variant} className={clsx('flex flex-col gap-1', className)}>
       <span className="text-[11px] font-medium uppercase tracking-widest text-ink-tertiary dark:text-dark-ink-tertiary">{label}</span>
       <span className={clsx('text-xl font-semibold text-ink dark:text-dark-ink', mono && 'font-mono tabular-nums')}>
         {value}
