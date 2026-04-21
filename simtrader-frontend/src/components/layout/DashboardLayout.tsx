@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
-  User, LogOut, Menu, X, ChevronRight, Activity
+  User, LogOut, Menu, X, ChevronRight, Activity, Briefcase
 } from 'lucide-react'
 
 // Compact sidebar widget — reads active sim from shared React Query cache
@@ -50,12 +50,13 @@ function SimulationSidebarWidget() {
 }
 
 const navItems = [
-  { to: '/dashboard',       icon: LayoutDashboard, label: 'Portfolio'    },
-  { to: '/dashboard/trade', icon: TrendingUp,      label: 'Order Entry'  },
-  { to: '/dashboard/chart', icon: BarChart3,        label: 'Charts'       },
-  { to: '/dashboard/book',  icon: BookOpen,         label: 'Order Book'   },
-  { to: '/dashboard/orders',icon: Activity,         label: 'My Orders'    },
-  { to: '/dashboard/profile', icon: User,           label: 'Profile'      },
+  { to: '/dashboard',            icon: LayoutDashboard, label: 'Overview'    },
+  { to: '/dashboard/portfolio',  icon: Briefcase,       label: 'Portfolio'   },
+  { to: '/dashboard/trade',      icon: TrendingUp,      label: 'Order Entry' },
+  { to: '/dashboard/chart',      icon: BarChart3,       label: 'Charts'      },
+  { to: '/dashboard/book',       icon: BookOpen,        label: 'Order Book'  },
+  { to: '/dashboard/orders',     icon: Activity,        label: 'My Orders'   },
+  { to: '/dashboard/profile',    icon: User,            label: 'Profile'     },
 ]
 
 // Detects simulation restarts (simulationTime jumping backwards) and flushes
@@ -122,10 +123,16 @@ export default function DashboardLayout() {
       )}>
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border flex-shrink-0">
-          <div className="w-6 h-6 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-3.5 h-3.5 text-surface dark:text-dark-surface" strokeWidth={2.5} />
+          <img
+            src="/iba-logo.png"
+            alt="IBA"
+            className="h-7 w-auto object-contain flex-shrink-0"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+          <div className="min-w-0">
+            <p className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink leading-tight">SimTrader</p>
+            <p className="text-[9px] font-semibold tracking-widest uppercase text-iba dark:text-dark-iba leading-tight">Finance Lab</p>
           </div>
-          <span className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
         </div>
 
         {/* Live simulation timer */}
@@ -140,10 +147,10 @@ export default function DashboardLayout() {
               end={to === '/dashboard'}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => clsx(
-                'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group',
+                'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group border-l-2',
                 isActive
-                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
-                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink',
+                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface border-iba dark:border-dark-iba'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink border-transparent',
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />

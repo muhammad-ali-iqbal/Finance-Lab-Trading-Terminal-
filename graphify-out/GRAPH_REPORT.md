@@ -1,12 +1,12 @@
 # Graph Report - .  (2026-04-20)
 
 ## Corpus Check
-- 59 files · ~46,447 words
+- 61 files · ~1,086,277 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 367 nodes · 602 edges · 67 communities detected
-- Extraction: 61% EXTRACTED · 39% INFERRED · 0% AMBIGUOUS · INFERRED: 237 edges (avg confidence: 0.8)
+- 397 nodes · 656 edges · 67 communities detected
+- Extraction: 63% EXTRACTED · 37% INFERRED · 0% AMBIGUOUS · INFERRED: 244 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -82,25 +82,25 @@
 1. `BadRequest()` - 31 edges
 2. `Status` - 28 edges
 3. `InternalError()` - 27 edges
-4. `Repository` - 22 edges
+4. `Repository` - 23 edges
 5. `Handler` - 20 edges
 6. `main()` - 16 edges
 7. `Repository` - 16 edges
-8. `Close()` - 14 edges
+8. `Close()` - 15 edges
 9. `Service` - 12 edges
 10. `GetClaims()` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `main()` --calls--> `NewSMTPMailer()`  [INFERRED]
-  simtrader\cmd\server\main.go → simtrader\internal\auth\mailer.go
 - `main()` --calls--> `NewService()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\auth\service.go
 - `main()` --calls--> `NewEngine()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\order\engine.go
-- `main()` --calls--> `NewOrderRepository()`  [INFERRED]
-  simtrader\cmd\server\main.go → simtrader\internal\order\handler.go
 - `jsonErrorHandler()` --calls--> `Status`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\user\model.go
+- `main()` --calls--> `Connect()`  [INFERRED]
+  simtrader\cmd\server\main.go → simtrader\internal\db\db.go
+- `main()` --calls--> `Close()`  [INFERRED]
+  simtrader\cmd\server\main.go → simtrader\internal\db\db.go
 
 ## Hyperedges (group relationships)
 - **Student Trading Flow (Order â†’ Portfolio â†’ P&L)** — claudemd_order_module, claudemd_portfolio_module, claudemd_simulation_clock [INFERRED 0.85]
@@ -112,56 +112,56 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.11
-Nodes (11): GetClaims(), Handler, BadRequest(), InternalError(), mapAuthError(), Handler, Handler, Handler (+3 more)
+Cohesion: 0.06
+Nodes (19): Mailer, NoOpMailer, Service, TokenPair, handler(), contains(), containsRune(), isDuplicateError() (+11 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.08
-Nodes (14): Mailer, NoOpMailer, Service, TokenPair, scanUser(), generateSecureToken(), hashPassword(), hashToken() (+6 more)
-
-### Community 2 - "Community 2"
-Cohesion: 0.09
 Nodes (8): NewClock(), NewRepository(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry, Repository
 
+### Community 2 - "Community 2"
+Cohesion: 0.15
+Nodes (11): extractBearerToken(), GetClaims(), RequireAuth(), RequireRole(), BadRequest(), InternalError(), TokenParser, Handler (+3 more)
+
 ### Community 3 - "Community 3"
-Cohesion: 0.09
-Nodes (14): extractBearerToken(), RequireAuth(), RequireRole(), jsonErrorHandler(), main(), TokenParser, set(), RequireAuth() (+6 more)
+Cohesion: 0.07
+Nodes (22): SMTPMailer, Config, getEnv(), Load(), parseDuration(), requireEnv(), NewHandler(), NewOrderRepository() (+14 more)
 
 ### Community 4 - "Community 4"
+Cohesion: 0.13
+Nodes (21): detect_columns(), expand_daily_to_minutes(), forward_fill_gaps(), _in_session(), main(), parse_daily_file(), parse_datetime(), parse_intraday_file() (+13 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.1
 Nodes (24): Admin Route Prefix Convention, Go Backend Architecture, Bloomberg to SimTrader CSV Conversion Tool, Directory Structure and Project Layout, React Frontend Architecture, Go 1.22+ with Fiber v2, Insufficient Resources WebSocket Issue, Invite-Only Registration Pattern (+16 more)
 
-### Community 5 - "Community 5"
-Cohesion: 0.09
-Nodes (19): authResponse, forgotPasswordRequest, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest, NewHandler() (+11 more)
-
 ### Community 6 - "Community 6"
 Cohesion: 0.14
-Nodes (5): Close(), Connect(), NewEngine(), Engine, OrderRepository
+Nodes (11): authResponse, forgotPasswordRequest, Handler, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest (+3 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
 ### Community 8 - "Community 8"
+Cohesion: 0.15
+Nodes (7): Close(), Connect(), OrderRepository, getConn(), notify(), wsConnect(), wsDisconnect()
+
+### Community 9 - "Community 9"
 Cohesion: 0.19
 Nodes (5): Handler, Portfolio, Position, Repository, SimRepo
 
-### Community 9 - "Community 9"
-Cohesion: 0.28
-Nodes (5): handler(), contains(), containsRune(), isDuplicateError(), scanFn
-
 ### Community 10 - "Community 10"
-Cohesion: 0.29
-Nodes (2): useTheme(), ThemeToggle()
+Cohesion: 0.36
+Nodes (9): forward_fill(), in_session(), main(), parse_file(), parse_row_date(), pf(), pkt_to_utc(), PSO.PK.txt  →  PSO   (strips exchange suffix like .PK, .KAR) (+1 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.47
-Nodes (2): SMTPMailer, NewSMTPMailer()
+Cohesion: 0.43
+Nodes (2): NewEngine(), Engine
 
 ### Community 12 - "Community 12"
-Cohesion: 0.6
-Nodes (5): Config, getEnv(), Load(), parseDuration(), requireEnv()
+Cohesion: 0.29
+Nodes (2): useTheme(), ThemeToggle()
 
 ### Community 13 - "Community 13"
 Cohesion: 0.47
@@ -380,7 +380,7 @@ Cohesion: 1.0
 Nodes (1): Light/Dark Mode Toggle UI Component
 
 ## Knowledge Gaps
-- **73 isolated node(s):** `loginRequest`, `registerRequest`, `refreshRequest`, `logoutRequest`, `forgotPasswordRequest` (+68 more)
+- **82 isolated node(s):** `loginRequest`, `registerRequest`, `refreshRequest`, `logoutRequest`, `forgotPasswordRequest` (+77 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 20`** (2 nodes): `processPending()`, `client.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -480,12 +480,12 @@ Nodes (1): Light/Dark Mode Toggle UI Component
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 11`, `Community 12`?**
-  _High betweenness centrality (0.107) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Community 8`, `Community 2`, `Community 3`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 8`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Why does `main()` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 8`, `Community 11`?**
+  _High betweenness centrality (0.117) - this node is a cross-community bridge._
+- **Why does `Status` connect `Community 2` to `Community 9`, `Community 3`, `Community 6`, `Community 1`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `set()` connect `Community 4` to `Community 8`?**
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Are the 30 inferred relationships involving `BadRequest()` (e.g. with `.Login()` and `.CompleteRegistration()`) actually correct?**
   _`BadRequest()` has 30 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 27 inferred relationships involving `Status` (e.g. with `main()` and `jsonErrorHandler()`) actually correct?**
@@ -493,4 +493,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 26 inferred relationships involving `InternalError()` (e.g. with `Status` and `.SubmitOrder()`) actually correct?**
   _`InternalError()` has 26 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `loginRequest`, `registerRequest`, `refreshRequest` to the rest of the system?**
-  _73 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _82 weakly-connected nodes found - possible documentation gaps or missing edges._

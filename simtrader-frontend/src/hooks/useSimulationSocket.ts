@@ -10,8 +10,12 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { useAuthStore } from '@/store/auth'
 import type { SimulationTick, PriceTick } from '@/api'
 
-// In dev mode, connect directly to Go backend. In production, use VITE_WS_URL.
-const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:8080'
+// Connect directly to the Go backend (port 8080), bypassing the Vite proxy.
+// Vite's ws:true proxy is unreliable for non-HMR WebSocket upgrades.
+// window.location.hostname gives the right host for localhost, LAN IP, or production domain.
+const _backendPort = import.meta.env.VITE_API_PORT ?? '8080'
+const WS_URL = import.meta.env.VITE_WS_URL ??
+  `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:${_backendPort}`
 const RECONNECT_DELAY_MS = 3000
 const MAX_RECONNECT_ATTEMPTS = 10
 
@@ -59,7 +63,7 @@ function wsConnect(simId: string, token: string) {
   conn.error = null; notify(simId)
 
   const url = `${WS_URL}/api/simulations/${simId}/ws?token=${token}`
-  console.log('[ws-pool] Connecting:', simId)
+  console.log('[ws-pool] Connecting to:', url)
 
   const ws = new WebSocket(url)
   conn.ws = ws

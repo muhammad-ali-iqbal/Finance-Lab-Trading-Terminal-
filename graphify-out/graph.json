@@ -113,7 +113,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_auth_handler_go",
-      "community": 5,
+      "community": 6,
       "norm_label": "handler.go"
     },
     {
@@ -122,7 +122,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L18",
       "id": "auth_handler",
-      "community": 0,
+      "community": 6,
       "norm_label": "handler"
     },
     {
@@ -131,7 +131,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L30",
       "id": "handler_newhandler",
-      "community": 5,
+      "community": 3,
       "norm_label": "newhandler()"
     },
     {
@@ -140,7 +140,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L28",
       "id": "auth_handler_registerroutes",
-      "community": 0,
+      "community": 6,
       "norm_label": ".registerroutes()"
     },
     {
@@ -149,7 +149,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L40",
       "id": "auth_loginrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "loginrequest"
     },
     {
@@ -158,7 +158,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L45",
       "id": "auth_registerrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "registerrequest"
     },
     {
@@ -167,7 +167,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L52",
       "id": "auth_refreshrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "refreshrequest"
     },
     {
@@ -176,7 +176,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L56",
       "id": "auth_logoutrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "logoutrequest"
     },
     {
@@ -185,7 +185,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L60",
       "id": "auth_forgotpasswordrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "forgotpasswordrequest"
     },
     {
@@ -194,7 +194,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L64",
       "id": "auth_resetpasswordrequest",
-      "community": 5,
+      "community": 6,
       "norm_label": "resetpasswordrequest"
     },
     {
@@ -203,7 +203,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L69",
       "id": "auth_authresponse",
-      "community": 5,
+      "community": 6,
       "norm_label": "authresponse"
     },
     {
@@ -212,7 +212,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L81",
       "id": "auth_handler_login",
-      "community": 0,
+      "community": 6,
       "norm_label": ".login()"
     },
     {
@@ -221,7 +221,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L106",
       "id": "auth_handler_completeregistration",
-      "community": 0,
+      "community": 6,
       "norm_label": ".completeregistration()"
     },
     {
@@ -230,7 +230,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L140",
       "id": "auth_handler_refreshtokens",
-      "community": 0,
+      "community": 6,
       "norm_label": ".refreshtokens()"
     },
     {
@@ -257,7 +257,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L200",
       "id": "auth_handler_resetpassword",
-      "community": 0,
+      "community": 6,
       "norm_label": ".resetpassword()"
     },
     {
@@ -266,7 +266,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L223",
       "id": "handler_mapautherror",
-      "community": 0,
+      "community": 6,
       "norm_label": "mapautherror()"
     },
     {
@@ -275,7 +275,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L1",
       "id": "simtrader_internal_auth_mailer_go",
-      "community": 11,
+      "community": 3,
       "norm_label": "mailer.go"
     },
     {
@@ -284,7 +284,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L16",
       "id": "auth_smtpmailer",
-      "community": 11,
+      "community": 3,
       "norm_label": "smtpmailer"
     },
     {
@@ -293,7 +293,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L20",
       "id": "mailer_newsmtpmailer",
-      "community": 11,
+      "community": 3,
       "norm_label": "newsmtpmailer()"
     },
     {
@@ -302,7 +302,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L25",
       "id": "auth_smtpmailer_sendinvite",
-      "community": 11,
+      "community": 3,
       "norm_label": ".sendinvite()"
     },
     {
@@ -311,7 +311,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L45",
       "id": "auth_smtpmailer_sendpasswordreset",
-      "community": 11,
+      "community": 3,
       "norm_label": ".sendpasswordreset()"
     },
     {
@@ -320,7 +320,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L66",
       "id": "auth_smtpmailer_send",
-      "community": 11,
+      "community": 3,
       "norm_label": ".send()"
     },
     {
@@ -329,7 +329,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L83",
       "id": "auth_noopmailer",
-      "community": 1,
+      "community": 0,
       "norm_label": "noopmailer"
     },
     {
@@ -338,7 +338,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L85",
       "id": "auth_noopmailer_sendinvite",
-      "community": 1,
+      "community": 0,
       "norm_label": ".sendinvite()"
     },
     {
@@ -347,7 +347,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L90",
       "id": "auth_noopmailer_sendpasswordreset",
-      "community": 1,
+      "community": 0,
       "norm_label": ".sendpasswordreset()"
     },
     {
@@ -356,7 +356,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L1",
       "id": "simtrader_internal_auth_service_go",
-      "community": 1,
+      "community": 0,
       "norm_label": "service.go"
     },
     {
@@ -365,7 +365,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L41",
       "id": "auth_tokenpair",
-      "community": 1,
+      "community": 0,
       "norm_label": "tokenpair"
     },
     {
@@ -374,7 +374,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L46",
       "id": "auth_service",
-      "community": 1,
+      "community": 0,
       "norm_label": "service"
     },
     {
@@ -383,7 +383,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L53",
       "id": "auth_mailer",
-      "community": 1,
+      "community": 0,
       "norm_label": "mailer"
     },
     {
@@ -392,7 +392,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L58",
       "id": "service_newservice",
-      "community": 1,
+      "community": 0,
       "norm_label": "newservice()"
     },
     {
@@ -401,7 +401,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L64",
       "id": "auth_service_verifypassword",
-      "community": 1,
+      "community": 0,
       "norm_label": ".verifypassword()"
     },
     {
@@ -410,7 +410,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L77",
       "id": "auth_service_login",
-      "community": 1,
+      "community": 0,
       "norm_label": ".login()"
     },
     {
@@ -419,7 +419,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L109",
       "id": "auth_service_invitestudent",
-      "community": 1,
+      "community": 0,
       "norm_label": ".invitestudent()"
     },
     {
@@ -428,7 +428,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L139",
       "id": "auth_service_completeregistration",
-      "community": 1,
+      "community": 0,
       "norm_label": ".completeregistration()"
     },
     {
@@ -437,7 +437,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L172",
       "id": "auth_service_forgotpassword",
-      "community": 1,
+      "community": 0,
       "norm_label": ".forgotpassword()"
     },
     {
@@ -446,7 +446,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L198",
       "id": "auth_service_resetpassword",
-      "community": 1,
+      "community": 0,
       "norm_label": ".resetpassword()"
     },
     {
@@ -455,7 +455,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L221",
       "id": "auth_service_refreshtokens",
-      "community": 1,
+      "community": 0,
       "norm_label": ".refreshtokens()"
     },
     {
@@ -464,7 +464,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L251",
       "id": "auth_service_logout",
-      "community": 1,
+      "community": 0,
       "norm_label": ".logout()"
     },
     {
@@ -473,7 +473,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L259",
       "id": "auth_service_issuetokenpair",
-      "community": 1,
+      "community": 0,
       "norm_label": ".issuetokenpair()"
     },
     {
@@ -482,7 +482,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L283",
       "id": "auth_service_createaccesstoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".createaccesstoken()"
     },
     {
@@ -491,7 +491,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L301",
       "id": "auth_service_parseaccesstoken",
-      "community": 3,
+      "community": 1,
       "norm_label": ".parseaccesstoken()"
     },
     {
@@ -500,7 +500,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L322",
       "id": "service_hashpassword",
-      "community": 1,
+      "community": 0,
       "norm_label": "hashpassword()"
     },
     {
@@ -509,7 +509,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L329",
       "id": "service_generatesecuretoken",
-      "community": 1,
+      "community": 0,
       "norm_label": "generatesecuretoken()"
     },
     {
@@ -518,7 +518,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L339",
       "id": "service_hashtoken",
-      "community": 1,
+      "community": 0,
       "norm_label": "hashtoken()"
     },
     {
@@ -527,7 +527,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L1",
       "id": "simtrader_internal_config_config_go",
-      "community": 12,
+      "community": 3,
       "norm_label": "config.go"
     },
     {
@@ -536,7 +536,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L18",
       "id": "config_config",
-      "community": 12,
+      "community": 3,
       "norm_label": "config"
     },
     {
@@ -545,7 +545,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L40",
       "id": "config_load",
-      "community": 12,
+      "community": 3,
       "norm_label": "load()"
     },
     {
@@ -554,7 +554,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L75",
       "id": "config_getenv",
-      "community": 12,
+      "community": 3,
       "norm_label": "getenv()"
     },
     {
@@ -563,7 +563,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L82",
       "id": "config_requireenv",
-      "community": 12,
+      "community": 3,
       "norm_label": "requireenv()"
     },
     {
@@ -572,7 +572,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L90",
       "id": "config_parseduration",
-      "community": 12,
+      "community": 3,
       "norm_label": "parseduration()"
     },
     {
@@ -581,7 +581,7 @@
       "source_file": "simtrader\\internal\\db\\db.go",
       "source_location": "L1",
       "id": "simtrader_internal_db_db_go",
-      "community": 6,
+      "community": 8,
       "norm_label": "db.go"
     },
     {
@@ -590,7 +590,7 @@
       "source_file": "simtrader\\internal\\db\\db.go",
       "source_location": "L26",
       "id": "db_connect",
-      "community": 6,
+      "community": 8,
       "norm_label": "connect()"
     },
     {
@@ -599,7 +599,7 @@
       "source_file": "simtrader\\internal\\db\\db.go",
       "source_location": "L63",
       "id": "db_close",
-      "community": 6,
+      "community": 8,
       "norm_label": "close()"
     },
     {
@@ -608,7 +608,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L1",
       "id": "simtrader_internal_httputil_errors_go",
-      "community": 0,
+      "community": 2,
       "norm_label": "errors.go"
     },
     {
@@ -617,7 +617,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L5",
       "id": "errors_badrequest",
-      "community": 0,
+      "community": 2,
       "norm_label": "badrequest()"
     },
     {
@@ -626,7 +626,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L9",
       "id": "errors_internalerror",
-      "community": 0,
+      "community": 2,
       "norm_label": "internalerror()"
     },
     {
@@ -635,7 +635,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L1",
       "id": "simtrader_internal_middleware_auth_go",
-      "community": 3,
+      "community": 2,
       "norm_label": "auth.go"
     },
     {
@@ -644,7 +644,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L15",
       "id": "middleware_tokenparser",
-      "community": 3,
+      "community": 2,
       "norm_label": "tokenparser"
     },
     {
@@ -653,7 +653,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L20",
       "id": "auth_requireauth",
-      "community": 3,
+      "community": 2,
       "norm_label": "requireauth()"
     },
     {
@@ -662,7 +662,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L41",
       "id": "auth_requirerole",
-      "community": 3,
+      "community": 2,
       "norm_label": "requirerole()"
     },
     {
@@ -671,7 +671,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L63",
       "id": "auth_getclaims",
-      "community": 0,
+      "community": 2,
       "norm_label": "getclaims()"
     },
     {
@@ -680,7 +680,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L68",
       "id": "auth_extractbearertoken",
-      "community": 3,
+      "community": 2,
       "norm_label": "extractbearertoken()"
     },
     {
@@ -689,7 +689,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L1",
       "id": "simtrader_internal_order_engine_go",
-      "community": 6,
+      "community": 11,
       "norm_label": "engine.go"
     },
     {
@@ -698,7 +698,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L39",
       "id": "order_engine",
-      "community": 6,
+      "community": 11,
       "norm_label": "engine"
     },
     {
@@ -707,7 +707,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L43",
       "id": "engine_newengine",
-      "community": 6,
+      "community": 11,
       "norm_label": "newengine()"
     },
     {
@@ -716,7 +716,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L49",
       "id": "order_engine_processtickorders",
-      "community": 6,
+      "community": 11,
       "norm_label": ".processtickorders()"
     },
     {
@@ -725,7 +725,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L66",
       "id": "order_engine_processsymbolorders",
-      "community": 6,
+      "community": 11,
       "norm_label": ".processsymbolorders()"
     },
     {
@@ -734,7 +734,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L124",
       "id": "order_engine_determinefill",
-      "community": 6,
+      "community": 11,
       "norm_label": ".determinefill()"
     },
     {
@@ -743,7 +743,7 @@
       "source_file": "simtrader\\internal\\order\\engine.go",
       "source_location": "L186",
       "id": "order_engine_executefill",
-      "community": 6,
+      "community": 11,
       "norm_label": ".executefill()"
     },
     {
@@ -752,7 +752,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_order_handler_go",
-      "community": 5,
+      "community": 3,
       "norm_label": "handler.go"
     },
     {
@@ -761,7 +761,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L25",
       "id": "order_order",
-      "community": 5,
+      "community": 3,
       "norm_label": "order"
     },
     {
@@ -770,7 +770,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L44",
       "id": "order_orderbooklevel",
-      "community": 5,
+      "community": 3,
       "norm_label": "orderbooklevel"
     },
     {
@@ -779,7 +779,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L50",
       "id": "order_orderbook",
-      "community": 5,
+      "community": 3,
       "norm_label": "orderbook"
     },
     {
@@ -788,7 +788,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L60",
       "id": "order_orderrepository",
-      "community": 6,
+      "community": 8,
       "norm_label": "orderrepository"
     },
     {
@@ -797,7 +797,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L64",
       "id": "handler_neworderrepository",
-      "community": 5,
+      "community": 3,
       "norm_label": "neworderrepository()"
     },
     {
@@ -806,7 +806,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L68",
       "id": "order_orderrepository_getportfolioid",
-      "community": 6,
+      "community": 8,
       "norm_label": ".getportfolioid()"
     },
     {
@@ -815,7 +815,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L83",
       "id": "order_orderrepository_insert",
-      "community": 6,
+      "community": 8,
       "norm_label": ".insert()"
     },
     {
@@ -824,7 +824,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L95",
       "id": "order_orderrepository_list",
-      "community": 6,
+      "community": 8,
       "norm_label": ".list()"
     },
     {
@@ -833,7 +833,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L127",
       "id": "order_orderrepository_cancel",
-      "community": 6,
+      "community": 8,
       "norm_label": ".cancel()"
     },
     {
@@ -842,7 +842,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L142",
       "id": "order_orderrepository_getorderbook",
-      "community": 6,
+      "community": 8,
       "norm_label": ".getorderbook()"
     },
     {
@@ -851,7 +851,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L222",
       "id": "order_handler",
-      "community": 0,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -860,7 +860,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L229",
       "id": "order_simulationrepo",
-      "community": 5,
+      "community": 3,
       "norm_label": "simulationrepo"
     },
     {
@@ -869,7 +869,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L237",
       "id": "order_handler_registerroutes",
-      "community": 3,
+      "community": 1,
       "norm_label": ".registerroutes()"
     },
     {
@@ -878,7 +878,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L247",
       "id": "order_submitorderrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "submitorderrequest"
     },
     {
@@ -887,7 +887,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L261",
       "id": "order_handler_submitorder",
-      "community": 0,
+      "community": 2,
       "norm_label": ".submitorder()"
     },
     {
@@ -896,7 +896,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L343",
       "id": "order_handler_listorders",
-      "community": 0,
+      "community": 2,
       "norm_label": ".listorders()"
     },
     {
@@ -905,7 +905,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L366",
       "id": "order_handler_cancelorder",
-      "community": 0,
+      "community": 2,
       "norm_label": ".cancelorder()"
     },
     {
@@ -914,7 +914,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L384",
       "id": "order_handler_getorderbook",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getorderbook()"
     },
     {
@@ -923,7 +923,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L1",
       "id": "simtrader_internal_portfolio_portfolio_go",
-      "community": 8,
+      "community": 9,
       "norm_label": "portfolio.go"
     },
     {
@@ -932,7 +932,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L28",
       "id": "portfolio_position",
-      "community": 8,
+      "community": 9,
       "norm_label": "position"
     },
     {
@@ -941,7 +941,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L38",
       "id": "portfolio_portfolio",
-      "community": 8,
+      "community": 9,
       "norm_label": "portfolio"
     },
     {
@@ -950,7 +950,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L51",
       "id": "portfolio_repository",
-      "community": 8,
+      "community": 9,
       "norm_label": "repository"
     },
     {
@@ -959,7 +959,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L55",
       "id": "portfolio_newrepository",
-      "community": 8,
+      "community": 9,
       "norm_label": "newrepository()"
     },
     {
@@ -968,7 +968,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L61",
       "id": "portfolio_repository_ensureexists",
-      "community": 8,
+      "community": 9,
       "norm_label": ".ensureexists()"
     },
     {
@@ -977,52 +977,52 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L73",
       "id": "portfolio_repository_get",
-      "community": 8,
+      "community": 9,
       "norm_label": ".get()"
     },
     {
       "label": "Handler",
       "file_type": "code",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L167",
+      "source_location": "L168",
       "id": "portfolio_handler",
-      "community": 8,
+      "community": 9,
       "norm_label": "handler"
     },
     {
       "label": "SimRepo",
       "file_type": "code",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L174",
+      "source_location": "L175",
       "id": "portfolio_simrepo",
-      "community": 8,
+      "community": 9,
       "norm_label": "simrepo"
     },
     {
       "label": "NewHandler()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L178",
+      "source_location": "L179",
       "id": "portfolio_newhandler",
-      "community": 8,
+      "community": 9,
       "norm_label": "newhandler()"
     },
     {
       "label": ".RegisterRoutes()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L182",
+      "source_location": "L183",
       "id": "portfolio_handler_registerroutes",
-      "community": 8,
+      "community": 9,
       "norm_label": ".registerroutes()"
     },
     {
       "label": ".GetPortfolio()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L190",
+      "source_location": "L191",
       "id": "portfolio_handler_getportfolio",
-      "community": 8,
+      "community": 9,
       "norm_label": ".getportfolio()"
     },
     {
@@ -1038,9 +1038,9 @@
       "label": "Repository",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L26",
+      "source_location": "L27",
       "id": "simulation_repository",
-      "community": 2,
+      "community": 1,
       "norm_label": "repository"
     },
     {
@@ -1049,7 +1049,7 @@
       "source_file": "simtrader\\internal\\simulation\\adapter.go",
       "source_location": "L15",
       "id": "simulation_repository_getsiminfo",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getsiminfo()"
     },
     {
@@ -1058,7 +1058,7 @@
       "source_file": "simtrader\\internal\\simulation\\adapter.go",
       "source_location": "L20",
       "id": "simulation_repository_getactivesiminfo",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getactivesiminfo()"
     },
     {
@@ -1067,7 +1067,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_clock_go",
-      "community": 2,
+      "community": 1,
       "norm_label": "clock.go"
     },
     {
@@ -1076,7 +1076,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L38",
       "id": "simulation_client",
-      "community": 2,
+      "community": 1,
       "norm_label": "client"
     },
     {
@@ -1085,7 +1085,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L45",
       "id": "simulation_clock",
-      "community": 2,
+      "community": 1,
       "norm_label": "clock"
     },
     {
@@ -1094,7 +1094,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L58",
       "id": "clock_newclock",
-      "community": 2,
+      "community": 1,
       "norm_label": "newclock()"
     },
     {
@@ -1103,97 +1103,97 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L72",
       "id": "simulation_clock_start",
-      "community": 2,
+      "community": 1,
       "norm_label": ".start()"
     },
     {
       "label": ".Stop()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L112",
+      "source_location": "L113",
       "id": "simulation_clock_stop",
-      "community": 2,
+      "community": 1,
       "norm_label": ".stop()"
     },
     {
       "label": ".IsRunning()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L123",
+      "source_location": "L136",
       "id": "simulation_clock_isrunning",
-      "community": 2,
+      "community": 1,
       "norm_label": ".isrunning()"
     },
     {
       "label": ".AddClient()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L130",
+      "source_location": "L143",
       "id": "simulation_clock_addclient",
-      "community": 3,
+      "community": 1,
       "norm_label": ".addclient()"
     },
     {
       "label": ".RemoveClient()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L135",
+      "source_location": "L148",
       "id": "simulation_clock_removeclient",
-      "community": 3,
+      "community": 1,
       "norm_label": ".removeclient()"
     },
     {
       "label": ".run()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L141",
+      "source_location": "L154",
       "id": "simulation_clock_run",
-      "community": 2,
+      "community": 1,
       "norm_label": ".run()"
     },
     {
       "label": ".broadcast()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L222",
+      "source_location": "L235",
       "id": "simulation_clock_broadcast",
-      "community": 2,
+      "community": 1,
       "norm_label": ".broadcast()"
     },
     {
       "label": "ClockRegistry",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L255",
+      "source_location": "L268",
       "id": "simulation_clockregistry",
-      "community": 2,
+      "community": 1,
       "norm_label": "clockregistry"
     },
     {
       "label": ".Register()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L264",
+      "source_location": "L277",
       "id": "simulation_clockregistry_register",
-      "community": 2,
+      "community": 1,
       "norm_label": ".register()"
     },
     {
       "label": ".Get()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L270",
+      "source_location": "L283",
       "id": "simulation_clockregistry_get",
-      "community": 3,
+      "community": 1,
       "norm_label": ".get()"
     },
     {
       "label": ".Remove()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L277",
+      "source_location": "L290",
       "id": "simulation_clockregistry_remove",
-      "community": 2,
+      "community": 1,
       "norm_label": ".remove()"
     },
     {
@@ -1202,7 +1202,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_handler_go",
-      "community": 5,
+      "community": 3,
       "norm_label": "handler.go"
     },
     {
@@ -1211,7 +1211,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L20",
       "id": "simulation_handler",
-      "community": 0,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -1220,7 +1220,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L30",
       "id": "simulation_handler_registerroutes",
-      "community": 3,
+      "community": 1,
       "norm_label": ".registerroutes()"
     },
     {
@@ -1229,7 +1229,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L62",
       "id": "simulation_handler_listsimulations",
-      "community": 0,
+      "community": 2,
       "norm_label": ".listsimulations()"
     },
     {
@@ -1238,7 +1238,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L70",
       "id": "simulation_handler_getactivesimulation",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getactivesimulation()"
     },
     {
@@ -1247,7 +1247,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L83",
       "id": "simulation_handler_getsimulation",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getsimulation()"
     },
     {
@@ -1256,7 +1256,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L98",
       "id": "simulation_handler_getsymbols",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getsymbols()"
     },
     {
@@ -1265,7 +1265,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L110",
       "id": "simulation_handler_gettickhistory",
-      "community": 0,
+      "community": 2,
       "norm_label": ".gettickhistory()"
     },
     {
@@ -1274,7 +1274,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L130",
       "id": "simulation_handler_websockethandler",
-      "community": 3,
+      "community": 1,
       "norm_label": ".websockethandler()"
     },
     {
@@ -1283,7 +1283,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L194",
       "id": "simulation_createsimrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "createsimrequest"
     },
     {
@@ -1292,7 +1292,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L201",
       "id": "simulation_handler_createsimulation",
-      "community": 0,
+      "community": 2,
       "norm_label": ".createsimulation()"
     },
     {
@@ -1301,7 +1301,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L237",
       "id": "simulation_handler_uploadcsv",
-      "community": 0,
+      "community": 2,
       "norm_label": ".uploadcsv()"
     },
     {
@@ -1310,7 +1310,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L280",
       "id": "simulation_handler_updatesimulation",
-      "community": 0,
+      "community": 2,
       "norm_label": ".updatesimulation()"
     },
     {
@@ -1319,7 +1319,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L318",
       "id": "simulation_handler_deletesimulation",
-      "community": 0,
+      "community": 2,
       "norm_label": ".deletesimulation()"
     },
     {
@@ -1328,7 +1328,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L341",
       "id": "simulation_handler_reuploadcsv",
-      "community": 0,
+      "community": 2,
       "norm_label": ".reuploadcsv()"
     },
     {
@@ -1337,61 +1337,61 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L382",
       "id": "simulation_handler_startsimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".startsimulation()"
     },
     {
       "label": ".PauseSimulation()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L423",
+      "source_location": "L433",
       "id": "simulation_handler_pausesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".pausesimulation()"
     },
     {
       "label": ".ResumeSimulation()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L441",
+      "source_location": "L451",
       "id": "simulation_handler_resumesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".resumesimulation()"
     },
     {
       "label": ".CompleteSimulation()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L446",
+      "source_location": "L456",
       "id": "simulation_handler_completesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".completesimulation()"
     },
     {
       "label": ".GetProgress()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L468",
+      "source_location": "L478",
       "id": "simulation_handler_getprogress",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getprogress()"
     },
     {
       "label": ".RestartSimulation()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L540",
+      "source_location": "L550",
       "id": "simulation_handler_restartsimulation",
-      "community": 2,
+      "community": 1,
       "norm_label": ".restartsimulation()"
     },
     {
       "label": ".ensurePortfolio()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L587",
+      "source_location": "L602",
       "id": "simulation_handler_ensureportfolio",
-      "community": 0,
+      "community": 2,
       "norm_label": ".ensureportfolio()"
     },
     {
@@ -1436,7 +1436,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_repository_go",
-      "community": 2,
+      "community": 1,
       "norm_label": "repository.go"
     },
     {
@@ -1445,197 +1445,206 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L33",
       "id": "repository_newrepository",
-      "community": 2,
+      "community": 1,
       "norm_label": "newrepository()"
     },
     {
       "label": ".Create()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "simulation_repository_create",
-      "community": 2,
+      "community": 1,
       "norm_label": ".create()"
     },
     {
       "label": ".GetByID()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "simulation_repository_getbyid",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getbyid()"
     },
     {
       "label": ".GetSimStatus()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L55",
+      "source_location": "L56",
       "id": "simulation_repository_getsimstatus",
-      "community": 8,
+      "community": 9,
       "norm_label": ".getsimstatus()"
     },
     {
       "label": ".GetActive()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L69",
+      "source_location": "L70",
       "id": "simulation_repository_getactive",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getactive()"
     },
     {
       "label": ".List()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L79",
+      "source_location": "L80",
       "id": "simulation_repository_list",
-      "community": 2,
+      "community": 1,
       "norm_label": ".list()"
     },
     {
       "label": ".UpdateStatus()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L102",
+      "source_location": "L103",
       "id": "simulation_repository_updatestatus",
-      "community": 0,
+      "community": 1,
       "norm_label": ".updatestatus()"
     },
     {
       "label": ".UpdateName()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L115",
+      "source_location": "L116",
       "id": "simulation_repository_updatename",
-      "community": 2,
+      "community": 1,
       "norm_label": ".updatename()"
     },
     {
       "label": ".UpdateDescription()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L128",
+      "source_location": "L129",
       "id": "simulation_repository_updatedescription",
-      "community": 2,
+      "community": 1,
       "norm_label": ".updatedescription()"
     },
     {
       "label": ".Delete()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L141",
+      "source_location": "L142",
       "id": "simulation_repository_delete",
-      "community": 3,
+      "community": 1,
       "norm_label": ".delete()"
     },
     {
       "label": ".UpdateCurrentSimTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L154",
+      "source_location": "L155",
       "id": "simulation_repository_updatecurrentsimtime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".updatecurrentsimtime()"
     },
     {
       "label": ".IngestCSV()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L163",
+      "source_location": "L164",
       "id": "simulation_repository_ingestcsv",
-      "community": 2,
+      "community": 1,
       "norm_label": ".ingestcsv()"
     },
     {
       "label": ".GetTicksAtTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L229",
+      "source_location": "L230",
       "id": "simulation_repository_getticksattime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getticksattime()"
     },
     {
       "label": ".GetNextSimTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L256",
+      "source_location": "L257",
       "id": "simulation_repository_getnextsimtime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getnextsimtime()"
     },
     {
       "label": ".GetFirstSimTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L274",
+      "source_location": "L275",
       "id": "simulation_repository_getfirstsimtime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getfirstsimtime()"
     },
     {
       "label": ".GetSymbols()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L285",
+      "source_location": "L286",
       "id": "simulation_repository_getsymbols",
-      "community": 6,
+      "community": 8,
       "norm_label": ".getsymbols()"
     },
     {
       "label": ".GetTicksForSymbol()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L304",
+      "source_location": "L305",
       "id": "simulation_repository_getticksforsymbol",
-      "community": 6,
+      "community": 8,
       "norm_label": ".getticksforsymbol()"
     },
     {
       "label": "validateHeader()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L330",
+      "source_location": "L331",
       "id": "repository_validateheader",
-      "community": 2,
+      "community": 1,
       "norm_label": "validateheader()"
     },
     {
       "label": "parseCSVRow()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L348",
+      "source_location": "L349",
       "id": "repository_parsecsvrow",
-      "community": 2,
+      "community": 1,
       "norm_label": "parsecsvrow()"
     },
     {
       "label": ".scanOne()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L395",
+      "source_location": "L396",
       "id": "simulation_repository_scanone",
-      "community": 2,
+      "community": 1,
       "norm_label": ".scanone()"
     },
     {
       "label": ".GetLastSimTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L411",
+      "source_location": "L412",
       "id": "simulation_repository_getlastsimtime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".getlastsimtime()"
     },
     {
       "label": ".ResetSimTime()",
       "file_type": "code",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L422",
+      "source_location": "L423",
       "id": "simulation_repository_resetsimtime",
-      "community": 2,
+      "community": 1,
       "norm_label": ".resetsimtime()"
+    },
+    {
+      "label": ".ResetStudentData()",
+      "file_type": "code",
+      "source_file": "simtrader\\internal\\simulation\\repository.go",
+      "source_location": "L433",
+      "id": "simulation_repository_resetstudentdata",
+      "community": 1,
+      "norm_label": ".resetstudentdata()"
     },
     {
       "label": "types.go",
@@ -1643,7 +1652,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L1",
       "id": "simtrader_internal_types_types_go",
-      "community": 1,
+      "community": 0,
       "norm_label": "types.go"
     },
     {
@@ -1652,7 +1661,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L19",
       "id": "types_role",
-      "community": 1,
+      "community": 0,
       "norm_label": "role"
     },
     {
@@ -1661,7 +1670,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L28",
       "id": "types_claims",
-      "community": 1,
+      "community": 0,
       "norm_label": "claims"
     },
     {
@@ -1670,7 +1679,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L36",
       "id": "types_pricetick",
-      "community": 1,
+      "community": 0,
       "norm_label": "pricetick"
     },
     {
@@ -1679,7 +1688,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L50",
       "id": "types_orderfiller",
-      "community": 1,
+      "community": 0,
       "norm_label": "orderfiller"
     },
     {
@@ -1688,7 +1697,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_user_handler_go",
-      "community": 5,
+      "community": 3,
       "norm_label": "handler.go"
     },
     {
@@ -1697,7 +1706,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L20",
       "id": "user_passwordverifier",
-      "community": 5,
+      "community": 3,
       "norm_label": "passwordverifier"
     },
     {
@@ -1706,7 +1715,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L25",
       "id": "user_handler",
-      "community": 0,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -1724,7 +1733,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L54",
       "id": "user_inviterequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "inviterequest"
     },
     {
@@ -1733,7 +1742,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L58",
       "id": "user_updateprofilerequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "updateprofilerequest"
     },
     {
@@ -1742,7 +1751,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L63",
       "id": "user_changepasswordrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "changepasswordrequest"
     },
     {
@@ -1751,7 +1760,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L73",
       "id": "user_handler_getmyprofile",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getmyprofile()"
     },
     {
@@ -1760,7 +1769,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L94",
       "id": "user_handler_updatemyprofile",
-      "community": 0,
+      "community": 2,
       "norm_label": ".updatemyprofile()"
     },
     {
@@ -1769,7 +1778,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L123",
       "id": "user_handler_changemypassword",
-      "community": 0,
+      "community": 2,
       "norm_label": ".changemypassword()"
     },
     {
@@ -1778,7 +1787,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L161",
       "id": "user_handler_listusers",
-      "community": 1,
+      "community": 0,
       "norm_label": ".listusers()"
     },
     {
@@ -1787,7 +1796,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L184",
       "id": "user_handler_invitestudent",
-      "community": 0,
+      "community": 2,
       "norm_label": ".invitestudent()"
     },
     {
@@ -1796,7 +1805,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L216",
       "id": "user_handler_getuser",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getuser()"
     },
     {
@@ -1805,7 +1814,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L236",
       "id": "user_handler_blockuser",
-      "community": 0,
+      "community": 2,
       "norm_label": ".blockuser()"
     },
     {
@@ -1814,7 +1823,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L242",
       "id": "user_handler_unblockuser",
-      "community": 0,
+      "community": 2,
       "norm_label": ".unblockuser()"
     },
     {
@@ -1823,7 +1832,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L246",
       "id": "user_handler_setuserstatus",
-      "community": 0,
+      "community": 2,
       "norm_label": ".setuserstatus()"
     },
     {
@@ -1832,7 +1841,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L1",
       "id": "simtrader_internal_user_model_go",
-      "community": 0,
+      "community": 6,
       "norm_label": "model.go"
     },
     {
@@ -1841,7 +1850,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L26",
       "id": "user_status",
-      "community": 0,
+      "community": 2,
       "norm_label": "status"
     },
     {
@@ -1850,7 +1859,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L35",
       "id": "user_user",
-      "community": 0,
+      "community": 6,
       "norm_label": "user"
     },
     {
@@ -1859,7 +1868,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L51",
       "id": "user_publicprofile",
-      "community": 0,
+      "community": 6,
       "norm_label": "publicprofile"
     },
     {
@@ -1868,7 +1877,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L61",
       "id": "user_user_topublicprofile",
-      "community": 0,
+      "community": 6,
       "norm_label": ".topublicprofile()"
     },
     {
@@ -1877,7 +1886,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L1",
       "id": "simtrader_internal_user_repository_go",
-      "community": 9,
+      "community": 0,
       "norm_label": "repository.go"
     },
     {
@@ -1886,7 +1895,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L29",
       "id": "user_repository",
-      "community": 1,
+      "community": 0,
       "norm_label": "repository"
     },
     {
@@ -1895,7 +1904,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L38",
       "id": "user_repository_create",
-      "community": 1,
+      "community": 0,
       "norm_label": ".create()"
     },
     {
@@ -1904,7 +1913,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L62",
       "id": "user_repository_getbyid",
-      "community": 0,
+      "community": 2,
       "norm_label": ".getbyid()"
     },
     {
@@ -1913,7 +1922,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L73",
       "id": "user_repository_getbyemail",
-      "community": 1,
+      "community": 0,
       "norm_label": ".getbyemail()"
     },
     {
@@ -1922,7 +1931,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L84",
       "id": "user_repository_getbyinvitetoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".getbyinvitetoken()"
     },
     {
@@ -1931,7 +1940,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L95",
       "id": "user_repository_getbyresettoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".getbyresettoken()"
     },
     {
@@ -1940,7 +1949,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L115",
       "id": "user_repository_completeregistration",
-      "community": 1,
+      "community": 0,
       "norm_label": ".completeregistration()"
     },
     {
@@ -1949,7 +1958,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L137",
       "id": "user_repository_setresettoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".setresettoken()"
     },
     {
@@ -1958,7 +1967,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L150",
       "id": "user_repository_resetpassword",
-      "community": 1,
+      "community": 0,
       "norm_label": ".resetpassword()"
     },
     {
@@ -1967,7 +1976,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L164",
       "id": "user_repository_setstatus",
-      "community": 0,
+      "community": 2,
       "norm_label": ".setstatus()"
     },
     {
@@ -1976,7 +1985,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L178",
       "id": "user_repository_list",
-      "community": 1,
+      "community": 0,
       "norm_label": ".list()"
     },
     {
@@ -1985,7 +1994,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L211",
       "id": "user_repository_storerefreshtoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".storerefreshtoken()"
     },
     {
@@ -1994,7 +2003,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L220",
       "id": "user_repository_validaterefreshtoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".validaterefreshtoken()"
     },
     {
@@ -2003,7 +2012,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L237",
       "id": "user_repository_revokerefreshtoken",
-      "community": 1,
+      "community": 0,
       "norm_label": ".revokerefreshtoken()"
     },
     {
@@ -2012,7 +2021,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L245",
       "id": "user_repository_revokeallusertokens",
-      "community": 1,
+      "community": 0,
       "norm_label": ".revokeallusertokens()"
     },
     {
@@ -2021,7 +2030,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L254",
       "id": "user_repository_scanone",
-      "community": 1,
+      "community": 0,
       "norm_label": ".scanone()"
     },
     {
@@ -2030,7 +2039,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L268",
       "id": "user_scanfn",
-      "community": 9,
+      "community": 0,
       "norm_label": "scanfn"
     },
     {
@@ -2039,7 +2048,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L270",
       "id": "repository_scanuser",
-      "community": 1,
+      "community": 0,
       "norm_label": "scanuser()"
     },
     {
@@ -2048,7 +2057,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L278",
       "id": "repository_isduplicateerror",
-      "community": 9,
+      "community": 0,
       "norm_label": "isduplicateerror()"
     },
     {
@@ -2057,7 +2066,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L283",
       "id": "repository_contains",
-      "community": 9,
+      "community": 0,
       "norm_label": "contains()"
     },
     {
@@ -2066,7 +2075,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L288",
       "id": "repository_containsrune",
-      "community": 9,
+      "community": 0,
       "norm_label": "containsrune()"
     },
     {
@@ -2244,7 +2253,7 @@
       "label": "clsx()",
       "file_type": "code",
       "source_file": "simtrader-frontend\\src\\components\\layout\\DashboardLayout.tsx",
-      "source_location": "L82",
+      "source_location": "L118",
       "id": "dashboardlayout_clsx",
       "community": 21,
       "norm_label": "clsx()"
@@ -2309,7 +2318,7 @@
       "source_file": "simtrader-frontend\\src\\components\\ui\\ThemeToggle.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_components_ui_themetoggle_tsx",
-      "community": 10,
+      "community": 12,
       "norm_label": "themetoggle.tsx"
     },
     {
@@ -2318,7 +2327,7 @@
       "source_file": "simtrader-frontend\\src\\components\\ui\\ThemeToggle.tsx",
       "source_location": "L9",
       "id": "themetoggle_themetoggle",
-      "community": 10,
+      "community": 12,
       "norm_label": "themetoggle()"
     },
     {
@@ -2327,7 +2336,7 @@
       "source_file": "simtrader-frontend\\src\\components\\ui\\ThemeToggle.tsx",
       "source_location": "L17",
       "id": "themetoggle_clsx",
-      "community": 10,
+      "community": 12,
       "norm_label": "clsx()"
     },
     {
@@ -2336,7 +2345,7 @@
       "source_file": "simtrader-frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_context_themecontext_tsx",
-      "community": 10,
+      "community": 12,
       "norm_label": "themecontext.tsx"
     },
     {
@@ -2345,7 +2354,7 @@
       "source_file": "simtrader-frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L17",
       "id": "themecontext_getinitialtheme",
-      "community": 10,
+      "community": 12,
       "norm_label": "getinitialtheme()"
     },
     {
@@ -2354,7 +2363,7 @@
       "source_file": "simtrader-frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L27",
       "id": "themecontext_themeprovider",
-      "community": 10,
+      "community": 12,
       "norm_label": "themeprovider()"
     },
     {
@@ -2363,7 +2372,7 @@
       "source_file": "simtrader-frontend\\src\\context\\ThemeContext.tsx",
       "source_location": "L50",
       "id": "themecontext_usetheme",
-      "community": 10,
+      "community": 12,
       "norm_label": "usetheme()"
     },
     {
@@ -2372,7 +2381,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_hooks_usesimulationsocket_ts",
-      "community": 3,
+      "community": 8,
       "norm_label": "usesimulationsocket.ts"
     },
     {
@@ -2381,7 +2390,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L36",
       "id": "usesimulationsocket_getconn",
-      "community": 3,
+      "community": 8,
       "norm_label": "getconn()"
     },
     {
@@ -2390,7 +2399,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L48",
       "id": "usesimulationsocket_notify",
-      "community": 3,
+      "community": 8,
       "norm_label": "notify()"
     },
     {
@@ -2399,7 +2408,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L52",
       "id": "usesimulationsocket_wsconnect",
-      "community": 3,
+      "community": 8,
       "norm_label": "wsconnect()"
     },
     {
@@ -2408,7 +2417,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L111",
       "id": "usesimulationsocket_wsdisconnect",
-      "community": 3,
+      "community": 8,
       "norm_label": "wsdisconnect()"
     },
     {
@@ -2417,7 +2426,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L137",
       "id": "usesimulationsocket_usesimulationsocket",
-      "community": 3,
+      "community": 8,
       "norm_label": "usesimulationsocket()"
     },
     {
@@ -2570,7 +2579,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\auth\\RegisterPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_auth_registerpage_tsx",
-      "community": 3,
+      "community": 4,
       "norm_label": "registerpage.tsx"
     },
     {
@@ -2579,7 +2588,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\auth\\RegisterPage.tsx",
       "source_location": "L25",
       "id": "registerpage_set",
-      "community": 3,
+      "community": 4,
       "norm_label": "set()"
     },
     {
@@ -2588,7 +2597,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\auth\\RegisterPage.tsx",
       "source_location": "L45",
       "id": "registerpage_handlesubmit",
-      "community": 3,
+      "community": 4,
       "norm_label": "handlesubmit()"
     },
     {
@@ -2597,7 +2606,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_chartpage_tsx",
-      "community": 9,
+      "community": 0,
       "norm_label": "chartpage.tsx"
     },
     {
@@ -2606,7 +2615,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPage.tsx",
       "source_location": "L31",
       "id": "chartpage_fmt",
-      "community": 9,
+      "community": 0,
       "norm_label": "fmt()"
     },
     {
@@ -2615,16 +2624,16 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPage.tsx",
       "source_location": "L90",
       "id": "chartpage_handler",
-      "community": 9,
+      "community": 0,
       "norm_label": "handler()"
     },
     {
       "label": "simulationTime()",
       "file_type": "code",
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPage.tsx",
-      "source_location": "L439",
+      "source_location": "L515",
       "id": "chartpage_simulationtime",
-      "community": 9,
+      "community": 0,
       "norm_label": "simulationtime()"
     },
     {
@@ -2658,7 +2667,7 @@
       "label": "fmt()",
       "file_type": "code",
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderBookPage.tsx",
-      "source_location": "L14",
+      "source_location": "L10",
       "id": "orderbookpage_fmt",
       "community": 27,
       "norm_label": "fmt()"
@@ -2730,7 +2739,7 @@
       "label": "fmt()",
       "file_type": "code",
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
-      "source_location": "L8",
+      "source_location": "L10",
       "id": "portfoliopage_fmt",
       "community": 19,
       "norm_label": "fmt()"
@@ -2739,7 +2748,7 @@
       "label": "fmtCurrency()",
       "file_type": "code",
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
-      "source_location": "L11",
+      "source_location": "L13",
       "id": "portfoliopage_fmtcurrency",
       "community": 19,
       "norm_label": "fmtcurrency()"
@@ -2934,12 +2943,273 @@
       "id": "bloomberg_to_simtrader_rationale_385"
     },
     {
+      "label": "csv_to_simtrader.py",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L1",
+      "id": "simtrader_tools_csv_to_simtrader_py",
+      "community": 4,
+      "norm_label": "csv_to_simtrader.py"
+    },
+    {
+      "label": "detect_columns()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L93",
+      "id": "csv_to_simtrader_detect_columns",
+      "community": 4,
+      "norm_label": "detect_columns()"
+    },
+    {
+      "label": "validate_column_mapping()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L105",
+      "id": "csv_to_simtrader_validate_column_mapping",
+      "community": 4,
+      "norm_label": "validate_column_mapping()"
+    },
+    {
+      "label": "parse_datetime()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L117",
+      "id": "csv_to_simtrader_parse_datetime",
+      "community": 4,
+      "norm_label": "parse_datetime()"
+    },
+    {
+      "label": "_in_session()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L176",
+      "id": "csv_to_simtrader_in_session",
+      "community": 4,
+      "norm_label": "_in_session()"
+    },
+    {
+      "label": "parse_intraday_file()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L185",
+      "id": "csv_to_simtrader_parse_intraday_file",
+      "community": 4,
+      "norm_label": "parse_intraday_file()"
+    },
+    {
+      "label": "expand_daily_to_minutes()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L279",
+      "id": "csv_to_simtrader_expand_daily_to_minutes",
+      "community": 4,
+      "norm_label": "expand_daily_to_minutes()"
+    },
+    {
+      "label": "_pkt_to_utc_dt()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L365",
+      "id": "csv_to_simtrader_pkt_to_utc_dt",
+      "community": 4,
+      "norm_label": "_pkt_to_utc_dt()"
+    },
+    {
+      "label": "parse_daily_file()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L371",
+      "id": "csv_to_simtrader_parse_daily_file",
+      "community": 4,
+      "norm_label": "parse_daily_file()"
+    },
+    {
+      "label": "forward_fill_gaps()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L439",
+      "id": "csv_to_simtrader_forward_fill_gaps",
+      "community": 4,
+      "norm_label": "forward_fill_gaps()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L478",
+      "id": "csv_to_simtrader_main",
+      "community": 4,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Map canonical column names to their index in the CSV header.",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L94",
+      "id": "csv_to_simtrader_rationale_94",
+      "community": 4,
+      "norm_label": "map canonical column names to their index in the csv header."
+    },
+    {
+      "label": "Ensure all required columns are present.",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L106",
+      "id": "csv_to_simtrader_rationale_106",
+      "community": 4,
+      "norm_label": "ensure all required columns are present."
+    },
+    {
+      "label": "Parse a datetime string and convert to UTC.      Handles:     - Full datetime: \"",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L118",
+      "id": "csv_to_simtrader_rationale_118",
+      "community": 4,
+      "norm_label": "parse a datetime string and convert to utc.      handles:     - full datetime: \""
+    },
+    {
+      "label": "Return True if a PKT datetime falls within PSX trading hours.",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L177",
+      "id": "csv_to_simtrader_rationale_177",
+      "community": 4,
+      "norm_label": "return true if a pkt datetime falls within psx trading hours."
+    },
+    {
+      "label": "Parse a standard intraday OHLCV CSV file.     Returns list of SimTrader-format r",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L193",
+      "id": "csv_to_simtrader_rationale_193",
+      "community": 4,
+      "norm_label": "parse a standard intraday ohlcv csv file.     returns list of simtrader-format r"
+    },
+    {
+      "label": "Generate synthetic 1-minute OHLCV bars from a single daily OHLCV row.      Metho",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L284",
+      "id": "csv_to_simtrader_rationale_284",
+      "community": 4,
+      "norm_label": "generate synthetic 1-minute ohlcv bars from a single daily ohlcv row.      metho"
+    },
+    {
+      "label": "Parse a daily OHLCV file and return one dict per day (to be expanded later).",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L372",
+      "id": "csv_to_simtrader_rationale_372",
+      "community": 4,
+      "norm_label": "parse a daily ohlcv file and return one dict per day (to be expanded later)."
+    },
+    {
+      "label": "Fill missing 1-minute bars across the full PSX session.",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L440",
+      "id": "csv_to_simtrader_rationale_440",
+      "community": 4,
+      "norm_label": "fill missing 1-minute bars across the full psx session."
+    },
+    {
+      "label": "psx_to_simtrader.py",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L1",
+      "id": "simtrader_tools_psx_to_simtrader_py",
+      "community": 10,
+      "norm_label": "psx_to_simtrader.py"
+    },
+    {
+      "label": "symbol_from_path()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L44",
+      "id": "psx_to_simtrader_symbol_from_path",
+      "community": 10,
+      "norm_label": "symbol_from_path()"
+    },
+    {
+      "label": "parse_row_date()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L49",
+      "id": "psx_to_simtrader_parse_row_date",
+      "community": 10,
+      "norm_label": "parse_row_date()"
+    },
+    {
+      "label": "in_session()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L53",
+      "id": "psx_to_simtrader_in_session",
+      "community": 10,
+      "norm_label": "in_session()"
+    },
+    {
+      "label": "pkt_to_utc()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L61",
+      "id": "psx_to_simtrader_pkt_to_utc",
+      "community": 10,
+      "norm_label": "pkt_to_utc()"
+    },
+    {
+      "label": "pf()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L66",
+      "id": "psx_to_simtrader_pf",
+      "community": 10,
+      "norm_label": "pf()"
+    },
+    {
+      "label": "parse_file()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L72",
+      "id": "psx_to_simtrader_parse_file",
+      "community": 10,
+      "norm_label": "parse_file()"
+    },
+    {
+      "label": "forward_fill()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L117",
+      "id": "psx_to_simtrader_forward_fill",
+      "community": 10,
+      "norm_label": "forward_fill()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L145",
+      "id": "psx_to_simtrader_main",
+      "community": 10,
+      "norm_label": "main()"
+    },
+    {
+      "label": "PSO.PK.txt  \u2192  PSO   (strips exchange suffix like .PK, .KAR)",
+      "file_type": "rationale",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L45",
+      "id": "psx_to_simtrader_rationale_45",
+      "community": 10,
+      "norm_label": "pso.pk.txt  \u2192  pso   (strips exchange suffix like .pk, .kar)"
+    },
+    {
       "label": "validate_simtrader_csv.py",
       "file_type": "code",
       "source_file": "simtrader-tools\\validate_simtrader_csv.py",
       "source_location": "L1",
       "id": "simtrader_tools_validate_simtrader_csv_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "validate_simtrader_csv.py"
     },
     {
@@ -2948,7 +3218,7 @@
       "source_file": "simtrader-tools\\validate_simtrader_csv.py",
       "source_location": "L22",
       "id": "validate_simtrader_csv_validate",
-      "community": 3,
+      "community": 4,
       "norm_label": "validate()"
     },
     {
@@ -2957,7 +3227,7 @@
       "source_file": "simtrader-tools\\validate_simtrader_csv.py",
       "source_location": "L153",
       "id": "validate_simtrader_csv_report",
-      "community": 3,
+      "community": 4,
       "norm_label": "_report()"
     },
     {
@@ -3255,7 +3525,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "simtrader project context and architecture",
       "id": "CLAUDE_SimTraderContext"
     },
@@ -3268,7 +3538,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "technology stack",
       "id": "CLAUDE_TechStack"
     },
@@ -3281,7 +3551,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "go 1.22+ with fiber v2",
       "id": "CLAUDE_Go122Fiber"
     },
@@ -3294,7 +3564,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "postgresql 16+",
       "id": "CLAUDE_PostgreSQL"
     },
@@ -3307,7 +3577,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "react 18 with typescript 5.5",
       "id": "CLAUDE_ReactTS"
     },
@@ -3320,7 +3590,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "websocket real-time communication",
       "id": "CLAUDE_WebSocketRealtime"
     },
@@ -3333,7 +3603,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "websocket singleton pool pattern",
       "id": "CLAUDE_WebSocketSingletonPool"
     },
@@ -3346,7 +3616,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "admin route prefix convention",
       "id": "CLAUDE_AdminRoutePrefix"
     },
@@ -3359,7 +3629,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "invite-only registration pattern",
       "id": "CLAUDE_InviteOnlyRegistration"
     },
@@ -3372,7 +3642,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "password hashing with bcrypt",
       "id": "CLAUDE_PasswordHashing"
     },
@@ -3385,7 +3655,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "simulation clock engine",
       "id": "CLAUDE_SimulationClock"
     },
@@ -3398,7 +3668,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "order fill engine",
       "id": "CLAUDE_OrderFillEngine"
     },
@@ -3411,7 +3681,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "jwt authentication system",
       "id": "CLAUDE_JWTAuth"
     },
@@ -3424,7 +3694,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "tradingview lightweight charts",
       "id": "CLAUDE_TradingViewCharts"
     },
@@ -3437,7 +3707,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "zustand state management",
       "id": "CLAUDE_Zustand"
     },
@@ -3450,7 +3720,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "tanstack react query",
       "id": "CLAUDE_TanStackQuery"
     },
@@ -3463,7 +3733,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "directory structure and project layout",
       "id": "CLAUDE_DirectoryStructure"
     },
@@ -3476,7 +3746,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "go backend architecture",
       "id": "CLAUDE_BackendArchitecture"
     },
@@ -3489,7 +3759,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "react frontend architecture",
       "id": "CLAUDE_FrontendArchitecture"
     },
@@ -3502,7 +3772,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "pakistan stock exchange (psx) historical data",
       "id": "CLAUDE_PSXData"
     },
@@ -3515,7 +3785,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "bloomberg to simtrader csv conversion tool",
       "id": "CLAUDE_BloombergDataTool"
     },
@@ -3528,7 +3798,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "insufficient resources websocket issue",
       "id": "CLAUDE_InsufficientResourcesIssue"
     },
@@ -3541,7 +3811,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "multi-user testing with chrome profiles",
       "id": "CLAUDE_MultiUserTesting"
     },
@@ -3554,7 +3824,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "one active simulation constraint",
       "id": "CLAUDE_OneSimulationActive"
     }
@@ -5208,6 +5478,18 @@
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "simtrader\\internal\\simulation\\clock.go",
+      "source_location": "L127",
+      "weight": 1.0,
+      "_src": "simulation_clock_stop",
+      "_tgt": "db_close",
+      "source": "db_close",
+      "target": "simulation_clock_stop"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L263",
       "weight": 1.0,
@@ -6648,7 +6930,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L167",
+      "source_location": "L168",
       "weight": 1.0,
       "_src": "simtrader_internal_portfolio_portfolio_go",
       "_tgt": "portfolio_handler",
@@ -6660,7 +6942,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L174",
+      "source_location": "L175",
       "weight": 1.0,
       "_src": "simtrader_internal_portfolio_portfolio_go",
       "_tgt": "portfolio_simrepo",
@@ -6672,7 +6954,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L178",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "simtrader_internal_portfolio_portfolio_go",
       "_tgt": "portfolio_newhandler",
@@ -6708,7 +6990,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L206",
+      "source_location": "L207",
       "weight": 1.0,
       "_src": "portfolio_handler_getportfolio",
       "_tgt": "portfolio_repository_ensureexists",
@@ -6720,7 +7002,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L184",
+      "source_location": "L185",
       "weight": 1.0,
       "_src": "portfolio_handler_registerroutes",
       "_tgt": "portfolio_repository_get",
@@ -6732,7 +7014,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L210",
+      "source_location": "L211",
       "weight": 1.0,
       "_src": "portfolio_handler_getportfolio",
       "_tgt": "portfolio_repository_get",
@@ -6744,7 +7026,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L182",
+      "source_location": "L183",
       "weight": 1.0,
       "_src": "portfolio_handler",
       "_tgt": "portfolio_handler_registerroutes",
@@ -6756,7 +7038,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
-      "source_location": "L190",
+      "source_location": "L191",
       "weight": 1.0,
       "_src": "portfolio_handler",
       "_tgt": "portfolio_handler_getportfolio",
@@ -6816,7 +7098,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "simtrader_internal_simulation_repository_go",
       "_tgt": "simulation_repository",
@@ -6828,7 +7110,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_create",
@@ -6840,7 +7122,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getbyid",
@@ -6852,7 +7134,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L55",
+      "source_location": "L56",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getsimstatus",
@@ -6864,7 +7146,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L69",
+      "source_location": "L70",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getactive",
@@ -6876,7 +7158,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L79",
+      "source_location": "L80",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_list",
@@ -6888,7 +7170,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L102",
+      "source_location": "L103",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_updatestatus",
@@ -6900,7 +7182,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L115",
+      "source_location": "L116",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_updatename",
@@ -6912,7 +7194,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L128",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_updatedescription",
@@ -6924,7 +7206,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L141",
+      "source_location": "L142",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_delete",
@@ -6936,7 +7218,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L154",
+      "source_location": "L155",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_updatecurrentsimtime",
@@ -6948,7 +7230,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L163",
+      "source_location": "L164",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_ingestcsv",
@@ -6960,7 +7242,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L229",
+      "source_location": "L230",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getticksattime",
@@ -6972,7 +7254,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L256",
+      "source_location": "L257",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getnextsimtime",
@@ -6984,7 +7266,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L274",
+      "source_location": "L275",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getfirstsimtime",
@@ -6996,7 +7278,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L285",
+      "source_location": "L286",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getsymbols",
@@ -7008,7 +7290,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L304",
+      "source_location": "L305",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getticksforsymbol",
@@ -7020,7 +7302,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L395",
+      "source_location": "L396",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_scanone",
@@ -7032,7 +7314,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L411",
+      "source_location": "L412",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_getlastsimtime",
@@ -7044,12 +7326,24 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L422",
+      "source_location": "L423",
       "weight": 1.0,
       "_src": "simulation_repository",
       "_tgt": "simulation_repository_resetsimtime",
       "source": "simulation_repository",
       "target": "simulation_repository_resetsimtime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader\\internal\\simulation\\repository.go",
+      "source_location": "L433",
+      "weight": 1.0,
+      "_src": "simulation_repository",
+      "_tgt": "simulation_repository_resetstudentdata",
+      "source": "simulation_repository",
+      "target": "simulation_repository_resetstudentdata",
       "confidence_score": 1.0
     },
     {
@@ -7116,7 +7410,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L255",
+      "source_location": "L268",
       "weight": 1.0,
       "_src": "simtrader_internal_simulation_clock_go",
       "_tgt": "simulation_clockregistry",
@@ -7140,7 +7434,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L112",
+      "source_location": "L113",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_stop",
@@ -7152,7 +7446,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L123",
+      "source_location": "L136",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_isrunning",
@@ -7164,7 +7458,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L130",
+      "source_location": "L143",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_addclient",
@@ -7176,7 +7470,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L135",
+      "source_location": "L148",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_removeclient",
@@ -7188,7 +7482,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L141",
+      "source_location": "L154",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_run",
@@ -7200,7 +7494,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L222",
+      "source_location": "L235",
       "weight": 1.0,
       "_src": "simulation_clock",
       "_tgt": "simulation_clock_broadcast",
@@ -7296,7 +7590,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L143",
+      "source_location": "L156",
       "weight": 1.0,
       "_src": "simulation_clock_run",
       "_tgt": "simulation_clock_stop",
@@ -7368,7 +7662,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L180",
+      "source_location": "L193",
       "weight": 1.0,
       "_src": "simulation_clock_run",
       "_tgt": "simulation_clock_broadcast",
@@ -7440,7 +7734,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L264",
+      "source_location": "L277",
       "weight": 1.0,
       "_src": "simulation_clockregistry",
       "_tgt": "simulation_clockregistry_register",
@@ -7452,7 +7746,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L270",
+      "source_location": "L283",
       "weight": 1.0,
       "_src": "simulation_clockregistry",
       "_tgt": "simulation_clockregistry_get",
@@ -7464,7 +7758,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\clock.go",
-      "source_location": "L277",
+      "source_location": "L290",
       "weight": 1.0,
       "_src": "simulation_clockregistry",
       "_tgt": "simulation_clockregistry_remove",
@@ -7591,6 +7885,18 @@
       "_tgt": "usesimulationsocket_notify",
       "source": "simulation_clockregistry_get",
       "target": "usesimulationsocket_notify"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_parse_file",
+      "_tgt": "simulation_clockregistry_get",
+      "source": "simulation_clockregistry_get",
+      "target": "psx_to_simtrader_parse_file"
     },
     {
       "relation": "calls",
@@ -7836,7 +8142,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L423",
+      "source_location": "L433",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_pausesimulation",
@@ -7848,7 +8154,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L441",
+      "source_location": "L451",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_resumesimulation",
@@ -7860,7 +8166,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L446",
+      "source_location": "L456",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_completesimulation",
@@ -7872,7 +8178,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L468",
+      "source_location": "L478",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_getprogress",
@@ -7884,7 +8190,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L540",
+      "source_location": "L550",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_restartsimulation",
@@ -7896,7 +8202,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L587",
+      "source_location": "L602",
       "weight": 1.0,
       "_src": "simulation_handler",
       "_tgt": "simulation_handler_ensureportfolio",
@@ -8220,7 +8526,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\handler.go",
-      "source_location": "L443",
+      "source_location": "L453",
       "weight": 1.0,
       "_src": "simulation_handler_resumesimulation",
       "_tgt": "simulation_handler_startsimulation",
@@ -8263,6 +8569,30 @@
       "_tgt": "simulation_repository_getactive",
       "source": "simulation_handler_startsimulation",
       "target": "simulation_repository_getactive"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "simtrader\\internal\\simulation\\handler.go",
+      "source_location": "L404",
+      "weight": 1.0,
+      "_src": "simulation_handler_startsimulation",
+      "_tgt": "simulation_repository_resetstudentdata",
+      "source": "simulation_handler_startsimulation",
+      "target": "simulation_repository_resetstudentdata"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "simtrader\\internal\\simulation\\handler.go",
+      "source_location": "L407",
+      "weight": 1.0,
+      "_src": "simulation_handler_startsimulation",
+      "_tgt": "simulation_repository_resetsimtime",
+      "source": "simulation_handler_startsimulation",
+      "target": "simulation_repository_resetsimtime"
     },
     {
       "relation": "calls",
@@ -8353,6 +8683,18 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "simtrader\\internal\\simulation\\handler.go",
+      "source_location": "L563",
+      "weight": 1.0,
+      "_src": "simulation_handler_restartsimulation",
+      "_tgt": "simulation_repository_resetstudentdata",
+      "source": "simulation_handler_restartsimulation",
+      "target": "simulation_repository_resetstudentdata"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L553",
       "weight": 1.0,
       "_src": "simulation_handler_restartsimulation",
@@ -8436,7 +8778,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "_src": "simtrader_internal_simulation_repository_go",
       "_tgt": "repository_newrepository",
@@ -8448,7 +8790,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L330",
+      "source_location": "L331",
       "weight": 1.0,
       "_src": "simtrader_internal_simulation_repository_go",
       "_tgt": "repository_validateheader",
@@ -8460,7 +8802,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L348",
+      "source_location": "L349",
       "weight": 1.0,
       "_src": "simtrader_internal_simulation_repository_go",
       "_tgt": "repository_parsecsvrow",
@@ -8484,7 +8826,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "_src": "simulation_repository_getbyid",
       "_tgt": "simulation_repository_scanone",
@@ -8496,7 +8838,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "simulation_repository_getactive",
       "_tgt": "simulation_repository_scanone",
@@ -8508,7 +8850,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L92",
+      "source_location": "L93",
       "weight": 1.0,
       "_src": "simulation_repository_list",
       "_tgt": "simulation_repository_scanone",
@@ -8520,7 +8862,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L336",
+      "source_location": "L337",
       "weight": 1.0,
       "_src": "repository_validateheader",
       "_tgt": "simulation_repository_delete",
@@ -8544,7 +8886,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L172",
+      "source_location": "L173",
       "weight": 1.0,
       "_src": "simulation_repository_ingestcsv",
       "_tgt": "repository_validateheader",
@@ -8556,7 +8898,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader\\internal\\simulation\\repository.go",
-      "source_location": "L190",
+      "source_location": "L191",
       "weight": 1.0,
       "_src": "simulation_repository_ingestcsv",
       "_tgt": "repository_parsecsvrow",
@@ -9528,7 +9870,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\components\\layout\\DashboardLayout.tsx",
-      "source_location": "L82",
+      "source_location": "L118",
       "weight": 1.0,
       "_src": "simtrader_frontend_src_components_layout_dashboardlayout_tsx",
       "_tgt": "dashboardlayout_clsx",
@@ -9936,6 +10278,30 @@
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_validate_column_mapping",
+      "_tgt": "registerpage_set",
+      "source": "registerpage_set",
+      "target": "csv_to_simtrader_validate_column_mapping"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L553",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_main",
+      "_tgt": "registerpage_set",
+      "source": "registerpage_set",
+      "target": "csv_to_simtrader_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "simtrader-tools\\validate_simtrader_csv.py",
       "source_location": "L41",
       "weight": 1.0,
@@ -9972,7 +10338,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPage.tsx",
-      "source_location": "L439",
+      "source_location": "L515",
       "weight": 1.0,
       "_src": "simtrader_frontend_src_pages_student_chartpage_tsx",
       "_tgt": "chartpage_simulationtime",
@@ -9996,7 +10362,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderBookPage.tsx",
-      "source_location": "L14",
+      "source_location": "L10",
       "weight": 1.0,
       "_src": "simtrader_frontend_src_pages_student_orderbookpage_tsx",
       "_tgt": "orderbookpage_fmt",
@@ -10056,7 +10422,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
-      "source_location": "L8",
+      "source_location": "L10",
       "weight": 1.0,
       "_src": "simtrader_frontend_src_pages_student_portfoliopage_tsx",
       "_tgt": "portfoliopage_fmt",
@@ -10068,7 +10434,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0,
       "_src": "simtrader_frontend_src_pages_student_portfoliopage_tsx",
       "_tgt": "portfoliopage_fmtcurrency",
@@ -10080,7 +10446,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "_src": "portfoliopage_fmtcurrency",
       "_tgt": "portfoliopage_fmt",
@@ -10398,6 +10764,558 @@
       "_tgt": "bloomberg_to_simtrader_in_session",
       "source": "bloomberg_to_simtrader_in_session",
       "target": "bloomberg_to_simtrader_rationale_385",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_detect_columns",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_detect_columns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_validate_column_mapping",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_validate_column_mapping",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_parse_datetime",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_parse_datetime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_in_session",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_in_session",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L185",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_parse_intraday_file",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_parse_intraday_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L279",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_expand_daily_to_minutes",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_expand_daily_to_minutes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L365",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_pkt_to_utc_dt",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_pkt_to_utc_dt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L371",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_parse_daily_file",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_parse_daily_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L439",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_forward_fill_gaps",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_forward_fill_gaps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L478",
+      "weight": 1.0,
+      "_src": "simtrader_tools_csv_to_simtrader_py",
+      "_tgt": "csv_to_simtrader_main",
+      "source": "simtrader_tools_csv_to_simtrader_py",
+      "target": "csv_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L211",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_intraday_file",
+      "_tgt": "csv_to_simtrader_detect_columns",
+      "source": "csv_to_simtrader_detect_columns",
+      "target": "csv_to_simtrader_parse_intraday_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L382",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_daily_file",
+      "_tgt": "csv_to_simtrader_detect_columns",
+      "source": "csv_to_simtrader_detect_columns",
+      "target": "csv_to_simtrader_parse_daily_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_94",
+      "_tgt": "csv_to_simtrader_detect_columns",
+      "source": "csv_to_simtrader_detect_columns",
+      "target": "csv_to_simtrader_rationale_94",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_intraday_file",
+      "_tgt": "csv_to_simtrader_validate_column_mapping",
+      "source": "csv_to_simtrader_validate_column_mapping",
+      "target": "csv_to_simtrader_parse_intraday_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L384",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_daily_file",
+      "_tgt": "csv_to_simtrader_validate_column_mapping",
+      "source": "csv_to_simtrader_validate_column_mapping",
+      "target": "csv_to_simtrader_parse_daily_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_106",
+      "_tgt": "csv_to_simtrader_validate_column_mapping",
+      "source": "csv_to_simtrader_validate_column_mapping",
+      "target": "csv_to_simtrader_rationale_106",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L225",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_intraday_file",
+      "_tgt": "csv_to_simtrader_parse_datetime",
+      "source": "csv_to_simtrader_parse_datetime",
+      "target": "csv_to_simtrader_parse_intraday_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_118",
+      "_tgt": "csv_to_simtrader_parse_datetime",
+      "source": "csv_to_simtrader_parse_datetime",
+      "target": "csv_to_simtrader_rationale_118",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_parse_intraday_file",
+      "_tgt": "csv_to_simtrader_in_session",
+      "source": "csv_to_simtrader_in_session",
+      "target": "csv_to_simtrader_parse_intraday_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_177",
+      "_tgt": "csv_to_simtrader_in_session",
+      "source": "csv_to_simtrader_in_session",
+      "target": "csv_to_simtrader_rationale_177",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L588",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_main",
+      "_tgt": "csv_to_simtrader_parse_intraday_file",
+      "source": "csv_to_simtrader_parse_intraday_file",
+      "target": "csv_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L193",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_193",
+      "_tgt": "csv_to_simtrader_parse_intraday_file",
+      "source": "csv_to_simtrader_parse_intraday_file",
+      "target": "csv_to_simtrader_rationale_193",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L322",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_expand_daily_to_minutes",
+      "_tgt": "csv_to_simtrader_pkt_to_utc_dt",
+      "source": "csv_to_simtrader_expand_daily_to_minutes",
+      "target": "csv_to_simtrader_pkt_to_utc_dt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L585",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_main",
+      "_tgt": "csv_to_simtrader_expand_daily_to_minutes",
+      "source": "csv_to_simtrader_expand_daily_to_minutes",
+      "target": "csv_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L284",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_284",
+      "_tgt": "csv_to_simtrader_expand_daily_to_minutes",
+      "source": "csv_to_simtrader_expand_daily_to_minutes",
+      "target": "csv_to_simtrader_rationale_284",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L445",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_forward_fill_gaps",
+      "_tgt": "csv_to_simtrader_pkt_to_utc_dt",
+      "source": "csv_to_simtrader_pkt_to_utc_dt",
+      "target": "csv_to_simtrader_forward_fill_gaps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L577",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_main",
+      "_tgt": "csv_to_simtrader_parse_daily_file",
+      "source": "csv_to_simtrader_parse_daily_file",
+      "target": "csv_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L372",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_372",
+      "_tgt": "csv_to_simtrader_parse_daily_file",
+      "source": "csv_to_simtrader_parse_daily_file",
+      "target": "csv_to_simtrader_rationale_372",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L601",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_main",
+      "_tgt": "csv_to_simtrader_forward_fill_gaps",
+      "source": "csv_to_simtrader_forward_fill_gaps",
+      "target": "csv_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\csv_to_simtrader.py",
+      "source_location": "L440",
+      "weight": 1.0,
+      "_src": "csv_to_simtrader_rationale_440",
+      "_tgt": "csv_to_simtrader_forward_fill_gaps",
+      "source": "csv_to_simtrader_forward_fill_gaps",
+      "target": "csv_to_simtrader_rationale_440",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_symbol_from_path",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_symbol_from_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_parse_row_date",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_parse_row_date",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_in_session",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_in_session",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_pkt_to_utc",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_pkt_to_utc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_pf",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_pf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_parse_file",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_parse_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_forward_fill",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_forward_fill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_src": "simtrader_tools_psx_to_simtrader_py",
+      "_tgt": "psx_to_simtrader_main",
+      "source": "simtrader_tools_psx_to_simtrader_py",
+      "target": "psx_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L171",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_main",
+      "_tgt": "psx_to_simtrader_symbol_from_path",
+      "source": "psx_to_simtrader_symbol_from_path",
+      "target": "psx_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_rationale_45",
+      "_tgt": "psx_to_simtrader_symbol_from_path",
+      "source": "psx_to_simtrader_symbol_from_path",
+      "target": "psx_to_simtrader_rationale_45",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_parse_file",
+      "_tgt": "psx_to_simtrader_parse_row_date",
+      "source": "psx_to_simtrader_parse_row_date",
+      "target": "psx_to_simtrader_parse_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_parse_file",
+      "_tgt": "psx_to_simtrader_in_session",
+      "source": "psx_to_simtrader_in_session",
+      "target": "psx_to_simtrader_parse_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_parse_file",
+      "_tgt": "psx_to_simtrader_pkt_to_utc",
+      "source": "psx_to_simtrader_pkt_to_utc",
+      "target": "psx_to_simtrader_parse_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_parse_file",
+      "_tgt": "psx_to_simtrader_pf",
+      "source": "psx_to_simtrader_pf",
+      "target": "psx_to_simtrader_parse_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L174",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_main",
+      "_tgt": "psx_to_simtrader_parse_file",
+      "source": "psx_to_simtrader_parse_file",
+      "target": "psx_to_simtrader_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader-tools\\psx_to_simtrader.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "_src": "psx_to_simtrader_main",
+      "_tgt": "psx_to_simtrader_forward_fill",
+      "source": "psx_to_simtrader_forward_fill",
+      "target": "psx_to_simtrader_main",
       "confidence_score": 1.0
     },
     {

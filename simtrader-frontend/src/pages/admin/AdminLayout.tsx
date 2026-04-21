@@ -6,7 +6,7 @@ import { authApi } from '@/api'
 import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
-  TrendingUp, LayoutDashboard, Users, PlayCircle,
+  LayoutDashboard, Users, PlayCircle,
   LogOut, ChevronRight, Settings
 } from 'lucide-react'
 
@@ -39,11 +39,17 @@ export default function AdminLayout() {
       <aside className="w-56 bg-surface dark:bg-dark-surface border-r border-border dark:border-dark-border flex flex-col flex-shrink-0">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border">
-          <div className="w-6 h-6 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-3.5 h-3.5 text-surface dark:text-dark-surface" strokeWidth={2.5} />
+          <img
+            src="/iba-logo.png"
+            alt="IBA"
+            className="h-7 w-auto object-contain flex-shrink-0"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink leading-tight">SimTrader</p>
+            <p className="text-[9px] font-semibold tracking-widest uppercase text-iba dark:text-dark-iba leading-tight">Finance Lab</p>
           </div>
-          <span className="font-semibold text-sm tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
-          <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded bg-ink dark:bg-dark-ink text-surface dark:text-dark-surface">
+          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-iba text-white flex-shrink-0">
             Admin
           </span>
         </div>
@@ -56,10 +62,10 @@ export default function AdminLayout() {
               to={to}
               end={end}
               className={({ isActive }) => clsx(
-                'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group',
+                'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group border-l-2',
                 isActive
-                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
-                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink',
+                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface border-iba dark:border-dark-iba'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink border-transparent',
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />

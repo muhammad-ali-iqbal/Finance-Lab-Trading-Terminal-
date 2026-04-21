@@ -14,6 +14,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import AdminLayout from '@/pages/admin/AdminLayout'
 
 // Student pages
+import OverviewPage from '@/pages/student/OverviewPage'
 import PortfolioPage from '@/pages/student/PortfolioPage'
 import OrderEntryPage from '@/pages/student/OrderEntryPage'
 import ChartPage from '@/pages/student/ChartPage'
@@ -66,8 +67,9 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route index          element={<PortfolioPage />} />
-            <Route path="trade"   element={<OrderEntryPage />} />
+            <Route index               element={<OverviewPage />} />
+            <Route path="portfolio"    element={<PortfolioPage />} />
+            <Route path="trade"        element={<OrderEntryPage />} />
             <Route path="chart"   element={<ChartPage />} />
             <Route path="book"    element={<OrderBookPage />} />
             <Route path="orders"  element={<OrdersPage />} />

@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
 import { Button, Input, Alert, ThemeToggle } from '@/components/ui'
-import { Eye, EyeOff, TrendingUp } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -33,24 +33,31 @@ export default function LoginPage() {
     <div className="min-h-screen bg-surface-secondary dark:bg-dark-surface-secondary flex">
       {/* Left panel — branding */}
       <div className="hidden lg:flex w-[480px] flex-shrink-0 bg-ink dark:bg-dark-ink flex-col justify-between p-12">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-surface dark:bg-dark-surface rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-ink dark:text-dark-ink" strokeWidth={2.5} />
+        <div className="flex items-center gap-3">
+          <img
+            src="/iba-logo.png"
+            alt="IBA"
+            className="h-9 w-auto object-contain"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
+          <div>
+            <p className="text-surface dark:text-dark-surface font-semibold tracking-tight text-sm leading-tight">SimTrader</p>
+            <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight" style={{ color: '#C4526A' }}>Finance Lab</p>
           </div>
-          <span className="text-surface dark:text-dark-surface font-semibold tracking-tight">SimTrader</span>
         </div>
 
         <div className="space-y-6">
+          <div className="w-8 h-0.5 bg-iba" />
           <p className="font-display text-4xl text-surface dark:text-dark-surface leading-snug italic">
             Learn markets by<br />participating in them.
           </p>
           <p className="text-sm text-surface/50 dark:text-dark-surface/50 leading-relaxed max-w-xs">
-            A controlled simulation environment for understanding order types, portfolio mechanics, and market microstructure.
+            A controlled simulation environment built for IBA students to understand order types, portfolio mechanics, and market microstructure using real PSX data.
           </p>
         </div>
 
         <div className="text-xs text-surface/30 dark:text-dark-surface/30">
-          © {new Date().getFullYear()} SimTrader Academic Platform
+          © {new Date().getFullYear()} Institute of Business Administration, Karachi
         </div>
       </div>
 
@@ -63,11 +70,17 @@ export default function LoginPage() {
 
         <div className="w-full max-w-sm animate-fade-up">
           {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2 mb-10">
-            <div className="w-7 h-7 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-surface dark:text-dark-surface" strokeWidth={2.5} />
+          <div className="flex lg:hidden items-center gap-2.5 mb-10">
+            <img
+              src="/iba-logo.png"
+              alt="IBA"
+              className="h-7 w-auto object-contain"
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+            />
+            <div>
+              <p className="font-semibold tracking-tight text-ink dark:text-dark-ink text-sm leading-tight">SimTrader</p>
+              <p className="text-[9px] font-semibold tracking-widest uppercase text-iba dark:text-dark-iba leading-tight">Finance Lab</p>
             </div>
-            <span className="font-semibold tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
           </div>
 
           <div className="mb-8">

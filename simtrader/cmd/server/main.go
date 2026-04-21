@@ -88,6 +88,9 @@ func main() {
 		Format: "${time} | ${status} | ${latency} | ${method} ${path}\n",
 	}))
 	app.Use(cors.New(cors.Config{
+		// In development, accept any origin so LAN devices (mobile/laptop via IP)
+		// and localhost both work without reconfiguration.
+		AllowOriginsFunc: func(origin string) bool { return cfg.Env == "development" },
 		AllowOrigins:     cfg.FrontendURL,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, Sec-WebSocket-Key, Sec-WebSocket-Version, Sec-WebSocket-Extensions, Upgrade",
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",

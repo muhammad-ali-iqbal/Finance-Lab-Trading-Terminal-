@@ -11,6 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // listen on all interfaces so LAN devices can connect
     proxy: {
       // Proxy all /api requests to Go backend (REST + WebSocket)
       '/api': {

@@ -85,6 +85,16 @@ export default {
           muted: '#D9770622',
           text: '#D97706',
         },
+        // IBA brand
+        iba: {
+          DEFAULT: '#8B1A2A',
+          light:   '#A82234',
+          muted:   '#8B1A2A12',
+        },
+        'dark-iba': {
+          DEFAULT: '#C4526A',
+          muted:   '#8B1A2A30',
+        },
         // Market-specific
         bid: '#0D7A4E',
         ask: '#C8291A',

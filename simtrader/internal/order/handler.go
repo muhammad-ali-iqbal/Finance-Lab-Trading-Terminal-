@@ -190,11 +190,12 @@ func (r *OrderRepository) GetOrderBook(ctx context.Context, simID uuid.UUID, sym
 		asks = append(asks, l)
 	}
 
-	// Latest price
+	// Latest price — capped at current simulation time so future ticks are never shown
 	var lastPrice float64
 	_ = r.db.QueryRow(ctx, `
 		SELECT close FROM price_ticks
 		WHERE simulation_id=$1 AND symbol=$2
+		  AND sim_time <= (SELECT current_sim_time FROM simulations WHERE id=$1)
 		ORDER BY sim_time DESC LIMIT 1`,
 		simID, symbol,
 	).Scan(&lastPrice)

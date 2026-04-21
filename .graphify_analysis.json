@@ -1,0 +1,720 @@
+{
+  "communities": {
+    "0": [
+      "auth_getclaims",
+      "auth_handler",
+      "auth_handler_completeregistration",
+      "auth_handler_forgotpassword",
+      "auth_handler_login",
+      "auth_handler_logout",
+      "auth_handler_refreshtokens",
+      "auth_handler_registerroutes",
+      "auth_handler_resetpassword",
+      "errors_badrequest",
+      "errors_internalerror",
+      "handler_mapautherror",
+      "order_handler",
+      "order_handler_cancelorder",
+      "order_handler_getorderbook",
+      "order_handler_listorders",
+      "order_handler_submitorder",
+      "simtrader_internal_httputil_errors_go",
+      "simtrader_internal_user_model_go",
+      "simulation_handler",
+      "simulation_handler_completesimulation",
+      "simulation_handler_createsimulation",
+      "simulation_handler_deletesimulation",
+      "simulation_handler_ensureportfolio",
+      "simulation_handler_getactivesimulation",
+      "simulation_handler_getprogress",
+      "simulation_handler_getsimulation",
+      "simulation_handler_getsymbols",
+      "simulation_handler_gettickhistory",
+      "simulation_handler_listsimulations",
+      "simulation_handler_pausesimulation",
+      "simulation_handler_resumesimulation",
+      "simulation_handler_reuploadcsv",
+      "simulation_handler_startsimulation",
+      "simulation_handler_updatesimulation",
+      "simulation_handler_uploadcsv",
+      "simulation_repository_updatestatus",
+      "user_handler",
+      "user_handler_blockuser",
+      "user_handler_changemypassword",
+      "user_handler_getmyprofile",
+      "user_handler_getuser",
+      "user_handler_invitestudent",
+      "user_handler_setuserstatus",
+      "user_handler_unblockuser",
+      "user_handler_updatemyprofile",
+      "user_publicprofile",
+      "user_repository_getbyid",
+      "user_repository_setstatus",
+      "user_status",
+      "user_user",
+      "user_user_topublicprofile"
+    ],
+    "1": [
+      "auth_mailer",
+      "auth_noopmailer",
+      "auth_noopmailer_sendinvite",
+      "auth_noopmailer_sendpasswordreset",
+      "auth_service",
+      "auth_service_completeregistration",
+      "auth_service_createaccesstoken",
+      "auth_service_forgotpassword",
+      "auth_service_invitestudent",
+      "auth_service_issuetokenpair",
+      "auth_service_login",
+      "auth_service_logout",
+      "auth_service_refreshtokens",
+      "auth_service_resetpassword",
+      "auth_service_verifypassword",
+      "auth_tokenpair",
+      "repository_scanuser",
+      "service_generatesecuretoken",
+      "service_hashpassword",
+      "service_hashtoken",
+      "service_newservice",
+      "simtrader_internal_auth_service_go",
+      "simtrader_internal_types_types_go",
+      "types_claims",
+      "types_orderfiller",
+      "types_pricetick",
+      "types_role",
+      "user_handler_listusers",
+      "user_repository",
+      "user_repository_completeregistration",
+      "user_repository_create",
+      "user_repository_getbyemail",
+      "user_repository_getbyinvitetoken",
+      "user_repository_getbyresettoken",
+      "user_repository_list",
+      "user_repository_resetpassword",
+      "user_repository_revokeallusertokens",
+      "user_repository_revokerefreshtoken",
+      "user_repository_scanone",
+      "user_repository_setresettoken",
+      "user_repository_storerefreshtoken",
+      "user_repository_validaterefreshtoken"
+    ],
+    "2": [
+      "clock_newclock",
+      "repository_newrepository",
+      "repository_parsecsvrow",
+      "repository_validateheader",
+      "simtrader_internal_simulation_clock_go",
+      "simtrader_internal_simulation_repository_go",
+      "simulation_client",
+      "simulation_clock",
+      "simulation_clock_broadcast",
+      "simulation_clock_isrunning",
+      "simulation_clock_run",
+      "simulation_clock_start",
+      "simulation_clock_stop",
+      "simulation_clockregistry",
+      "simulation_clockregistry_register",
+      "simulation_clockregistry_remove",
+      "simulation_handler_restartsimulation",
+      "simulation_repository",
+      "simulation_repository_create",
+      "simulation_repository_getactive",
+      "simulation_repository_getactivesiminfo",
+      "simulation_repository_getbyid",
+      "simulation_repository_getfirstsimtime",
+      "simulation_repository_getlastsimtime",
+      "simulation_repository_getnextsimtime",
+      "simulation_repository_getsiminfo",
+      "simulation_repository_getticksattime",
+      "simulation_repository_ingestcsv",
+      "simulation_repository_list",
+      "simulation_repository_resetsimtime",
+      "simulation_repository_scanone",
+      "simulation_repository_updatecurrentsimtime",
+      "simulation_repository_updatedescription",
+      "simulation_repository_updatename"
+    ],
+    "3": [
+      "auth_extractbearertoken",
+      "auth_requireauth",
+      "auth_requirerole",
+      "auth_service_parseaccesstoken",
+      "main_jsonerrorhandler",
+      "main_main",
+      "middleware_tokenparser",
+      "order_handler_registerroutes",
+      "registerpage_handlesubmit",
+      "registerpage_set",
+      "requireauth_requireauth",
+      "simtrader_cmd_server_main_go",
+      "simtrader_frontend_src_components_auth_requireauth_tsx",
+      "simtrader_frontend_src_hooks_usesimulationsocket_ts",
+      "simtrader_frontend_src_pages_auth_registerpage_tsx",
+      "simtrader_internal_middleware_auth_go",
+      "simtrader_tools_validate_simtrader_csv_py",
+      "simulation_clock_addclient",
+      "simulation_clock_removeclient",
+      "simulation_clockregistry_get",
+      "simulation_handler_registerroutes",
+      "simulation_handler_websockethandler",
+      "simulation_repository_delete",
+      "user_handler_registerroutes",
+      "usesimulationsocket_getconn",
+      "usesimulationsocket_notify",
+      "usesimulationsocket_usesimulationsocket",
+      "usesimulationsocket_wsconnect",
+      "usesimulationsocket_wsdisconnect",
+      "validate_simtrader_csv_report",
+      "validate_simtrader_csv_validate"
+    ],
+    "4": [
+      "CLAUDE_AdminRoutePrefix",
+      "CLAUDE_BackendArchitecture",
+      "CLAUDE_BloombergDataTool",
+      "CLAUDE_DirectoryStructure",
+      "CLAUDE_FrontendArchitecture",
+      "CLAUDE_Go122Fiber",
+      "CLAUDE_InsufficientResourcesIssue",
+      "CLAUDE_InviteOnlyRegistration",
+      "CLAUDE_JWTAuth",
+      "CLAUDE_MultiUserTesting",
+      "CLAUDE_OneSimulationActive",
+      "CLAUDE_OrderFillEngine",
+      "CLAUDE_PSXData",
+      "CLAUDE_PasswordHashing",
+      "CLAUDE_PostgreSQL",
+      "CLAUDE_ReactTS",
+      "CLAUDE_SimTraderContext",
+      "CLAUDE_SimulationClock",
+      "CLAUDE_TanStackQuery",
+      "CLAUDE_TechStack",
+      "CLAUDE_TradingViewCharts",
+      "CLAUDE_WebSocketRealtime",
+      "CLAUDE_WebSocketSingletonPool",
+      "CLAUDE_Zustand"
+    ],
+    "5": [
+      "auth_authresponse",
+      "auth_forgotpasswordrequest",
+      "auth_loginrequest",
+      "auth_logoutrequest",
+      "auth_refreshrequest",
+      "auth_registerrequest",
+      "auth_resetpasswordrequest",
+      "handler_newhandler",
+      "handler_neworderrepository",
+      "order_order",
+      "order_orderbook",
+      "order_orderbooklevel",
+      "order_simulationrepo",
+      "order_submitorderrequest",
+      "simtrader_internal_auth_handler_go",
+      "simtrader_internal_order_handler_go",
+      "simtrader_internal_simulation_handler_go",
+      "simtrader_internal_user_handler_go",
+      "simulation_createsimrequest",
+      "user_changepasswordrequest",
+      "user_inviterequest",
+      "user_passwordverifier",
+      "user_updateprofilerequest"
+    ],
+    "6": [
+      "db_close",
+      "db_connect",
+      "engine_newengine",
+      "order_engine",
+      "order_engine_determinefill",
+      "order_engine_executefill",
+      "order_engine_processsymbolorders",
+      "order_engine_processtickorders",
+      "order_orderrepository",
+      "order_orderrepository_cancel",
+      "order_orderrepository_getorderbook",
+      "order_orderrepository_getportfolioid",
+      "order_orderrepository_insert",
+      "order_orderrepository_list",
+      "simtrader_internal_db_db_go",
+      "simtrader_internal_order_engine_go",
+      "simulation_repository_getsymbols",
+      "simulation_repository_getticksforsymbol"
+    ],
+    "7": [
+      "bloomberg_to_simtrader_forward_fill_gaps",
+      "bloomberg_to_simtrader_in_session",
+      "bloomberg_to_simtrader_main",
+      "bloomberg_to_simtrader_parse_bloomberg_paste",
+      "bloomberg_to_simtrader_parse_price",
+      "bloomberg_to_simtrader_parse_volume",
+      "bloomberg_to_simtrader_pkt_to_datetime",
+      "bloomberg_to_simtrader_pkt_to_utc",
+      "bloomberg_to_simtrader_rationale_168",
+      "bloomberg_to_simtrader_rationale_337",
+      "bloomberg_to_simtrader_rationale_345",
+      "bloomberg_to_simtrader_rationale_353",
+      "bloomberg_to_simtrader_rationale_364",
+      "bloomberg_to_simtrader_rationale_375",
+      "bloomberg_to_simtrader_rationale_385",
+      "bloomberg_to_simtrader_rationale_68",
+      "bloomberg_to_simtrader_valid_ohlc",
+      "simtrader_tools_bloomberg_to_simtrader_py"
+    ],
+    "8": [
+      "portfolio_handler",
+      "portfolio_handler_getportfolio",
+      "portfolio_handler_registerroutes",
+      "portfolio_newhandler",
+      "portfolio_newrepository",
+      "portfolio_portfolio",
+      "portfolio_position",
+      "portfolio_repository",
+      "portfolio_repository_ensureexists",
+      "portfolio_repository_get",
+      "portfolio_simrepo",
+      "simtrader_internal_portfolio_portfolio_go",
+      "simulation_repository_getsimstatus"
+    ],
+    "9": [
+      "chartpage_fmt",
+      "chartpage_handler",
+      "chartpage_simulationtime",
+      "repository_contains",
+      "repository_containsrune",
+      "repository_isduplicateerror",
+      "simtrader_frontend_src_pages_student_chartpage_tsx",
+      "simtrader_internal_user_repository_go",
+      "user_scanfn"
+    ],
+    "10": [
+      "simtrader_frontend_src_components_ui_themetoggle_tsx",
+      "simtrader_frontend_src_context_themecontext_tsx",
+      "themecontext_getinitialtheme",
+      "themecontext_themeprovider",
+      "themecontext_usetheme",
+      "themetoggle_clsx",
+      "themetoggle_themetoggle"
+    ],
+    "11": [
+      "auth_smtpmailer",
+      "auth_smtpmailer_send",
+      "auth_smtpmailer_sendinvite",
+      "auth_smtpmailer_sendpasswordreset",
+      "mailer_newsmtpmailer",
+      "simtrader_internal_auth_mailer_go"
+    ],
+    "12": [
+      "config_config",
+      "config_getenv",
+      "config_load",
+      "config_parseduration",
+      "config_requireenv",
+      "simtrader_internal_config_config_go"
+    ],
+    "13": [
+      "adminsimulationspage_handledelete",
+      "adminsimulationspage_handlefileupload",
+      "adminsimulationspage_handlereupload",
+      "adminsimulationspage_invalidate",
+      "adminsimulationspage_set",
+      "simtrader_frontend_src_pages_admin_adminsimulationspage_tsx"
+    ],
+    "14": [
+      "simtrader_internal_simulation_model_go",
+      "simulation_simulation",
+      "simulation_status",
+      "simulation_tickbroadcast"
+    ],
+    "15": [
+      "simtrader_frontend_src_components_simulation_simulationtimer_tsx",
+      "simulationtimer_formatsimtime",
+      "simulationtimer_formattime",
+      "simulationtimer_statuscolor"
+    ],
+    "16": [
+      "orderentrypage_currentprice",
+      "orderentrypage_fmt",
+      "orderentrypage_handlesubmit",
+      "simtrader_frontend_src_pages_student_orderentrypage_tsx"
+    ],
+    "17": [
+      "app_app",
+      "app_notfound",
+      "simtrader_frontend_src_app_tsx"
+    ],
+    "18": [
+      "adminuserspage_handlesubmit",
+      "adminuserspage_invalidate",
+      "simtrader_frontend_src_pages_admin_adminuserspage_tsx"
+    ],
+    "19": [
+      "portfoliopage_fmt",
+      "portfoliopage_fmtcurrency",
+      "simtrader_frontend_src_pages_student_portfoliopage_tsx"
+    ],
+    "20": [
+      "client_processpending",
+      "simtrader_frontend_src_api_client_ts"
+    ],
+    "21": [
+      "dashboardlayout_clsx",
+      "simtrader_frontend_src_components_layout_dashboardlayout_tsx"
+    ],
+    "22": [
+      "index_clsx",
+      "simtrader_frontend_src_components_ui_index_tsx"
+    ],
+    "23": [
+      "adminlayout_adminlayout",
+      "simtrader_frontend_src_pages_admin_adminlayout_tsx"
+    ],
+    "24": [
+      "adminsettingspage_handlesubmit",
+      "simtrader_frontend_src_pages_admin_adminsettingspage_tsx"
+    ],
+    "25": [
+      "loginpage_handlesubmit",
+      "simtrader_frontend_src_pages_auth_loginpage_tsx"
+    ],
+    "26": [
+      "chartpageold_fmt",
+      "simtrader_frontend_src_pages_student_chartpageold_tsx"
+    ],
+    "27": [
+      "orderbookpage_fmt",
+      "simtrader_frontend_src_pages_student_orderbookpage_tsx"
+    ],
+    "28": [
+      "orderspage_fmt",
+      "simtrader_frontend_src_pages_student_orderspage_tsx"
+    ],
+    "29": [
+      "aapltxt_bloomberg_ohlcv_data",
+      "tools_readme_bloomberg_workflow"
+    ],
+    "30": [
+      "gemma_py"
+    ],
+    "31": [
+      "simtrader_internal_simulation_adapter_go"
+    ],
+    "32": [
+      "simtrader_frontend_postcss_config_js"
+    ],
+    "33": [
+      "simtrader_frontend_tailwind_config_js"
+    ],
+    "34": [
+      "simtrader_frontend_vite_config_ts"
+    ],
+    "35": [
+      "simtrader_frontend_src_main_tsx"
+    ],
+    "36": [
+      "simtrader_frontend_src_vite_env_d_ts"
+    ],
+    "37": [
+      "simtrader_frontend_src_api_auth_ts"
+    ],
+    "38": [
+      "simtrader_frontend_src_api_index_ts"
+    ],
+    "39": [
+      "simtrader_frontend_src_api_order_ts"
+    ],
+    "40": [
+      "simtrader_frontend_src_api_portfolio_ts"
+    ],
+    "41": [
+      "simtrader_frontend_src_api_simulation_ts"
+    ],
+    "42": [
+      "simtrader_frontend_src_api_user_ts"
+    ],
+    "43": [
+      "simtrader_frontend_src_pages_admin_adminoverviewpage_tsx"
+    ],
+    "44": [
+      "simtrader_frontend_src_pages_student_profilepage_tsx"
+    ],
+    "45": [
+      "simtrader_frontend_src_store_auth_ts"
+    ],
+    "46": [
+      "simtrader_frontend_src_types_index_ts"
+    ],
+    "47": [
+      "progressreport_portfolio_management"
+    ],
+    "48": [
+      "progressreport_order_management"
+    ],
+    "49": [
+      "progressreport_admin_dashboard"
+    ],
+    "50": [
+      "progressreport_realtime_websocket"
+    ],
+    "51": [
+      "progressreport_simulation_timer"
+    ],
+    "52": [
+      "progressreport_frontend_infrastructure"
+    ],
+    "53": [
+      "progressreport_auth_user_management"
+    ],
+    "54": [
+      "qwenmd_simtrader_context"
+    ],
+    "55": [
+      "readme_monorepo_structure"
+    ],
+    "56": [
+      "readme_security_features"
+    ],
+    "57": [
+      "readme_design_system"
+    ],
+    "58": [
+      "readme_session_workflow"
+    ],
+    "59": [
+      "readme_railway_deployment"
+    ],
+    "60": [
+      "readme_role_based_access"
+    ],
+    "61": [
+      "simtrader_readme_module_pattern"
+    ],
+    "62": [
+      "simtrader_readme_mailer"
+    ],
+    "63": [
+      "simtrader_readme_migrations"
+    ],
+    "64": [
+      "tools_readme_psx_session"
+    ],
+    "65": [
+      "tools_readme_stock_categories"
+    ],
+    "66": [
+      "togglejpg_light_dark_mode_toggle"
+    ]
+  },
+  "cohesion": {
+    "0": 0.11,
+    "1": 0.08,
+    "2": 0.09,
+    "3": 0.09,
+    "4": 0.1,
+    "5": 0.09,
+    "6": 0.14,
+    "7": 0.17,
+    "8": 0.19,
+    "9": 0.28,
+    "10": 0.29,
+    "11": 0.47,
+    "12": 0.6,
+    "13": 0.47,
+    "14": 0.5,
+    "15": 0.5,
+    "16": 0.5,
+    "17": 0.67,
+    "18": 0.67,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0
+  },
+  "gods": [
+    {
+      "id": "errors_badrequest",
+      "label": "BadRequest()",
+      "degree": 31
+    },
+    {
+      "id": "user_status",
+      "label": "Status",
+      "degree": 28
+    },
+    {
+      "id": "errors_internalerror",
+      "label": "InternalError()",
+      "degree": 27
+    },
+    {
+      "id": "simulation_repository",
+      "label": "Repository",
+      "degree": 22
+    },
+    {
+      "id": "simulation_handler",
+      "label": "Handler",
+      "degree": 20
+    },
+    {
+      "id": "main_main",
+      "label": "main()",
+      "degree": 16
+    },
+    {
+      "id": "user_repository",
+      "label": "Repository",
+      "degree": 16
+    },
+    {
+      "id": "db_close",
+      "label": "Close()",
+      "degree": 14
+    },
+    {
+      "id": "auth_service",
+      "label": "Service",
+      "degree": 12
+    },
+    {
+      "id": "auth_getclaims",
+      "label": "GetClaims()",
+      "degree": 11
+    }
+  ],
+  "surprises": [
+    {
+      "source": "main()",
+      "target": "NewSMTPMailer()",
+      "source_files": [
+        "simtrader\\cmd\\server\\main.go",
+        "simtrader\\internal\\auth\\mailer.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities; peripheral node `NewSMTPMailer()` unexpectedly reaches hub `main()`"
+    },
+    {
+      "source": "main()",
+      "target": "NewService()",
+      "source_files": [
+        "simtrader\\cmd\\server\\main.go",
+        "simtrader\\internal\\auth\\service.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities; peripheral node `NewService()` unexpectedly reaches hub `main()`"
+    },
+    {
+      "source": "main()",
+      "target": "NewEngine()",
+      "source_files": [
+        "simtrader\\cmd\\server\\main.go",
+        "simtrader\\internal\\order\\engine.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities; peripheral node `NewEngine()` unexpectedly reaches hub `main()`"
+    },
+    {
+      "source": "main()",
+      "target": "NewOrderRepository()",
+      "source_files": [
+        "simtrader\\cmd\\server\\main.go",
+        "simtrader\\internal\\order\\handler.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities; peripheral node `NewOrderRepository()` unexpectedly reaches hub `main()`"
+    },
+    {
+      "source": "jsonErrorHandler()",
+      "target": "Status",
+      "source_files": [
+        "simtrader\\cmd\\server\\main.go",
+        "simtrader\\internal\\user\\model.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities; peripheral node `jsonErrorHandler()` unexpectedly reaches hub `Status`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `main()` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 11`, `Community 12`?",
+      "why": "High betweenness centrality (0.107) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Status` connect `Community 0` to `Community 8`, `Community 2`, `Community 3`?",
+      "why": "High betweenness centrality (0.080) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Close()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 8`?",
+      "why": "High betweenness centrality (0.056) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 30 inferred relationships involving `BadRequest()` (e.g. with `.Login()` and `.CompleteRegistration()`) actually correct?",
+      "why": "`BadRequest()` has 30 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 27 inferred relationships involving `Status` (e.g. with `main()` and `jsonErrorHandler()`) actually correct?",
+      "why": "`Status` has 27 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 26 inferred relationships involving `InternalError()` (e.g. with `Status` and `.SubmitOrder()`) actually correct?",
+      "why": "`InternalError()` has 26 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `loginRequest`, `registerRequest`, `refreshRequest` to the rest of the system?",
+      "why": "73 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}
