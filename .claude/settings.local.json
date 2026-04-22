@@ -27,7 +27,9 @@
       "Bash(npx tsc *)",
       "Bash(grep -n \"func.*List\\\\|orders.*user_id\\\\|func.*h\\\\\\\\.repo\\\\\\\\.List\\\\|h\\\\\\\\.repo \" \"C:/Users/maiqbal/OneDrive - Institute of Business Administration/Desktop/Finance-Lab-Trading-Terminal-/simtrader/internal/order/handler.go\")",
       "Bash(grep -n \"repo\\\\s*\\\\*\\\\|type Handler struct\\\\|h\\\\\\\\.repo\\\\\\\\.\" \"C:/Users/maiqbal/OneDrive - Institute of Business Administration/Desktop/Finance-Lab-Trading-Terminal-/simtrader/internal/simulation/handler.go\")",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); lc=d.get\\('packages',{}\\).get\\('node_modules/lightweight-charts',{}\\); print\\(lc.get\\('version','not found'\\)\\)\")",
+      "Bash(claude doctor *)"
     ]
   }
 }
