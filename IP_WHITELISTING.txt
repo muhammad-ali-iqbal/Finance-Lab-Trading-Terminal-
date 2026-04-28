@@ -1,0 +1,162 @@
+========================================
+FINANCE LAB IP WHITELISTING — IMPLEMENTATION GUIDE
+SimTrader Backend (Go/Fiber)
+========================================
+
+OVERVIEW
+--------
+Restrict SimTrader access to Finance Lab PCs only by adding an IP whitelist
+middleware to the Go backend. No software needs to be installed on lab PCs.
+The middleware reads a CIDR subnet from an environment variable and rejects
+all requests from IPs outside that range with a 403 Forbidden response.
+In development mode the check is bypassed automatically.
+
+
+STEP 1 — Create the middleware
+-------------------------------
+File: simtrader/internal/middleware/ip.go  (NEW FILE)
+
+------------------------------------------------------------
+package middleware
+
+import (
+	"net"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// AllowedNetworks rejects requests whose source IP is not in nets.
+// Pass an empty slice to allow all (development mode).
+func AllowedNetworks(nets []*net.IPNet) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		if len(nets) == 0 {
+			return c.Next()
+		}
+		ip := net.ParseIP(c.IP())
+		for _, n := range nets {
+			if n.Contains(ip) {
+				return c.Next()
+			}
+		}
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Access restricted to Finance Lab network",
+		})
+	}
+}
+------------------------------------------------------------
+
+
+STEP 2 — Add config field
+--------------------------
+File: simtrader/internal/config/config.go  (MODIFY)
+
+A) Add field to Config struct:
+
+    AllowedCIDRs string
+
+B) Load it in the Load() function (alongside other os.Getenv calls):
+
+    AllowedCIDRs: os.Getenv("ALLOWED_CIDRS"),
+
+C) Add a helper method after the Load() function:
+
+------------------------------------------------------------
+func (c *Config) ParsedAllowedCIDRs() ([]*net.IPNet, error) {
+	if c.AllowedCIDRs == "" {
+		return nil, nil
+	}
+	var nets []*net.IPNet
+	for _, raw := range strings.Split(c.AllowedCIDRs, ",") {
+		raw = strings.TrimSpace(raw)
+		if raw == "" {
+			continue
+		}
+		_, n, err := net.ParseCIDR(raw)
+		if err != nil {
+			return nil, fmt.Errorf("invalid CIDR %q: %w", raw, err)
+		}
+		nets = append(nets, n)
+	}
+	return nets, nil
+}
+------------------------------------------------------------
+
+    Add required imports: "net", "strings", "fmt"
+    (net and fmt may already be imported; add strings if missing)
+
+
+STEP 3 — Register the middleware globally
+------------------------------------------
+File: simtrader/cmd/server/main.go  (MODIFY)
+
+After the existing CORS middleware block (around line 99), add:
+
+------------------------------------------------------------
+// IP allowlist — bypass in development
+var allowedNets []*net.IPNet
+if cfg.Env != "development" {
+    allowedNets, err = cfg.ParsedAllowedCIDRs()
+    if err != nil {
+        log.Fatalf("invalid ALLOWED_CIDRS: %v", err)
+    }
+}
+app.Use(middleware.AllowedNetworks(allowedNets))
+------------------------------------------------------------
+
+    Note: 'err' is already declared earlier in main() from db setup,
+    so use '=' not ':=' for the assignment.
+
+
+STEP 4 — Update environment example
+-------------------------------------
+File: simtrader/.env.example  (MODIFY)
+
+Add at the bottom:
+
+------------------------------------------------------------
+# Comma-separated CIDR ranges allowed to access the app (production only).
+# Example — single lab subnet:
+#   ALLOWED_CIDRS=192.168.10.0/24
+# Example — subnet + one external admin IP:
+#   ALLOWED_CIDRS=192.168.10.0/24,203.0.113.5/32
+ALLOWED_CIDRS=
+------------------------------------------------------------
+
+
+STEP 5 — Set the value for deployment
+---------------------------------------
+In the production .env file on the server, set the Finance Lab subnet.
+Ask IT for the exact subnet. Common formats:
+
+    ALLOWED_CIDRS=192.168.10.0/24      # covers .1 – .254
+    ALLOWED_CIDRS=10.10.5.0/24         # if lab is on 10.x range
+
+Also make sure:
+    ENV=production
+
+
+VERIFICATION CHECKLIST
+-----------------------
+1. Start backend with ENV=development
+   → All requests pass (middleware is bypassed)
+
+2. Start backend with ENV=production and ALLOWED_CIDRS=127.0.0.1/32
+   → Requests from localhost succeed
+   → Requests from any other IP get: 403 {"error":"Access restricted to Finance Lab network"}
+
+3. Test from a lab PC (after setting real subnet)
+   → Login and full app work normally
+
+4. Test from outside the lab network
+   → Every request returns 403 immediately (before auth is even checked)
+
+
+NOTES
+------
+- The middleware fires BEFORE authentication, so blocked IPs never reach
+  login or any API endpoint.
+- c.IP() in Fiber respects X-Forwarded-For if a reverse proxy is in use.
+  If running behind Nginx/Caddy, set app.Config.ProxyHeader = "X-Forwarded-For"
+  so the real client IP is used instead of the proxy's IP.
+- To allow multiple subnets, just comma-separate them:
+    ALLOWED_CIDRS=192.168.10.0/24,192.168.20.0/24
