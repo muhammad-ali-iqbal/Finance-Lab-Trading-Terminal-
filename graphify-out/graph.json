@@ -77,17 +77,233 @@
       "source_file": "gemma.py",
       "source_location": "L1",
       "id": "gemma_py",
-      "community": 29,
+      "community": 32,
       "norm_label": "gemma.py"
     },
     {
-      "label": "main.go",
+      "label": "config.py",
       "file_type": "code",
-      "source_file": "simtrader\\cmd\\server\\main.go",
+      "source_file": "psx_tracker\\config.py",
       "source_location": "L1",
-      "id": "simtrader_cmd_server_main_go",
+      "id": "psx_tracker_config_py",
+      "community": 33,
+      "norm_label": "config.py"
+    },
+    {
+      "label": "database.py",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L1",
+      "id": "psx_tracker_database_py",
       "community": 3,
-      "norm_label": "main.go"
+      "norm_label": "database.py"
+    },
+    {
+      "label": "get_connection()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L6",
+      "id": "database_get_connection",
+      "community": 3,
+      "norm_label": "get_connection()"
+    },
+    {
+      "label": "db()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L15",
+      "id": "database_db",
+      "community": 3,
+      "norm_label": "db()"
+    },
+    {
+      "label": "init_db()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L27",
+      "id": "database_init_db",
+      "community": 3,
+      "norm_label": "init_db()"
+    },
+    {
+      "label": "upsert_tickers()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L62",
+      "id": "database_upsert_tickers",
+      "community": 3,
+      "norm_label": "upsert_tickers()"
+    },
+    {
+      "label": "upsert_ohlcv()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L71",
+      "id": "database_upsert_ohlcv",
+      "community": 3,
+      "norm_label": "upsert_ohlcv()"
+    },
+    {
+      "label": "get_known_tickers()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L90",
+      "id": "database_get_known_tickers",
+      "community": 3,
+      "norm_label": "get_known_tickers()"
+    },
+    {
+      "label": "last_fetch_date()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L96",
+      "id": "database_last_fetch_date",
+      "community": 3,
+      "norm_label": "last_fetch_date()"
+    },
+    {
+      "label": "log_fetch()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L104",
+      "id": "database_log_fetch",
+      "community": 3,
+      "norm_label": "log_fetch()"
+    },
+    {
+      "label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L72",
+      "id": "database_rationale_72",
+      "community": 3,
+      "norm_label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume"
+    },
+    {
+      "label": "fetcher.py",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L1",
+      "id": "psx_tracker_fetcher_py",
+      "community": 3,
+      "norm_label": "fetcher.py"
+    },
+    {
+      "label": "refresh_tickers()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L32",
+      "id": "fetcher_refresh_tickers",
+      "community": 3,
+      "norm_label": "refresh_tickers()"
+    },
+    {
+      "label": "_fetch_month()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L50",
+      "id": "fetcher_fetch_month",
+      "community": 3,
+      "norm_label": "_fetch_month()"
+    },
+    {
+      "label": "_fetch_symbol_range()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L104",
+      "id": "fetcher_fetch_symbol_range",
+      "community": 3,
+      "norm_label": "_fetch_symbol_range()"
+    },
+    {
+      "label": "fetch_day()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L125",
+      "id": "fetcher_fetch_day",
+      "community": 3,
+      "norm_label": "fetch_day()"
+    },
+    {
+      "label": "backfill()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L159",
+      "id": "fetcher_backfill",
+      "community": 3,
+      "norm_label": "backfill()"
+    },
+    {
+      "label": "Direct PSX scraper \u2014 hits dps.psx.com.pk without relying on the psx package's br",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L1",
+      "id": "fetcher_rationale_1",
+      "community": 3,
+      "norm_label": "direct psx scraper \u2014 hits dps.psx.com.pk without relying on the psx package's br"
+    },
+    {
+      "label": "Pull the full ticker list from PSX and persist any new ones.",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L33",
+      "id": "fetcher_rationale_33",
+      "community": 3,
+      "norm_label": "pull the full ticker list from psx and persist any new ones."
+    },
+    {
+      "label": "Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L51",
+      "id": "fetcher_rationale_51",
+      "community": 3,
+      "norm_label": "fetch one month of ohlcv for a single symbol via psx html endpoint."
+    },
+    {
+      "label": "Fetch all months covering from_date..to_date for a single symbol.",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L105",
+      "id": "fetcher_rationale_105",
+      "community": 3,
+      "norm_label": "fetch all months covering from_date..to_date for a single symbol."
+    },
+    {
+      "label": "Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L126",
+      "id": "fetcher_rationale_126",
+      "community": 3,
+      "norm_label": "fetch eod ohlcv for all known tickers on target_date.     defaults to yesterday"
+    },
+    {
+      "label": "Fetch all trading days between from_date and to_date (inclusive).",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L160",
+      "id": "fetcher_rationale_160",
+      "community": 3,
+      "norm_label": "fetch all trading days between from_date and to_date (inclusive)."
+    },
+    {
+      "label": "main.py",
+      "file_type": "code",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L1",
+      "id": "psx_tracker_main_py",
+      "community": 3,
+      "norm_label": "main.py"
+    },
+    {
+      "label": "cmd_status()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L16",
+      "id": "main_cmd_status",
+      "community": 3,
+      "norm_label": "cmd_status()"
     },
     {
       "label": "main()",
@@ -97,6 +313,114 @@
       "id": "main_main",
       "community": 3,
       "norm_label": "main()"
+    },
+    {
+      "label": "Entry point.  Usage:     python main.py                   # Start the live sched",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L1",
+      "id": "main_rationale_1",
+      "community": 3,
+      "norm_label": "entry point.  usage:     python main.py                   # start the live sched"
+    },
+    {
+      "label": "scheduler.py",
+      "file_type": "code",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L1",
+      "id": "psx_tracker_scheduler_py",
+      "community": 3,
+      "norm_label": "scheduler.py"
+    },
+    {
+      "label": "_eod_job()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L21",
+      "id": "scheduler_eod_job",
+      "community": 3,
+      "norm_label": "_eod_job()"
+    },
+    {
+      "label": "_ticker_refresh_job()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L29",
+      "id": "scheduler_ticker_refresh_job",
+      "community": 3,
+      "norm_label": "_ticker_refresh_job()"
+    },
+    {
+      "label": "_catch_up()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L33",
+      "id": "scheduler_catch_up",
+      "community": 3,
+      "norm_label": "_catch_up()"
+    },
+    {
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L53",
+      "id": "scheduler_run",
+      "community": 3,
+      "norm_label": "run()"
+    },
+    {
+      "label": "Runs as a long-lived process.  Every weekday at EOD_FETCH_TIME (PKT) it fetches",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L1",
+      "id": "scheduler_rationale_1",
+      "community": 3,
+      "norm_label": "runs as a long-lived process.  every weekday at eod_fetch_time (pkt) it fetches"
+    },
+    {
+      "label": "If the process was offline, backfill missing trading days.",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L34",
+      "id": "scheduler_rationale_34",
+      "community": 3,
+      "norm_label": "if the process was offline, backfill missing trading days."
+    },
+    {
+      "label": "test_pipeline.py",
+      "file_type": "code",
+      "source_file": "psx_tracker\\test_pipeline.py",
+      "source_location": "L1",
+      "id": "psx_tracker_test_pipeline_py",
+      "community": 21,
+      "norm_label": "test_pipeline.py"
+    },
+    {
+      "label": "check()",
+      "file_type": "code",
+      "source_file": "psx_tracker\\test_pipeline.py",
+      "source_location": "L18",
+      "id": "test_pipeline_check",
+      "community": 21,
+      "norm_label": "check()"
+    },
+    {
+      "label": "End-to-end test suite for psx_tracker. Tests: DB schema, ticker loading, single-",
+      "file_type": "rationale",
+      "source_file": "psx_tracker\\test_pipeline.py",
+      "source_location": "L1",
+      "id": "test_pipeline_rationale_1",
+      "community": 21,
+      "norm_label": "end-to-end test suite for psx_tracker. tests: db schema, ticker loading, single-"
+    },
+    {
+      "label": "main.go",
+      "file_type": "code",
+      "source_file": "simtrader\\cmd\\server\\main.go",
+      "source_location": "L1",
+      "id": "simtrader_cmd_server_main_go",
+      "community": 3,
+      "norm_label": "main.go"
     },
     {
       "label": "jsonErrorHandler()",
@@ -113,7 +437,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_auth_handler_go",
-      "community": 8,
+      "community": 7,
       "norm_label": "handler.go"
     },
     {
@@ -122,7 +446,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L18",
       "id": "auth_handler",
-      "community": 8,
+      "community": 0,
       "norm_label": "handler"
     },
     {
@@ -131,7 +455,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L30",
       "id": "handler_newhandler",
-      "community": 3,
+      "community": 7,
       "norm_label": "newhandler()"
     },
     {
@@ -140,7 +464,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L28",
       "id": "auth_handler_registerroutes",
-      "community": 8,
+      "community": 0,
       "norm_label": ".registerroutes()"
     },
     {
@@ -149,7 +473,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L40",
       "id": "auth_loginrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "loginrequest"
     },
     {
@@ -158,7 +482,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L45",
       "id": "auth_registerrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "registerrequest"
     },
     {
@@ -167,7 +491,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L52",
       "id": "auth_refreshrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "refreshrequest"
     },
     {
@@ -176,7 +500,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L56",
       "id": "auth_logoutrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "logoutrequest"
     },
     {
@@ -185,7 +509,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L60",
       "id": "auth_forgotpasswordrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "forgotpasswordrequest"
     },
     {
@@ -194,7 +518,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L64",
       "id": "auth_resetpasswordrequest",
-      "community": 8,
+      "community": 7,
       "norm_label": "resetpasswordrequest"
     },
     {
@@ -203,7 +527,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L69",
       "id": "auth_authresponse",
-      "community": 8,
+      "community": 7,
       "norm_label": "authresponse"
     },
     {
@@ -212,7 +536,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L81",
       "id": "auth_handler_login",
-      "community": 8,
+      "community": 0,
       "norm_label": ".login()"
     },
     {
@@ -221,7 +545,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L106",
       "id": "auth_handler_completeregistration",
-      "community": 1,
+      "community": 0,
       "norm_label": ".completeregistration()"
     },
     {
@@ -230,7 +554,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L140",
       "id": "auth_handler_refreshtokens",
-      "community": 8,
+      "community": 0,
       "norm_label": ".refreshtokens()"
     },
     {
@@ -239,7 +563,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L164",
       "id": "auth_handler_logout",
-      "community": 2,
+      "community": 0,
       "norm_label": ".logout()"
     },
     {
@@ -248,7 +572,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L180",
       "id": "auth_handler_forgotpassword",
-      "community": 2,
+      "community": 0,
       "norm_label": ".forgotpassword()"
     },
     {
@@ -257,7 +581,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L200",
       "id": "auth_handler_resetpassword",
-      "community": 8,
+      "community": 0,
       "norm_label": ".resetpassword()"
     },
     {
@@ -266,7 +590,7 @@
       "source_file": "simtrader\\internal\\auth\\handler.go",
       "source_location": "L223",
       "id": "handler_mapautherror",
-      "community": 8,
+      "community": 0,
       "norm_label": "mapautherror()"
     },
     {
@@ -329,7 +653,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L83",
       "id": "auth_noopmailer",
-      "community": 2,
+      "community": 0,
       "norm_label": "noopmailer"
     },
     {
@@ -338,7 +662,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L85",
       "id": "auth_noopmailer_sendinvite",
-      "community": 2,
+      "community": 0,
       "norm_label": ".sendinvite()"
     },
     {
@@ -347,7 +671,7 @@
       "source_file": "simtrader\\internal\\auth\\mailer.go",
       "source_location": "L90",
       "id": "auth_noopmailer_sendpasswordreset",
-      "community": 2,
+      "community": 0,
       "norm_label": ".sendpasswordreset()"
     },
     {
@@ -356,7 +680,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L1",
       "id": "simtrader_internal_auth_service_go",
-      "community": 2,
+      "community": 0,
       "norm_label": "service.go"
     },
     {
@@ -365,7 +689,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L41",
       "id": "auth_tokenpair",
-      "community": 2,
+      "community": 0,
       "norm_label": "tokenpair"
     },
     {
@@ -374,7 +698,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L46",
       "id": "auth_service",
-      "community": 2,
+      "community": 0,
       "norm_label": "service"
     },
     {
@@ -383,7 +707,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L53",
       "id": "auth_mailer",
-      "community": 2,
+      "community": 0,
       "norm_label": "mailer"
     },
     {
@@ -392,7 +716,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L58",
       "id": "service_newservice",
-      "community": 2,
+      "community": 0,
       "norm_label": "newservice()"
     },
     {
@@ -401,7 +725,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L64",
       "id": "auth_service_verifypassword",
-      "community": 2,
+      "community": 0,
       "norm_label": ".verifypassword()"
     },
     {
@@ -410,7 +734,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L77",
       "id": "auth_service_login",
-      "community": 2,
+      "community": 0,
       "norm_label": ".login()"
     },
     {
@@ -419,7 +743,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L109",
       "id": "auth_service_invitestudent",
-      "community": 2,
+      "community": 0,
       "norm_label": ".invitestudent()"
     },
     {
@@ -428,7 +752,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L139",
       "id": "auth_service_completeregistration",
-      "community": 2,
+      "community": 0,
       "norm_label": ".completeregistration()"
     },
     {
@@ -437,7 +761,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L172",
       "id": "auth_service_forgotpassword",
-      "community": 2,
+      "community": 0,
       "norm_label": ".forgotpassword()"
     },
     {
@@ -446,7 +770,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L198",
       "id": "auth_service_resetpassword",
-      "community": 2,
+      "community": 0,
       "norm_label": ".resetpassword()"
     },
     {
@@ -455,7 +779,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L221",
       "id": "auth_service_refreshtokens",
-      "community": 2,
+      "community": 0,
       "norm_label": ".refreshtokens()"
     },
     {
@@ -464,7 +788,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L251",
       "id": "auth_service_logout",
-      "community": 2,
+      "community": 0,
       "norm_label": ".logout()"
     },
     {
@@ -473,7 +797,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L259",
       "id": "auth_service_issuetokenpair",
-      "community": 2,
+      "community": 0,
       "norm_label": ".issuetokenpair()"
     },
     {
@@ -482,7 +806,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L283",
       "id": "auth_service_createaccesstoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".createaccesstoken()"
     },
     {
@@ -491,7 +815,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L301",
       "id": "auth_service_parseaccesstoken",
-      "community": 0,
+      "community": 1,
       "norm_label": ".parseaccesstoken()"
     },
     {
@@ -500,7 +824,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L322",
       "id": "service_hashpassword",
-      "community": 2,
+      "community": 0,
       "norm_label": "hashpassword()"
     },
     {
@@ -509,7 +833,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L329",
       "id": "service_generatesecuretoken",
-      "community": 2,
+      "community": 0,
       "norm_label": "generatesecuretoken()"
     },
     {
@@ -518,7 +842,7 @@
       "source_file": "simtrader\\internal\\auth\\service.go",
       "source_location": "L339",
       "id": "service_hashtoken",
-      "community": 2,
+      "community": 0,
       "norm_label": "hashtoken()"
     },
     {
@@ -527,7 +851,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L1",
       "id": "simtrader_internal_config_config_go",
-      "community": 3,
+      "community": 14,
       "norm_label": "config.go"
     },
     {
@@ -536,7 +860,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L18",
       "id": "config_config",
-      "community": 3,
+      "community": 14,
       "norm_label": "config"
     },
     {
@@ -545,7 +869,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L40",
       "id": "config_load",
-      "community": 3,
+      "community": 14,
       "norm_label": "load()"
     },
     {
@@ -554,7 +878,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L75",
       "id": "config_getenv",
-      "community": 3,
+      "community": 14,
       "norm_label": "getenv()"
     },
     {
@@ -563,7 +887,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L82",
       "id": "config_requireenv",
-      "community": 3,
+      "community": 14,
       "norm_label": "requireenv()"
     },
     {
@@ -572,7 +896,7 @@
       "source_file": "simtrader\\internal\\config\\config.go",
       "source_location": "L90",
       "id": "config_parseduration",
-      "community": 3,
+      "community": 14,
       "norm_label": "parseduration()"
     },
     {
@@ -608,7 +932,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L1",
       "id": "simtrader_internal_httputil_errors_go",
-      "community": 1,
+      "community": 2,
       "norm_label": "errors.go"
     },
     {
@@ -617,7 +941,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L5",
       "id": "errors_badrequest",
-      "community": 1,
+      "community": 2,
       "norm_label": "badrequest()"
     },
     {
@@ -626,7 +950,7 @@
       "source_file": "simtrader\\internal\\httputil\\errors.go",
       "source_location": "L9",
       "id": "errors_internalerror",
-      "community": 1,
+      "community": 2,
       "norm_label": "internalerror()"
     },
     {
@@ -635,7 +959,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L1",
       "id": "simtrader_internal_middleware_auth_go",
-      "community": 0,
+      "community": 1,
       "norm_label": "auth.go"
     },
     {
@@ -644,7 +968,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L15",
       "id": "middleware_tokenparser",
-      "community": 0,
+      "community": 1,
       "norm_label": "tokenparser"
     },
     {
@@ -653,7 +977,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L20",
       "id": "auth_requireauth",
-      "community": 0,
+      "community": 1,
       "norm_label": "requireauth()"
     },
     {
@@ -662,7 +986,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L41",
       "id": "auth_requirerole",
-      "community": 1,
+      "community": 2,
       "norm_label": "requirerole()"
     },
     {
@@ -671,7 +995,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L63",
       "id": "auth_getclaims",
-      "community": 1,
+      "community": 2,
       "norm_label": "getclaims()"
     },
     {
@@ -680,7 +1004,7 @@
       "source_file": "simtrader\\internal\\middleware\\auth.go",
       "source_location": "L68",
       "id": "auth_extractbearertoken",
-      "community": 0,
+      "community": 1,
       "norm_label": "extractbearertoken()"
     },
     {
@@ -752,7 +1076,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_order_handler_go",
-      "community": 3,
+      "community": 7,
       "norm_label": "handler.go"
     },
     {
@@ -761,7 +1085,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L25",
       "id": "order_order",
-      "community": 3,
+      "community": 7,
       "norm_label": "order"
     },
     {
@@ -770,7 +1094,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L44",
       "id": "order_orderbooklevel",
-      "community": 3,
+      "community": 7,
       "norm_label": "orderbooklevel"
     },
     {
@@ -779,7 +1103,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L50",
       "id": "order_orderbook",
-      "community": 3,
+      "community": 7,
       "norm_label": "orderbook"
     },
     {
@@ -797,7 +1121,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L64",
       "id": "handler_neworderrepository",
-      "community": 3,
+      "community": 7,
       "norm_label": "neworderrepository()"
     },
     {
@@ -851,7 +1175,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L223",
       "id": "order_handler",
-      "community": 1,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -860,7 +1184,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L230",
       "id": "order_simulationrepo",
-      "community": 3,
+      "community": 7,
       "norm_label": "simulationrepo"
     },
     {
@@ -869,7 +1193,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L238",
       "id": "order_handler_registerroutes",
-      "community": 0,
+      "community": 1,
       "norm_label": ".registerroutes()"
     },
     {
@@ -878,7 +1202,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L248",
       "id": "order_submitorderrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "submitorderrequest"
     },
     {
@@ -887,7 +1211,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L262",
       "id": "order_handler_submitorder",
-      "community": 1,
+      "community": 2,
       "norm_label": ".submitorder()"
     },
     {
@@ -896,7 +1220,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L344",
       "id": "order_handler_listorders",
-      "community": 1,
+      "community": 2,
       "norm_label": ".listorders()"
     },
     {
@@ -905,7 +1229,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L367",
       "id": "order_handler_cancelorder",
-      "community": 1,
+      "community": 2,
       "norm_label": ".cancelorder()"
     },
     {
@@ -914,7 +1238,7 @@
       "source_file": "simtrader\\internal\\order\\handler.go",
       "source_location": "L385",
       "id": "order_handler_getorderbook",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getorderbook()"
     },
     {
@@ -1022,7 +1346,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L276",
       "id": "portfolio_handler",
-      "community": 1,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -1058,7 +1382,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L301",
       "id": "portfolio_handler_getportfolio",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getportfolio()"
     },
     {
@@ -1067,7 +1391,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L331",
       "id": "portfolio_handler_getportfoliohistory",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getportfoliohistory()"
     },
     {
@@ -1076,7 +1400,7 @@
       "source_file": "simtrader\\internal\\portfolio\\portfolio.go",
       "source_location": "L354",
       "id": "portfolio_handler_getleaderboard",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getleaderboard()"
     },
     {
@@ -1085,7 +1409,7 @@
       "source_file": "simtrader\\internal\\simulation\\adapter.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_adapter_go",
-      "community": 30,
+      "community": 34,
       "norm_label": "adapter.go"
     },
     {
@@ -1094,7 +1418,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L27",
       "id": "simulation_repository",
-      "community": 0,
+      "community": 1,
       "norm_label": "repository"
     },
     {
@@ -1103,7 +1427,7 @@
       "source_file": "simtrader\\internal\\simulation\\adapter.go",
       "source_location": "L15",
       "id": "simulation_repository_getsiminfo",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getsiminfo()"
     },
     {
@@ -1112,7 +1436,7 @@
       "source_file": "simtrader\\internal\\simulation\\adapter.go",
       "source_location": "L20",
       "id": "simulation_repository_getactivesiminfo",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getactivesiminfo()"
     },
     {
@@ -1121,7 +1445,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_clock_go",
-      "community": 0,
+      "community": 1,
       "norm_label": "clock.go"
     },
     {
@@ -1130,7 +1454,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L38",
       "id": "simulation_client",
-      "community": 0,
+      "community": 1,
       "norm_label": "client"
     },
     {
@@ -1139,7 +1463,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L45",
       "id": "simulation_clock",
-      "community": 0,
+      "community": 1,
       "norm_label": "clock"
     },
     {
@@ -1148,7 +1472,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L58",
       "id": "clock_newclock",
-      "community": 0,
+      "community": 1,
       "norm_label": "newclock()"
     },
     {
@@ -1157,7 +1481,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L72",
       "id": "simulation_clock_start",
-      "community": 0,
+      "community": 1,
       "norm_label": ".start()"
     },
     {
@@ -1166,7 +1490,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L113",
       "id": "simulation_clock_stop",
-      "community": 0,
+      "community": 1,
       "norm_label": ".stop()"
     },
     {
@@ -1175,7 +1499,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L136",
       "id": "simulation_clock_isrunning",
-      "community": 0,
+      "community": 1,
       "norm_label": ".isrunning()"
     },
     {
@@ -1184,7 +1508,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L143",
       "id": "simulation_clock_addclient",
-      "community": 0,
+      "community": 1,
       "norm_label": ".addclient()"
     },
     {
@@ -1193,7 +1517,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L148",
       "id": "simulation_clock_removeclient",
-      "community": 0,
+      "community": 1,
       "norm_label": ".removeclient()"
     },
     {
@@ -1202,7 +1526,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L154",
       "id": "simulation_clock_run",
-      "community": 0,
+      "community": 1,
       "norm_label": ".run()"
     },
     {
@@ -1211,7 +1535,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L235",
       "id": "simulation_clock_broadcast",
-      "community": 0,
+      "community": 1,
       "norm_label": ".broadcast()"
     },
     {
@@ -1220,7 +1544,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L268",
       "id": "simulation_clockregistry",
-      "community": 0,
+      "community": 1,
       "norm_label": "clockregistry"
     },
     {
@@ -1229,7 +1553,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L277",
       "id": "simulation_clockregistry_register",
-      "community": 0,
+      "community": 1,
       "norm_label": ".register()"
     },
     {
@@ -1238,7 +1562,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L283",
       "id": "simulation_clockregistry_get",
-      "community": 0,
+      "community": 1,
       "norm_label": ".get()"
     },
     {
@@ -1247,7 +1571,7 @@
       "source_file": "simtrader\\internal\\simulation\\clock.go",
       "source_location": "L290",
       "id": "simulation_clockregistry_remove",
-      "community": 0,
+      "community": 1,
       "norm_label": ".remove()"
     },
     {
@@ -1256,7 +1580,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_handler_go",
-      "community": 3,
+      "community": 7,
       "norm_label": "handler.go"
     },
     {
@@ -1265,7 +1589,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L20",
       "id": "simulation_handler",
-      "community": 1,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -1274,7 +1598,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L30",
       "id": "simulation_handler_registerroutes",
-      "community": 0,
+      "community": 1,
       "norm_label": ".registerroutes()"
     },
     {
@@ -1283,7 +1607,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L62",
       "id": "simulation_handler_listsimulations",
-      "community": 1,
+      "community": 2,
       "norm_label": ".listsimulations()"
     },
     {
@@ -1292,7 +1616,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L70",
       "id": "simulation_handler_getactivesimulation",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getactivesimulation()"
     },
     {
@@ -1301,7 +1625,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L83",
       "id": "simulation_handler_getsimulation",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getsimulation()"
     },
     {
@@ -1310,7 +1634,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L98",
       "id": "simulation_handler_getsymbols",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getsymbols()"
     },
     {
@@ -1319,7 +1643,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L110",
       "id": "simulation_handler_gettickhistory",
-      "community": 1,
+      "community": 2,
       "norm_label": ".gettickhistory()"
     },
     {
@@ -1328,7 +1652,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L130",
       "id": "simulation_handler_websockethandler",
-      "community": 0,
+      "community": 1,
       "norm_label": ".websockethandler()"
     },
     {
@@ -1337,7 +1661,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L194",
       "id": "simulation_createsimrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "createsimrequest"
     },
     {
@@ -1346,7 +1670,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L201",
       "id": "simulation_handler_createsimulation",
-      "community": 1,
+      "community": 2,
       "norm_label": ".createsimulation()"
     },
     {
@@ -1355,7 +1679,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L237",
       "id": "simulation_handler_uploadcsv",
-      "community": 1,
+      "community": 2,
       "norm_label": ".uploadcsv()"
     },
     {
@@ -1364,7 +1688,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L280",
       "id": "simulation_handler_updatesimulation",
-      "community": 1,
+      "community": 2,
       "norm_label": ".updatesimulation()"
     },
     {
@@ -1373,7 +1697,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L318",
       "id": "simulation_handler_deletesimulation",
-      "community": 1,
+      "community": 2,
       "norm_label": ".deletesimulation()"
     },
     {
@@ -1382,7 +1706,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L341",
       "id": "simulation_handler_reuploadcsv",
-      "community": 1,
+      "community": 2,
       "norm_label": ".reuploadcsv()"
     },
     {
@@ -1391,7 +1715,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L382",
       "id": "simulation_handler_startsimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".startsimulation()"
     },
     {
@@ -1400,7 +1724,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L433",
       "id": "simulation_handler_pausesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".pausesimulation()"
     },
     {
@@ -1409,7 +1733,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L451",
       "id": "simulation_handler_resumesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".resumesimulation()"
     },
     {
@@ -1418,7 +1742,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L456",
       "id": "simulation_handler_completesimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".completesimulation()"
     },
     {
@@ -1427,7 +1751,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L478",
       "id": "simulation_handler_getprogress",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getprogress()"
     },
     {
@@ -1436,7 +1760,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L550",
       "id": "simulation_handler_restartsimulation",
-      "community": 0,
+      "community": 1,
       "norm_label": ".restartsimulation()"
     },
     {
@@ -1445,7 +1769,7 @@
       "source_file": "simtrader\\internal\\simulation\\handler.go",
       "source_location": "L602",
       "id": "simulation_handler_ensureportfolio",
-      "community": 1,
+      "community": 2,
       "norm_label": ".ensureportfolio()"
     },
     {
@@ -1454,7 +1778,7 @@
       "source_file": "simtrader\\internal\\simulation\\model.go",
       "source_location": "L1",
       "id": "simtrader_internal_simulation_model_go",
-      "community": 15,
+      "community": 17,
       "norm_label": "model.go"
     },
     {
@@ -1463,7 +1787,7 @@
       "source_file": "simtrader\\internal\\simulation\\model.go",
       "source_location": "L12",
       "id": "simulation_status",
-      "community": 15,
+      "community": 17,
       "norm_label": "status"
     },
     {
@@ -1472,7 +1796,7 @@
       "source_file": "simtrader\\internal\\simulation\\model.go",
       "source_location": "L21",
       "id": "simulation_simulation",
-      "community": 15,
+      "community": 17,
       "norm_label": "simulation"
     },
     {
@@ -1481,7 +1805,7 @@
       "source_file": "simtrader\\internal\\simulation\\model.go",
       "source_location": "L36",
       "id": "simulation_tickbroadcast",
-      "community": 15,
+      "community": 17,
       "norm_label": "tickbroadcast"
     },
     {
@@ -1508,7 +1832,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L36",
       "id": "simulation_repository_create",
-      "community": 0,
+      "community": 1,
       "norm_label": ".create()"
     },
     {
@@ -1517,7 +1841,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L46",
       "id": "simulation_repository_getbyid",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getbyid()"
     },
     {
@@ -1526,7 +1850,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L56",
       "id": "simulation_repository_getsimstatus",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getsimstatus()"
     },
     {
@@ -1535,7 +1859,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L70",
       "id": "simulation_repository_getactive",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getactive()"
     },
     {
@@ -1544,7 +1868,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L80",
       "id": "simulation_repository_list",
-      "community": 0,
+      "community": 1,
       "norm_label": ".list()"
     },
     {
@@ -1553,7 +1877,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L103",
       "id": "simulation_repository_updatestatus",
-      "community": 0,
+      "community": 1,
       "norm_label": ".updatestatus()"
     },
     {
@@ -1562,7 +1886,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L116",
       "id": "simulation_repository_updatename",
-      "community": 0,
+      "community": 1,
       "norm_label": ".updatename()"
     },
     {
@@ -1571,7 +1895,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L129",
       "id": "simulation_repository_updatedescription",
-      "community": 0,
+      "community": 1,
       "norm_label": ".updatedescription()"
     },
     {
@@ -1580,7 +1904,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L142",
       "id": "simulation_repository_delete",
-      "community": 0,
+      "community": 1,
       "norm_label": ".delete()"
     },
     {
@@ -1589,7 +1913,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L155",
       "id": "simulation_repository_updatecurrentsimtime",
-      "community": 0,
+      "community": 1,
       "norm_label": ".updatecurrentsimtime()"
     },
     {
@@ -1607,7 +1931,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L230",
       "id": "simulation_repository_getticksattime",
-      "community": 4,
+      "community": 1,
       "norm_label": ".getticksattime()"
     },
     {
@@ -1616,7 +1940,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L257",
       "id": "simulation_repository_getnextsimtime",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getnextsimtime()"
     },
     {
@@ -1625,7 +1949,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L275",
       "id": "simulation_repository_getfirstsimtime",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getfirstsimtime()"
     },
     {
@@ -1670,7 +1994,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L396",
       "id": "simulation_repository_scanone",
-      "community": 0,
+      "community": 1,
       "norm_label": ".scanone()"
     },
     {
@@ -1679,7 +2003,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L412",
       "id": "simulation_repository_getlastsimtime",
-      "community": 0,
+      "community": 1,
       "norm_label": ".getlastsimtime()"
     },
     {
@@ -1688,7 +2012,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L423",
       "id": "simulation_repository_resetsimtime",
-      "community": 0,
+      "community": 1,
       "norm_label": ".resetsimtime()"
     },
     {
@@ -1697,7 +2021,7 @@
       "source_file": "simtrader\\internal\\simulation\\repository.go",
       "source_location": "L433",
       "id": "simulation_repository_resetstudentdata",
-      "community": 0,
+      "community": 1,
       "norm_label": ".resetstudentdata()"
     },
     {
@@ -1706,7 +2030,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L1",
       "id": "simtrader_internal_types_types_go",
-      "community": 2,
+      "community": 0,
       "norm_label": "types.go"
     },
     {
@@ -1715,7 +2039,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L19",
       "id": "types_role",
-      "community": 2,
+      "community": 0,
       "norm_label": "role"
     },
     {
@@ -1724,7 +2048,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L28",
       "id": "types_claims",
-      "community": 2,
+      "community": 0,
       "norm_label": "claims"
     },
     {
@@ -1733,7 +2057,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L36",
       "id": "types_pricetick",
-      "community": 2,
+      "community": 0,
       "norm_label": "pricetick"
     },
     {
@@ -1742,7 +2066,7 @@
       "source_file": "simtrader\\internal\\types\\types.go",
       "source_location": "L50",
       "id": "types_orderfiller",
-      "community": 2,
+      "community": 0,
       "norm_label": "orderfiller"
     },
     {
@@ -1751,7 +2075,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L1",
       "id": "simtrader_internal_user_handler_go",
-      "community": 3,
+      "community": 7,
       "norm_label": "handler.go"
     },
     {
@@ -1760,7 +2084,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L20",
       "id": "user_passwordverifier",
-      "community": 3,
+      "community": 7,
       "norm_label": "passwordverifier"
     },
     {
@@ -1769,7 +2093,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L25",
       "id": "user_handler",
-      "community": 1,
+      "community": 2,
       "norm_label": "handler"
     },
     {
@@ -1787,7 +2111,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L54",
       "id": "user_inviterequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "inviterequest"
     },
     {
@@ -1796,7 +2120,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L58",
       "id": "user_updateprofilerequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "updateprofilerequest"
     },
     {
@@ -1805,7 +2129,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L63",
       "id": "user_changepasswordrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "changepasswordrequest"
     },
     {
@@ -1814,7 +2138,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L73",
       "id": "user_handler_getmyprofile",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getmyprofile()"
     },
     {
@@ -1823,7 +2147,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L94",
       "id": "user_handler_updatemyprofile",
-      "community": 1,
+      "community": 2,
       "norm_label": ".updatemyprofile()"
     },
     {
@@ -1832,7 +2156,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L123",
       "id": "user_handler_changemypassword",
-      "community": 1,
+      "community": 2,
       "norm_label": ".changemypassword()"
     },
     {
@@ -1841,7 +2165,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L161",
       "id": "user_handler_listusers",
-      "community": 1,
+      "community": 2,
       "norm_label": ".listusers()"
     },
     {
@@ -1850,7 +2174,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L184",
       "id": "user_handler_invitestudent",
-      "community": 1,
+      "community": 2,
       "norm_label": ".invitestudent()"
     },
     {
@@ -1859,7 +2183,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L216",
       "id": "user_handler_getuser",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getuser()"
     },
     {
@@ -1868,7 +2192,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L236",
       "id": "user_handler_blockuser",
-      "community": 1,
+      "community": 2,
       "norm_label": ".blockuser()"
     },
     {
@@ -1877,7 +2201,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L242",
       "id": "user_handler_unblockuser",
-      "community": 1,
+      "community": 2,
       "norm_label": ".unblockuser()"
     },
     {
@@ -1886,7 +2210,7 @@
       "source_file": "simtrader\\internal\\user\\handler.go",
       "source_location": "L246",
       "id": "user_handler_setuserstatus",
-      "community": 1,
+      "community": 2,
       "norm_label": ".setuserstatus()"
     },
     {
@@ -1895,7 +2219,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L1",
       "id": "simtrader_internal_user_model_go",
-      "community": 1,
+      "community": 2,
       "norm_label": "model.go"
     },
     {
@@ -1904,7 +2228,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L26",
       "id": "user_status",
-      "community": 1,
+      "community": 2,
       "norm_label": "status"
     },
     {
@@ -1913,7 +2237,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L35",
       "id": "user_user",
-      "community": 1,
+      "community": 2,
       "norm_label": "user"
     },
     {
@@ -1922,7 +2246,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L51",
       "id": "user_publicprofile",
-      "community": 1,
+      "community": 2,
       "norm_label": "publicprofile"
     },
     {
@@ -1931,7 +2255,7 @@
       "source_file": "simtrader\\internal\\user\\model.go",
       "source_location": "L61",
       "id": "user_user_topublicprofile",
-      "community": 1,
+      "community": 2,
       "norm_label": ".topublicprofile()"
     },
     {
@@ -1949,7 +2273,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L29",
       "id": "user_repository",
-      "community": 2,
+      "community": 0,
       "norm_label": "repository"
     },
     {
@@ -1958,7 +2282,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L38",
       "id": "user_repository_create",
-      "community": 2,
+      "community": 0,
       "norm_label": ".create()"
     },
     {
@@ -1967,7 +2291,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L62",
       "id": "user_repository_getbyid",
-      "community": 1,
+      "community": 2,
       "norm_label": ".getbyid()"
     },
     {
@@ -1976,7 +2300,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L73",
       "id": "user_repository_getbyemail",
-      "community": 2,
+      "community": 0,
       "norm_label": ".getbyemail()"
     },
     {
@@ -1985,7 +2309,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L84",
       "id": "user_repository_getbyinvitetoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".getbyinvitetoken()"
     },
     {
@@ -1994,7 +2318,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L95",
       "id": "user_repository_getbyresettoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".getbyresettoken()"
     },
     {
@@ -2003,7 +2327,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L115",
       "id": "user_repository_completeregistration",
-      "community": 2,
+      "community": 0,
       "norm_label": ".completeregistration()"
     },
     {
@@ -2012,7 +2336,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L137",
       "id": "user_repository_setresettoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".setresettoken()"
     },
     {
@@ -2021,7 +2345,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L150",
       "id": "user_repository_resetpassword",
-      "community": 8,
+      "community": 0,
       "norm_label": ".resetpassword()"
     },
     {
@@ -2030,7 +2354,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L164",
       "id": "user_repository_setstatus",
-      "community": 1,
+      "community": 0,
       "norm_label": ".setstatus()"
     },
     {
@@ -2039,7 +2363,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L178",
       "id": "user_repository_list",
-      "community": 2,
+      "community": 0,
       "norm_label": ".list()"
     },
     {
@@ -2048,7 +2372,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L211",
       "id": "user_repository_storerefreshtoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".storerefreshtoken()"
     },
     {
@@ -2057,7 +2381,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L220",
       "id": "user_repository_validaterefreshtoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".validaterefreshtoken()"
     },
     {
@@ -2066,7 +2390,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L237",
       "id": "user_repository_revokerefreshtoken",
-      "community": 2,
+      "community": 0,
       "norm_label": ".revokerefreshtoken()"
     },
     {
@@ -2084,7 +2408,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L254",
       "id": "user_repository_scanone",
-      "community": 2,
+      "community": 0,
       "norm_label": ".scanone()"
     },
     {
@@ -2102,7 +2426,7 @@
       "source_file": "simtrader\\internal\\user\\repository.go",
       "source_location": "L270",
       "id": "repository_scanuser",
-      "community": 2,
+      "community": 0,
       "norm_label": "scanuser()"
     },
     {
@@ -2138,7 +2462,7 @@
       "source_file": "simtrader-frontend\\postcss.config.js",
       "source_location": "L1",
       "id": "simtrader_frontend_postcss_config_js",
-      "community": 31,
+      "community": 35,
       "norm_label": "postcss.config.js"
     },
     {
@@ -2147,7 +2471,7 @@
       "source_file": "simtrader-frontend\\tailwind.config.js",
       "source_location": "L1",
       "id": "simtrader_frontend_tailwind_config_js",
-      "community": 32,
+      "community": 36,
       "norm_label": "tailwind.config.js"
     },
     {
@@ -2156,7 +2480,7 @@
       "source_file": "simtrader-frontend\\vite.config.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_vite_config_ts",
-      "community": 33,
+      "community": 37,
       "norm_label": "vite.config.ts"
     },
     {
@@ -2165,7 +2489,7 @@
       "source_file": "simtrader-frontend\\src\\App.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_app_tsx",
-      "community": 34,
+      "community": 38,
       "norm_label": "app.tsx"
     },
     {
@@ -2174,7 +2498,7 @@
       "source_file": "simtrader-frontend\\src\\main.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_main_tsx",
-      "community": 35,
+      "community": 39,
       "norm_label": "main.tsx"
     },
     {
@@ -2183,7 +2507,7 @@
       "source_file": "simtrader-frontend\\src\\vite-env.d.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_vite_env_d_ts",
-      "community": 36,
+      "community": 40,
       "norm_label": "vite-env.d.ts"
     },
     {
@@ -2192,7 +2516,7 @@
       "source_file": "simtrader-frontend\\src\\api\\auth.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_auth_ts",
-      "community": 37,
+      "community": 41,
       "norm_label": "auth.ts"
     },
     {
@@ -2201,7 +2525,7 @@
       "source_file": "simtrader-frontend\\src\\api\\client.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_client_ts",
-      "community": 21,
+      "community": 24,
       "norm_label": "client.ts"
     },
     {
@@ -2210,7 +2534,7 @@
       "source_file": "simtrader-frontend\\src\\api\\client.ts",
       "source_location": "L34",
       "id": "client_processpending",
-      "community": 21,
+      "community": 24,
       "norm_label": "processpending()"
     },
     {
@@ -2219,7 +2543,7 @@
       "source_file": "simtrader-frontend\\src\\api\\index.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_index_ts",
-      "community": 38,
+      "community": 42,
       "norm_label": "index.ts"
     },
     {
@@ -2228,7 +2552,7 @@
       "source_file": "simtrader-frontend\\src\\api\\order.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_order_ts",
-      "community": 39,
+      "community": 43,
       "norm_label": "order.ts"
     },
     {
@@ -2237,7 +2561,7 @@
       "source_file": "simtrader-frontend\\src\\api\\portfolio.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_portfolio_ts",
-      "community": 40,
+      "community": 44,
       "norm_label": "portfolio.ts"
     },
     {
@@ -2246,7 +2570,7 @@
       "source_file": "simtrader-frontend\\src\\api\\simulation.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_simulation_ts",
-      "community": 41,
+      "community": 45,
       "norm_label": "simulation.ts"
     },
     {
@@ -2255,7 +2579,7 @@
       "source_file": "simtrader-frontend\\src\\api\\user.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_api_user_ts",
-      "community": 42,
+      "community": 46,
       "norm_label": "user.ts"
     },
     {
@@ -2282,7 +2606,7 @@
       "source_file": "simtrader-frontend\\src\\components\\layout\\DashboardLayout.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_components_layout_dashboardlayout_tsx",
-      "community": 22,
+      "community": 25,
       "norm_label": "dashboardlayout.tsx"
     },
     {
@@ -2291,7 +2615,7 @@
       "source_file": "simtrader-frontend\\src\\components\\layout\\DashboardLayout.tsx",
       "source_location": "L119",
       "id": "dashboardlayout_clsx",
-      "community": 22,
+      "community": 25,
       "norm_label": "clsx()"
     },
     {
@@ -2300,7 +2624,7 @@
       "source_file": "simtrader-frontend\\src\\components\\simulation\\SimulationTimer.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_components_simulation_simulationtimer_tsx",
-      "community": 16,
+      "community": 18,
       "norm_label": "simulationtimer.tsx"
     },
     {
@@ -2309,7 +2633,7 @@
       "source_file": "simtrader-frontend\\src\\components\\simulation\\SimulationTimer.tsx",
       "source_location": "L20",
       "id": "simulationtimer_formattime",
-      "community": 16,
+      "community": 18,
       "norm_label": "formattime()"
     },
     {
@@ -2318,7 +2642,7 @@
       "source_file": "simtrader-frontend\\src\\components\\simulation\\SimulationTimer.tsx",
       "source_location": "L28",
       "id": "simulationtimer_formatsimtime",
-      "community": 16,
+      "community": 18,
       "norm_label": "formatsimtime()"
     },
     {
@@ -2327,7 +2651,7 @@
       "source_file": "simtrader-frontend\\src\\components\\simulation\\SimulationTimer.tsx",
       "source_location": "L40",
       "id": "simulationtimer_statuscolor",
-      "community": 16,
+      "community": 18,
       "norm_label": "statuscolor()"
     },
     {
@@ -2336,7 +2660,7 @@
       "source_file": "simtrader-frontend\\src\\components\\ui\\index.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_components_ui_index_tsx",
-      "community": 43,
+      "community": 47,
       "norm_label": "index.tsx"
     },
     {
@@ -2408,7 +2732,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_hooks_usesimulationsocket_ts",
-      "community": 3,
+      "community": 15,
       "norm_label": "usesimulationsocket.ts"
     },
     {
@@ -2417,7 +2741,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L40",
       "id": "usesimulationsocket_getconn",
-      "community": 3,
+      "community": 15,
       "norm_label": "getconn()"
     },
     {
@@ -2426,7 +2750,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L52",
       "id": "usesimulationsocket_notify",
-      "community": 3,
+      "community": 15,
       "norm_label": "notify()"
     },
     {
@@ -2435,7 +2759,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L56",
       "id": "usesimulationsocket_wsconnect",
-      "community": 3,
+      "community": 15,
       "norm_label": "wsconnect()"
     },
     {
@@ -2444,7 +2768,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L115",
       "id": "usesimulationsocket_wsdisconnect",
-      "community": 3,
+      "community": 15,
       "norm_label": "wsdisconnect()"
     },
     {
@@ -2453,7 +2777,7 @@
       "source_file": "simtrader-frontend\\src\\hooks\\useSimulationSocket.ts",
       "source_location": "L141",
       "id": "usesimulationsocket_usesimulationsocket",
-      "community": 3,
+      "community": 15,
       "norm_label": "usesimulationsocket()"
     },
     {
@@ -2462,7 +2786,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminLayout.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_admin_adminlayout_tsx",
-      "community": 44,
+      "community": 48,
       "norm_label": "adminlayout.tsx"
     },
     {
@@ -2471,7 +2795,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminOverviewPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_admin_adminoverviewpage_tsx",
-      "community": 45,
+      "community": 49,
       "norm_label": "adminoverviewpage.tsx"
     },
     {
@@ -2480,7 +2804,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSettingsPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_admin_adminsettingspage_tsx",
-      "community": 23,
+      "community": 26,
       "norm_label": "adminsettingspage.tsx"
     },
     {
@@ -2489,7 +2813,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSettingsPage.tsx",
       "source_location": "L24",
       "id": "adminsettingspage_handlesubmit",
-      "community": 23,
+      "community": 26,
       "norm_label": "handlesubmit()"
     },
     {
@@ -2498,7 +2822,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_admin_adminsimulationspage_tsx",
-      "community": 14,
+      "community": 16,
       "norm_label": "adminsimulationspage.tsx"
     },
     {
@@ -2507,7 +2831,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L32",
       "id": "adminsimulationspage_invalidate",
-      "community": 14,
+      "community": 16,
       "norm_label": "invalidate()"
     },
     {
@@ -2516,7 +2840,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L58",
       "id": "adminsimulationspage_handlefileupload",
-      "community": 14,
+      "community": 16,
       "norm_label": "handlefileupload()"
     },
     {
@@ -2525,7 +2849,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L76",
       "id": "adminsimulationspage_handlereupload",
-      "community": 14,
+      "community": 16,
       "norm_label": "handlereupload()"
     },
     {
@@ -2534,7 +2858,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L94",
       "id": "adminsimulationspage_handledelete",
-      "community": 14,
+      "community": 16,
       "norm_label": "handledelete()"
     },
     {
@@ -2543,7 +2867,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminSimulationsPage.tsx",
       "source_location": "L328",
       "id": "adminsimulationspage_set",
-      "community": 14,
+      "community": 16,
       "norm_label": "set()"
     },
     {
@@ -2552,7 +2876,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminUsersPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_admin_adminuserspage_tsx",
-      "community": 19,
+      "community": 22,
       "norm_label": "adminuserspage.tsx"
     },
     {
@@ -2561,7 +2885,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminUsersPage.tsx",
       "source_location": "L27",
       "id": "adminuserspage_handlesubmit",
-      "community": 19,
+      "community": 22,
       "norm_label": "handlesubmit()"
     },
     {
@@ -2570,7 +2894,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\admin\\AdminUsersPage.tsx",
       "source_location": "L95",
       "id": "adminuserspage_invalidate",
-      "community": 19,
+      "community": 22,
       "norm_label": "invalidate()"
     },
     {
@@ -2579,7 +2903,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\auth\\LoginPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_auth_loginpage_tsx",
-      "community": 24,
+      "community": 27,
       "norm_label": "loginpage.tsx"
     },
     {
@@ -2588,7 +2912,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\auth\\LoginPage.tsx",
       "source_location": "L26",
       "id": "loginpage_handlesubmit",
-      "community": 24,
+      "community": 27,
       "norm_label": "handlesubmit()"
     },
     {
@@ -2660,7 +2984,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPageold.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_chartpageold_tsx",
-      "community": 25,
+      "community": 28,
       "norm_label": "chartpageold.tsx"
     },
     {
@@ -2669,7 +2993,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ChartPageold.tsx",
       "source_location": "L15",
       "id": "chartpageold_fmt",
-      "community": 25,
+      "community": 28,
       "norm_label": "fmt()"
     },
     {
@@ -2678,7 +3002,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderBookPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_orderbookpage_tsx",
-      "community": 26,
+      "community": 29,
       "norm_label": "orderbookpage.tsx"
     },
     {
@@ -2687,7 +3011,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderBookPage.tsx",
       "source_location": "L10",
       "id": "orderbookpage_fmt",
-      "community": 26,
+      "community": 29,
       "norm_label": "fmt()"
     },
     {
@@ -2696,7 +3020,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderEntryPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_orderentrypage_tsx",
-      "community": 17,
+      "community": 19,
       "norm_label": "orderentrypage.tsx"
     },
     {
@@ -2705,7 +3029,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderEntryPage.tsx",
       "source_location": "L11",
       "id": "orderentrypage_fmt",
-      "community": 17,
+      "community": 19,
       "norm_label": "fmt()"
     },
     {
@@ -2714,7 +3038,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderEntryPage.tsx",
       "source_location": "L88",
       "id": "orderentrypage_handlesubmit",
-      "community": 17,
+      "community": 19,
       "norm_label": "handlesubmit()"
     },
     {
@@ -2723,7 +3047,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrderEntryPage.tsx",
       "source_location": "L227",
       "id": "orderentrypage_currentprice",
-      "community": 17,
+      "community": 19,
       "norm_label": "currentprice()"
     },
     {
@@ -2732,7 +3056,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrdersPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_orderspage_tsx",
-      "community": 27,
+      "community": 30,
       "norm_label": "orderspage.tsx"
     },
     {
@@ -2741,7 +3065,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OrdersPage.tsx",
       "source_location": "L7",
       "id": "orderspage_fmt",
-      "community": 27,
+      "community": 30,
       "norm_label": "fmt()"
     },
     {
@@ -2750,7 +3074,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OverviewPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_overviewpage_tsx",
-      "community": 18,
+      "community": 20,
       "norm_label": "overviewpage.tsx"
     },
     {
@@ -2759,7 +3083,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OverviewPage.tsx",
       "source_location": "L20",
       "id": "overviewpage_fmt",
-      "community": 18,
+      "community": 20,
       "norm_label": "fmt()"
     },
     {
@@ -2768,7 +3092,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OverviewPage.tsx",
       "source_location": "L23",
       "id": "overviewpage_fmtpkr",
-      "community": 18,
+      "community": 20,
       "norm_label": "fmtpkr()"
     },
     {
@@ -2777,7 +3101,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\OverviewPage.tsx",
       "source_location": "L24",
       "id": "overviewpage_fmtpct",
-      "community": 18,
+      "community": 20,
       "norm_label": "fmtpct()"
     },
     {
@@ -2786,7 +3110,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_portfoliopage_tsx",
-      "community": 20,
+      "community": 23,
       "norm_label": "portfoliopage.tsx"
     },
     {
@@ -2795,7 +3119,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
       "source_location": "L10",
       "id": "portfoliopage_fmt",
-      "community": 20,
+      "community": 23,
       "norm_label": "fmt()"
     },
     {
@@ -2804,7 +3128,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\PortfolioPage.tsx",
       "source_location": "L13",
       "id": "portfoliopage_fmtcurrency",
-      "community": 20,
+      "community": 23,
       "norm_label": "fmtcurrency()"
     },
     {
@@ -2813,7 +3137,7 @@
       "source_file": "simtrader-frontend\\src\\pages\\student\\ProfilePage.tsx",
       "source_location": "L1",
       "id": "simtrader_frontend_src_pages_student_profilepage_tsx",
-      "community": 46,
+      "community": 50,
       "norm_label": "profilepage.tsx"
     },
     {
@@ -2822,7 +3146,7 @@
       "source_file": "simtrader-frontend\\src\\store\\auth.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_store_auth_ts",
-      "community": 47,
+      "community": 51,
       "norm_label": "auth.ts"
     },
     {
@@ -2831,7 +3155,7 @@
       "source_file": "simtrader-frontend\\src\\types\\index.ts",
       "source_location": "L1",
       "id": "simtrader_frontend_src_types_index_ts",
-      "community": 48,
+      "community": 52,
       "norm_label": "index.ts"
     },
     {
@@ -2840,7 +3164,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L1",
       "id": "simtrader_tools_bloomberg_to_simtrader_py",
-      "community": 7,
+      "community": 8,
       "norm_label": "bloomberg_to_simtrader.py"
     },
     {
@@ -2849,7 +3173,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L67",
       "id": "bloomberg_to_simtrader_parse_bloomberg_paste",
-      "community": 7,
+      "community": 8,
       "norm_label": "parse_bloomberg_paste()"
     },
     {
@@ -2858,7 +3182,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L167",
       "id": "bloomberg_to_simtrader_forward_fill_gaps",
-      "community": 7,
+      "community": 8,
       "norm_label": "forward_fill_gaps()"
     },
     {
@@ -2867,7 +3191,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L219",
       "id": "bloomberg_to_simtrader_main",
-      "community": 7,
+      "community": 8,
       "norm_label": "main()"
     },
     {
@@ -2876,7 +3200,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L336",
       "id": "bloomberg_to_simtrader_parse_price",
-      "community": 7,
+      "community": 8,
       "norm_label": "_parse_price()"
     },
     {
@@ -2885,7 +3209,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L344",
       "id": "bloomberg_to_simtrader_parse_volume",
-      "community": 7,
+      "community": 8,
       "norm_label": "_parse_volume()"
     },
     {
@@ -2894,7 +3218,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L352",
       "id": "bloomberg_to_simtrader_valid_ohlc",
-      "community": 7,
+      "community": 8,
       "norm_label": "_valid_ohlc()"
     },
     {
@@ -2903,7 +3227,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L363",
       "id": "bloomberg_to_simtrader_pkt_to_datetime",
-      "community": 7,
+      "community": 8,
       "norm_label": "_pkt_to_datetime()"
     },
     {
@@ -2912,7 +3236,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L374",
       "id": "bloomberg_to_simtrader_pkt_to_utc",
-      "community": 7,
+      "community": 8,
       "norm_label": "_pkt_to_utc()"
     },
     {
@@ -2921,7 +3245,7 @@
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L384",
       "id": "bloomberg_to_simtrader_in_session",
-      "community": 7,
+      "community": 8,
       "norm_label": "_in_session()"
     },
     {
@@ -2929,7 +3253,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L68",
-      "community": 7,
+      "community": 8,
       "norm_label": "parse the raw text copied from bloomberg's intraday ohlc table.      bloomberg f",
       "id": "bloomberg_to_simtrader_rationale_68"
     },
@@ -2938,7 +3262,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L168",
-      "community": 7,
+      "community": 8,
       "norm_label": "psx session = 09:30 to 15:29 pkt = 04:30 to 10:29 utc     that's exactly 360 one",
       "id": "bloomberg_to_simtrader_rationale_168"
     },
@@ -2947,7 +3271,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L337",
-      "community": 7,
+      "community": 8,
       "norm_label": "parse a price string, handling bloomberg's formatting quirks.",
       "id": "bloomberg_to_simtrader_rationale_337"
     },
@@ -2956,7 +3280,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L345",
-      "community": 7,
+      "community": 8,
       "norm_label": "parse volume, removing commas (bloomberg formats as 1,234,567).",
       "id": "bloomberg_to_simtrader_rationale_345"
     },
@@ -2965,7 +3289,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L353",
-      "community": 7,
+      "community": 8,
       "norm_label": "validate that ohlc values are internally consistent.",
       "id": "bloomberg_to_simtrader_rationale_353"
     },
@@ -2974,7 +3298,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L364",
-      "community": 7,
+      "community": 8,
       "norm_label": "convert a pkt time string (hh:mm) on a given date to a utc datetime object.",
       "id": "bloomberg_to_simtrader_rationale_364"
     },
@@ -2983,7 +3307,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L375",
-      "community": 7,
+      "community": 8,
       "norm_label": "convert a pkt time string (hh:mm) on a given date to a utc iso 8601 string.",
       "id": "bloomberg_to_simtrader_rationale_375"
     },
@@ -2992,7 +3316,7 @@
       "file_type": "rationale",
       "source_file": "simtrader-tools\\bloomberg_to_simtrader.py",
       "source_location": "L385",
-      "community": 7,
+      "community": 8,
       "norm_label": "check if a pkt time string falls within psx trading hours.",
       "id": "bloomberg_to_simtrader_rationale_385"
     },
@@ -3293,7 +3617,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 49,
+      "community": 53,
       "norm_label": "portfolio management system (auto p&l)",
       "id": "progressreport_portfolio_management"
     },
@@ -3306,7 +3630,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 50,
+      "community": 54,
       "norm_label": "order management system",
       "id": "progressreport_order_management"
     },
@@ -3319,7 +3643,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 51,
+      "community": 55,
       "norm_label": "admin dashboard & simulation controls",
       "id": "progressreport_admin_dashboard"
     },
@@ -3332,7 +3656,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 52,
+      "community": 56,
       "norm_label": "real-time websocket integration",
       "id": "progressreport_realtime_websocket"
     },
@@ -3345,7 +3669,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 53,
+      "community": 57,
       "norm_label": "simulationtimer component",
       "id": "progressreport_simulation_timer"
     },
@@ -3358,7 +3682,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 54,
+      "community": 58,
       "norm_label": "frontend infrastructure (react+ts+vite+tailwind)",
       "id": "progressreport_frontend_infrastructure"
     },
@@ -3371,7 +3695,7 @@
       "captured_at": null,
       "author": "Muhammad Ali Iqbal",
       "contributor": null,
-      "community": 55,
+      "community": 59,
       "norm_label": "authentication & user management (invite flow)",
       "id": "progressreport_auth_user_management"
     },
@@ -3384,7 +3708,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 56,
+      "community": 60,
       "norm_label": "qwen.md a\u20ac\u201d simtrader context for qwen code",
       "id": "qwenmd_simtrader_context"
     },
@@ -3397,7 +3721,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 57,
+      "community": 61,
       "norm_label": "simtrader monorepo (3-component structure)",
       "id": "readme_monorepo_structure"
     },
@@ -3410,7 +3734,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 58,
+      "community": 62,
       "norm_label": "security feature set (short-lived tokens, rotation, bcrypt)",
       "id": "readme_security_features"
     },
@@ -3423,7 +3747,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 59,
+      "community": 63,
       "norm_label": "frontend design system (button, card, badge, statcard)",
       "id": "readme_design_system"
     },
@@ -3436,7 +3760,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 60,
+      "community": 64,
       "norm_label": "admin+student session workflow",
       "id": "readme_session_workflow"
     },
@@ -3449,7 +3773,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 61,
+      "community": 65,
       "norm_label": "railway deployment (backend)",
       "id": "readme_railway_deployment"
     },
@@ -3462,7 +3786,7 @@
       "captured_at": null,
       "author": null,
       "competitor": null,
-      "community": 62,
+      "community": 66,
       "norm_label": "role-based access control (admin/student)",
       "id": "readme_role_based_access"
     },
@@ -3475,7 +3799,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 63,
+      "community": 67,
       "norm_label": "module pattern (modela\u2020\u2019repositorya\u2020\u2019servicea\u2020\u2019handler)",
       "id": "simtrader_readme_module_pattern"
     },
@@ -3488,7 +3812,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 64,
+      "community": 68,
       "norm_label": "mailer (smtp + noop dev mode)",
       "id": "simtrader_readme_mailer"
     },
@@ -3501,7 +3825,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 65,
+      "community": 69,
       "norm_label": "database migrations (sql schema + seed admin)",
       "id": "simtrader_readme_migrations"
     },
@@ -3514,7 +3838,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 31,
       "norm_label": "bloomberg a\u2020\u2019 simtrader csv workflow",
       "id": "tools_readme_bloomberg_workflow"
     },
@@ -3527,7 +3851,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 66,
+      "community": 70,
       "norm_label": "psx session details (09:30-15:30 pkt, 360 bars)",
       "id": "tools_readme_psx_session"
     },
@@ -3540,7 +3864,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 67,
+      "community": 71,
       "norm_label": "psx stock teaching categories (large/mid/volatile/defensive)",
       "id": "tools_readme_stock_categories"
     },
@@ -3553,7 +3877,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 31,
       "norm_label": "aapl bloomberg ohlcv raw data (1-min bars, 2026-04-01)",
       "id": "aapltxt_bloomberg_ohlcv_data"
     },
@@ -3566,7 +3890,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 68,
+      "community": 72,
       "norm_label": "light/dark mode toggle ui component",
       "id": "togglejpg_light_dark_mode_toggle"
     },
@@ -3887,26 +4211,722 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "simtrader\\cmd\\server\\main.go",
-      "source_location": "L28",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L6",
       "weight": 1.0,
-      "_src": "simtrader_cmd_server_main_go",
-      "_tgt": "main_main",
-      "source": "simtrader_cmd_server_main_go",
-      "target": "main_main",
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_get_connection",
+      "source": "psx_tracker_database_py",
+      "target": "database_get_connection",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_db",
+      "source": "psx_tracker_database_py",
+      "target": "database_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_init_db",
+      "source": "psx_tracker_database_py",
+      "target": "database_init_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_upsert_tickers",
+      "source": "psx_tracker_database_py",
+      "target": "database_upsert_tickers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_upsert_ohlcv",
+      "source": "psx_tracker_database_py",
+      "target": "database_upsert_ohlcv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_get_known_tickers",
+      "source": "psx_tracker_database_py",
+      "target": "database_get_known_tickers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_last_fetch_date",
+      "source": "psx_tracker_database_py",
+      "target": "database_last_fetch_date",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_src": "psx_tracker_database_py",
+      "_tgt": "database_log_fetch",
+      "source": "psx_tracker_database_py",
+      "target": "database_log_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "database_db",
+      "_tgt": "database_get_connection",
+      "source": "database_get_connection",
+      "target": "database_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "database_get_connection",
+      "_tgt": "db_connect",
+      "source": "database_get_connection",
+      "target": "db_connect"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "main_cmd_status",
+      "_tgt": "database_get_connection",
+      "source": "database_get_connection",
+      "target": "main_cmd_status"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "database_init_db",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_init_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "database_upsert_tickers",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_upsert_tickers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_src": "database_upsert_ohlcv",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_upsert_ohlcv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_src": "database_get_known_tickers",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_get_known_tickers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L97",
+      "weight": 1.0,
+      "_src": "database_last_fetch_date",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_last_fetch_date",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "database_log_fetch",
+      "_tgt": "database_db",
+      "source": "database_db",
+      "target": "database_log_fetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "database_db",
+      "_tgt": "db_close",
+      "source": "database_db",
+      "target": "db_close"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "database_init_db",
+      "source": "database_init_db",
+      "target": "main_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_src": "scheduler_run",
+      "_tgt": "database_init_db",
+      "source": "database_init_db",
+      "target": "scheduler_run"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_src": "fetcher_refresh_tickers",
+      "_tgt": "database_upsert_tickers",
+      "source": "database_upsert_tickers",
+      "target": "fetcher_refresh_tickers"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\database.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "database_rationale_72",
+      "_tgt": "database_upsert_ohlcv",
+      "source": "database_upsert_ohlcv",
+      "target": "database_rationale_72",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L149",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_day",
+      "_tgt": "database_upsert_ohlcv",
+      "source": "database_upsert_ohlcv",
+      "target": "fetcher_fetch_day"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "fetcher_backfill",
+      "_tgt": "database_upsert_ohlcv",
+      "source": "database_upsert_ohlcv",
+      "target": "fetcher_backfill"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_day",
+      "_tgt": "database_get_known_tickers",
+      "source": "database_get_known_tickers",
+      "target": "fetcher_fetch_day"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "_src": "fetcher_backfill",
+      "_tgt": "database_get_known_tickers",
+      "source": "database_get_known_tickers",
+      "target": "fetcher_backfill"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "scheduler_catch_up",
+      "_tgt": "database_last_fetch_date",
+      "source": "database_last_fetch_date",
+      "target": "scheduler_catch_up"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L155",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_day",
+      "_tgt": "database_log_fetch",
+      "source": "database_log_fetch",
+      "target": "fetcher_fetch_day"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "_src": "fetcher_backfill",
+      "_tgt": "database_log_fetch",
+      "source": "database_log_fetch",
+      "target": "fetcher_backfill"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_src": "psx_tracker_fetcher_py",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_refresh_tickers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "_src": "psx_tracker_fetcher_py",
+      "_tgt": "fetcher_fetch_month",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_fetch_month",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_src": "psx_tracker_fetcher_py",
+      "_tgt": "fetcher_fetch_symbol_range",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_fetch_symbol_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L125",
+      "weight": 1.0,
+      "_src": "psx_tracker_fetcher_py",
+      "_tgt": "fetcher_fetch_day",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_fetch_day",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_src": "psx_tracker_fetcher_py",
+      "_tgt": "fetcher_backfill",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_backfill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_1",
+      "_tgt": "psx_tracker_fetcher_py",
+      "source": "psx_tracker_fetcher_py",
+      "target": "fetcher_rationale_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_day",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "fetcher_fetch_day",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "_src": "fetcher_backfill",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "fetcher_backfill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_33",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "fetcher_rationale_33",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "main_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "scheduler_ticker_refresh_job",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "scheduler_ticker_refresh_job"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "scheduler_run",
+      "_tgt": "fetcher_refresh_tickers",
+      "source": "fetcher_refresh_tickers",
+      "target": "scheduler_run"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_symbol_range",
+      "_tgt": "fetcher_fetch_month",
+      "source": "fetcher_fetch_month",
+      "target": "fetcher_fetch_symbol_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_51",
+      "_tgt": "fetcher_fetch_month",
+      "source": "fetcher_fetch_month",
+      "target": "fetcher_rationale_51",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_day",
+      "_tgt": "fetcher_fetch_symbol_range",
+      "source": "fetcher_fetch_symbol_range",
+      "target": "fetcher_fetch_day",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "_src": "fetcher_backfill",
+      "_tgt": "fetcher_fetch_symbol_range",
+      "source": "fetcher_fetch_symbol_range",
+      "target": "fetcher_backfill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_105",
+      "_tgt": "fetcher_fetch_symbol_range",
+      "source": "fetcher_fetch_symbol_range",
+      "target": "fetcher_rationale_105",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_src": "fetcher_fetch_symbol_range",
+      "_tgt": "registerpage_set",
+      "source": "fetcher_fetch_symbol_range",
+      "target": "registerpage_set"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L126",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_126",
+      "_tgt": "fetcher_fetch_day",
+      "source": "fetcher_fetch_day",
+      "target": "fetcher_rationale_126",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "fetcher_fetch_day",
+      "source": "fetcher_fetch_day",
+      "target": "main_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "scheduler_eod_job",
+      "_tgt": "fetcher_fetch_day",
+      "source": "fetcher_fetch_day",
+      "target": "scheduler_eod_job"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\fetcher.py",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_src": "fetcher_rationale_160",
+      "_tgt": "fetcher_backfill",
+      "source": "fetcher_backfill",
+      "target": "fetcher_rationale_160",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "fetcher_backfill",
+      "source": "fetcher_backfill",
+      "target": "main_main"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "scheduler_catch_up",
+      "_tgt": "fetcher_backfill",
+      "source": "fetcher_backfill",
+      "target": "scheduler_catch_up"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "psx_tracker_main_py",
+      "_tgt": "main_cmd_status",
+      "source": "psx_tracker_main_py",
+      "target": "main_cmd_status",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "psx_tracker_main_py",
+      "_tgt": "main_main",
+      "source": "psx_tracker_main_py",
+      "target": "main_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "main_rationale_1",
+      "_tgt": "psx_tracker_main_py",
+      "source": "psx_tracker_main_py",
+      "target": "main_rationale_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "main_cmd_status",
+      "source": "main_cmd_status",
+      "target": "main_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "main_cmd_status",
+      "_tgt": "db_close",
+      "source": "main_cmd_status",
+      "target": "db_close"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "simtrader\\cmd\\server\\main.go",
-      "source_location": "L144",
+      "source_location": "L28",
       "weight": 1.0,
       "_src": "simtrader_cmd_server_main_go",
-      "_tgt": "main_jsonerrorhandler",
-      "source": "simtrader_cmd_server_main_go",
-      "target": "main_jsonerrorhandler",
+      "_tgt": "main_main",
+      "source": "main_main",
+      "target": "simtrader_cmd_server_main_go",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "psx_tracker\\main.py",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "main_main",
+      "_tgt": "simulation_clock_run",
+      "source": "main_main",
+      "target": "simulation_clock_run"
     },
     {
       "relation": "calls",
@@ -4087,6 +5107,126 @@
       "_tgt": "usesimulationsocket_notify",
       "source": "main_main",
       "target": "usesimulationsocket_notify"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "psx_tracker_scheduler_py",
+      "_tgt": "scheduler_eod_job",
+      "source": "psx_tracker_scheduler_py",
+      "target": "scheduler_eod_job",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "psx_tracker_scheduler_py",
+      "_tgt": "scheduler_ticker_refresh_job",
+      "source": "psx_tracker_scheduler_py",
+      "target": "scheduler_ticker_refresh_job",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "psx_tracker_scheduler_py",
+      "_tgt": "scheduler_catch_up",
+      "source": "psx_tracker_scheduler_py",
+      "target": "scheduler_catch_up",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_src": "psx_tracker_scheduler_py",
+      "_tgt": "scheduler_run",
+      "source": "psx_tracker_scheduler_py",
+      "target": "scheduler_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "scheduler_rationale_1",
+      "_tgt": "psx_tracker_scheduler_py",
+      "source": "psx_tracker_scheduler_py",
+      "target": "scheduler_rationale_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "scheduler_run",
+      "_tgt": "scheduler_catch_up",
+      "source": "scheduler_catch_up",
+      "target": "scheduler_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\scheduler.py",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "scheduler_rationale_34",
+      "_tgt": "scheduler_catch_up",
+      "source": "scheduler_catch_up",
+      "target": "scheduler_rationale_34",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\test_pipeline.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "psx_tracker_test_pipeline_py",
+      "_tgt": "test_pipeline_check",
+      "source": "psx_tracker_test_pipeline_py",
+      "target": "test_pipeline_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "psx_tracker\\test_pipeline.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "test_pipeline_rationale_1",
+      "_tgt": "psx_tracker_test_pipeline_py",
+      "source": "psx_tracker_test_pipeline_py",
+      "target": "test_pipeline_rationale_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "simtrader\\cmd\\server\\main.go",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_src": "simtrader_cmd_server_main_go",
+      "_tgt": "main_jsonerrorhandler",
+      "source": "simtrader_cmd_server_main_go",
+      "target": "main_jsonerrorhandler",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
