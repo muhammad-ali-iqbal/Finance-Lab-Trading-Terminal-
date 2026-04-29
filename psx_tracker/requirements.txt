@@ -1,0 +1,5 @@
+psx-data-reader
+schedule
+pandas
+beautifulsoup4
+requests
