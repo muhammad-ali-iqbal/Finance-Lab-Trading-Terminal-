@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(python main.py status)",
+      "Bash(python main.py)"
+    ]
+  }
+}

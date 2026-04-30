@@ -1,6 +1,6 @@
 """
 Direct PSX scraper — hits dps.psx.com.pk without relying on the psx package's
-broken stocks() function (PSX changed the HTML column header from TIME → DATE
+broken stocks() function (PSX changed the HTML column header from TIME -> DATE
 in 2024, breaking psx-data-reader 0.0.6).
 
 tickers() still works fine so we use it for symbol discovery.
@@ -17,10 +17,17 @@ from bs4 import BeautifulSoup
 
 import psx as _psx                        # only for tickers()
 from config import BATCH_SIZE, BATCH_DELAY
-from database import upsert_ohlcv, upsert_tickers, get_known_tickers, log_fetch
+from database import (
+    upsert_ohlcv,
+    upsert_tickers,
+    get_known_tickers,
+    log_fetch,
+    set_active_tickers,
+)
 
 
 _HISTORICAL_URL = "https://dps.psx.com.pk/historical"
+_MARKET_WATCH_URL = "https://dps.psx.com.pk/market-watch"
 _SESSION = requests.Session()
 _SESSION.headers.update({"User-Agent": "Mozilla/5.0 (psx-tracker)"})
 
@@ -29,18 +36,75 @@ _SESSION.headers.update({"User-Agent": "Mozilla/5.0 (psx-tracker)"})
 # Ticker discovery
 # ---------------------------------------------------------------------------
 
-def refresh_tickers():
-    """Pull the full ticker list from PSX and persist any new ones."""
-    print("[Fetcher] Refreshing ticker list …")
+def _fetch_active_symbols() -> set[str]:
+    """
+    Scrape PSX /market-watch for the set of currently quoted (active) series.
+    The market-watch page only lists series with a live quote, so it is the
+    authoritative "active" set — delisted, suspended, and matured debt series
+    are absent.
+    """
     try:
-        df = _psx.tickers()          # returns a DataFrame
-        symbols = df["symbol"].dropna().str.strip().tolist()
+        resp = _SESSION.get(_MARKET_WATCH_URL, timeout=15)
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        print(f"[Fetcher] ERROR fetching market-watch: {e}")
+        return set()
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    active: set[str] = set()
+    for tr in soup.select("tbody tr"):
+        first = tr.select_one("td")
+        if first:
+            sym = first.get_text(strip=True)
+            if sym:
+                active.add(sym)
+    return active
+
+
+def refresh_tickers():
+    """Pull the full ticker list from PSX and persist any new ones.
+    Does NOT touch active/inactive flags — call sync_active_flags() for that."""
+    print("[Fetcher] Refreshing ticker list ...")
+    try:
+        df = _psx.tickers()
+        all_symbols = df["symbol"].dropna().str.strip().tolist()
     except Exception as e:
         print(f"[Fetcher] ERROR fetching tickers: {e}")
         return []
-    upsert_tickers(symbols)
-    print(f"[Fetcher] {len(symbols)} tickers available.")
-    return symbols
+    upsert_tickers(all_symbols)
+    print(f"[Fetcher] {len(all_symbols)} tickers in registry.")
+    return all_symbols
+
+
+def sync_active_flags():
+    """
+    Sync active/inactive status from PSX market-watch.
+    Only call this on confirmed trading days (weekdays, not PSX holidays) —
+    a closed market returns a partial quote list that would incorrectly mark
+    listed stocks as inactive.
+    """
+    from datetime import date as _date
+    from config import PSX_HOLIDAYS
+
+    today = _date.today()
+    if today.weekday() >= 5:
+        print("[Fetcher] sync_active_flags: weekend, skipping.")
+        return
+    if today in PSX_HOLIDAYS:
+        print(f"[Fetcher] sync_active_flags: {today} is a PSX holiday, skipping.")
+        return
+
+    active_quoted = _fetch_active_symbols()
+    known = set(get_known_tickers(include_inactive=True))
+    active = active_quoted & known
+    if not active:
+        print("[Fetcher] WARN: market-watch returned no known symbols, leaving flags untouched.")
+        return
+
+    active_count, inactive_count = set_active_tickers(active)
+    print(
+        f"[Fetcher] Active flags synced: {active_count} active, {inactive_count} inactive."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -65,7 +129,7 @@ def _fetch_month(symbol: str, year: int, month: int) -> list[dict]:
     if not headers:
         return []
 
-    # Detect the date column name (changed from TIME → DATE in 2024)
+    # Detect the date column name (changed from TIME -> DATE in 2024)
     date_col = next((h for h in headers if h in ("DATE", "TIME")), None)
     if date_col is None:
         return []
@@ -130,7 +194,7 @@ def fetch_day(target_date: date | None = None):
     if target_date is None:
         target_date = date.today() - timedelta(days=1)
 
-    print(f"[Fetcher] Fetching EOD data for {target_date} …")
+    print(f"[Fetcher] Fetching EOD data for {target_date} ...")
     symbols = get_known_tickers()
     if not symbols:
         symbols = refresh_tickers()
@@ -142,7 +206,7 @@ def fetch_day(target_date: date | None = None):
     batches = [symbols[i:i + BATCH_SIZE] for i in range(0, len(symbols), BATCH_SIZE)]
 
     for i, batch in enumerate(batches, 1):
-        print(f"[Fetcher] Batch {i}/{len(batches)} ({len(batch)} symbols) …", end="", flush=True)
+        print(f"[Fetcher] Batch {i}/{len(batches)} ({len(batch)} symbols) ...", end="", flush=True)
         batch_rows = []
         for sym in batch:
             batch_rows.extend(_fetch_symbol_range(sym, target_date, target_date))
@@ -165,7 +229,7 @@ def backfill(from_date: date, to_date: date | None = None):
     if not symbols:
         symbols = refresh_tickers()
 
-    print(f"[Fetcher] Backfill: {from_date} → {to_date}, {len(symbols)} symbols")
+    print(f"[Fetcher] Backfill: {from_date} -> {to_date}, {len(symbols)} symbols")
 
     # Fetch per-symbol across the full range (one call per month per symbol)
     total = 0

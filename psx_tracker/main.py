@@ -16,12 +16,14 @@ from datetime import date
 def cmd_status():
     from database import get_connection
     conn = get_connection()
-    tickers = conn.execute("SELECT COUNT(*) FROM tickers").fetchone()[0]
-    rows    = conn.execute("SELECT COUNT(*) FROM daily_ohlcv").fetchone()[0]
-    last    = conn.execute("SELECT MAX(date) FROM daily_ohlcv").fetchone()[0]
-    first   = conn.execute("SELECT MIN(date) FROM daily_ohlcv").fetchone()[0]
+    tickers  = conn.execute("SELECT COUNT(*) FROM tickers").fetchone()[0]
+    active   = conn.execute("SELECT COUNT(*) FROM tickers WHERE status = 1").fetchone()[0]
+    inactive = tickers - active
+    rows     = conn.execute("SELECT COUNT(*) FROM daily_ohlcv").fetchone()[0]
+    last     = conn.execute("SELECT MAX(date) FROM daily_ohlcv").fetchone()[0]
+    first    = conn.execute("SELECT MIN(date) FROM daily_ohlcv").fetchone()[0]
     conn.close()
-    print(f"Tickers tracked : {tickers}")
+    print(f"Tickers tracked : {tickers}  ({active} active, {inactive} inactive)")
     print(f"OHLCV rows      : {rows:,}")
     print(f"Date range      : {first} to {last}")
 

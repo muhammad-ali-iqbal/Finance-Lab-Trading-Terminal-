@@ -12,10 +12,9 @@ from datetime import date
 
 import schedule
 
-from config import EOD_FETCH_TIME
+from config import EOD_FETCH_TIME, START_DATE
 from database import init_db, last_fetch_date
-from fetcher import fetch_day, refresh_tickers
-from config import START_DATE
+from fetcher import fetch_day, refresh_tickers, sync_active_flags
 
 
 def _eod_job():
@@ -24,9 +23,15 @@ def _eod_job():
         print(f"[Scheduler] Weekend ({today}), skipping.")
         return
     fetch_day(today)
+    # Sync active flags after the fetch — only runs on weekdays that are not
+    # PSX holidays (the guard lives inside sync_active_flags).
+    sync_active_flags()
 
 
 def _ticker_refresh_job():
+    # Sunday job: just refresh the symbol list for new listings.
+    # Active-flag sync is intentionally excluded here — Sunday is not a
+    # trading day so market-watch would give an unreliable active set.
     refresh_tickers()
 
 
@@ -44,7 +49,7 @@ def _catch_up():
 
     today = date.today()
     if start <= today:
-        print(f"[Scheduler] Catching up from {start} to {today} …")
+        print(f"[Scheduler] Catching up from {start} to {today} ...")
         backfill(start, today)
     else:
         print("[Scheduler] Database is up to date.")
@@ -53,6 +58,7 @@ def _catch_up():
 def run():
     init_db()
     refresh_tickers()
+    sync_active_flags()   # guarded internally — skips weekends and holidays
     _catch_up()
 
     # Daily EOD fetch (Mon–Fri checked inside the job)

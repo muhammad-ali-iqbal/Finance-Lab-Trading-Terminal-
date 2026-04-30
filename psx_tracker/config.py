@@ -16,3 +16,11 @@ BATCH_SIZE = 50
 
 # Seconds to wait between batches
 BATCH_DELAY = 2
+
+# PSX public holidays — active-flag sync is skipped on these days so that a
+# closed market does not incorrectly mark listed stocks as inactive.
+# Add dates here whenever PSX announces a holiday (Eid, national days, etc.).
+PSX_HOLIDAYS: set[date] = {
+    date(2026, 3, 23),   # Pakistan Day
+    date(2026, 5,  1),   # Labour Day
+}

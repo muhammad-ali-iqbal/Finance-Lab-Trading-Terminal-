@@ -175,9 +175,9 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\database.py",
       "source_location": "L72",
-      "id": "database_rationale_72",
       "community": 3,
-      "norm_label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume"
+      "norm_label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume",
+      "id": "database_rationale_72"
     },
     {
       "label": "fetcher.py",
@@ -238,54 +238,54 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L1",
-      "id": "fetcher_rationale_1",
       "community": 3,
-      "norm_label": "direct psx scraper \u2014 hits dps.psx.com.pk without relying on the psx package's br"
+      "norm_label": "direct psx scraper \u2014 hits dps.psx.com.pk without relying on the psx package's br",
+      "id": "fetcher_rationale_1"
     },
     {
       "label": "Pull the full ticker list from PSX and persist any new ones.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L33",
-      "id": "fetcher_rationale_33",
       "community": 3,
-      "norm_label": "pull the full ticker list from psx and persist any new ones."
+      "norm_label": "pull the full ticker list from psx and persist any new ones.",
+      "id": "fetcher_rationale_33"
     },
     {
       "label": "Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L51",
-      "id": "fetcher_rationale_51",
       "community": 3,
-      "norm_label": "fetch one month of ohlcv for a single symbol via psx html endpoint."
+      "norm_label": "fetch one month of ohlcv for a single symbol via psx html endpoint.",
+      "id": "fetcher_rationale_51"
     },
     {
       "label": "Fetch all months covering from_date..to_date for a single symbol.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L105",
-      "id": "fetcher_rationale_105",
       "community": 3,
-      "norm_label": "fetch all months covering from_date..to_date for a single symbol."
+      "norm_label": "fetch all months covering from_date..to_date for a single symbol.",
+      "id": "fetcher_rationale_105"
     },
     {
       "label": "Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L126",
-      "id": "fetcher_rationale_126",
       "community": 3,
-      "norm_label": "fetch eod ohlcv for all known tickers on target_date.     defaults to yesterday"
+      "norm_label": "fetch eod ohlcv for all known tickers on target_date.     defaults to yesterday",
+      "id": "fetcher_rationale_126"
     },
     {
       "label": "Fetch all trading days between from_date and to_date (inclusive).",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L160",
-      "id": "fetcher_rationale_160",
       "community": 3,
-      "norm_label": "fetch all trading days between from_date and to_date (inclusive)."
+      "norm_label": "fetch all trading days between from_date and to_date (inclusive).",
+      "id": "fetcher_rationale_160"
     },
     {
       "label": "main.py",
@@ -319,9 +319,9 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\main.py",
       "source_location": "L1",
-      "id": "main_rationale_1",
       "community": 3,
-      "norm_label": "entry point.  usage:     python main.py                   # start the live sched"
+      "norm_label": "entry point.  usage:     python main.py                   # start the live sched",
+      "id": "main_rationale_1"
     },
     {
       "label": "scheduler.py",
@@ -373,18 +373,18 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L1",
-      "id": "scheduler_rationale_1",
       "community": 3,
-      "norm_label": "runs as a long-lived process.  every weekday at eod_fetch_time (pkt) it fetches"
+      "norm_label": "runs as a long-lived process.  every weekday at eod_fetch_time (pkt) it fetches",
+      "id": "scheduler_rationale_1"
     },
     {
       "label": "If the process was offline, backfill missing trading days.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L34",
-      "id": "scheduler_rationale_34",
       "community": 3,
-      "norm_label": "if the process was offline, backfill missing trading days."
+      "norm_label": "if the process was offline, backfill missing trading days.",
+      "id": "scheduler_rationale_34"
     },
     {
       "label": "test_pipeline.py",
@@ -409,9 +409,9 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\test_pipeline.py",
       "source_location": "L1",
-      "id": "test_pipeline_rationale_1",
       "community": 21,
-      "norm_label": "end-to-end test suite for psx_tracker. tests: db schema, ticker loading, single-"
+      "norm_label": "end-to-end test suite for psx_tracker. tests: db schema, ticker loading, single-",
+      "id": "test_pipeline_rationale_1"
     },
     {
       "label": "main.go",
@@ -4335,8 +4335,8 @@
       "source_file": "psx_tracker\\main.py",
       "source_location": "L18",
       "weight": 1.0,
-      "_src": "main_cmd_status",
-      "_tgt": "database_get_connection",
+      "_src": "database_get_connection",
+      "_tgt": "main_cmd_status",
       "source": "database_get_connection",
       "target": "main_cmd_status"
     },
@@ -4431,8 +4431,8 @@
       "source_file": "psx_tracker\\main.py",
       "source_location": "L39",
       "weight": 1.0,
-      "_src": "main_main",
-      "_tgt": "database_init_db",
+      "_src": "database_init_db",
+      "_tgt": "main_main",
       "source": "database_init_db",
       "target": "main_main"
     },
@@ -4443,8 +4443,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L54",
       "weight": 1.0,
-      "_src": "scheduler_run",
-      "_tgt": "database_init_db",
+      "_src": "database_init_db",
+      "_tgt": "scheduler_run",
       "source": "database_init_db",
       "target": "scheduler_run"
     },
@@ -4455,8 +4455,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L41",
       "weight": 1.0,
-      "_src": "fetcher_refresh_tickers",
-      "_tgt": "database_upsert_tickers",
+      "_src": "database_upsert_tickers",
+      "_tgt": "fetcher_refresh_tickers",
       "source": "database_upsert_tickers",
       "target": "fetcher_refresh_tickers"
     },
@@ -4479,8 +4479,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L149",
       "weight": 1.0,
-      "_src": "fetcher_fetch_day",
-      "_tgt": "database_upsert_ohlcv",
+      "_src": "database_upsert_ohlcv",
+      "_tgt": "fetcher_fetch_day",
       "source": "database_upsert_ohlcv",
       "target": "fetcher_fetch_day"
     },
@@ -4491,8 +4491,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L177",
       "weight": 1.0,
-      "_src": "fetcher_backfill",
-      "_tgt": "database_upsert_ohlcv",
+      "_src": "database_upsert_ohlcv",
+      "_tgt": "fetcher_backfill",
       "source": "database_upsert_ohlcv",
       "target": "fetcher_backfill"
     },
@@ -4503,8 +4503,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L134",
       "weight": 1.0,
-      "_src": "fetcher_fetch_day",
-      "_tgt": "database_get_known_tickers",
+      "_src": "database_get_known_tickers",
+      "_tgt": "fetcher_fetch_day",
       "source": "database_get_known_tickers",
       "target": "fetcher_fetch_day"
     },
@@ -4515,8 +4515,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L164",
       "weight": 1.0,
-      "_src": "fetcher_backfill",
-      "_tgt": "database_get_known_tickers",
+      "_src": "database_get_known_tickers",
+      "_tgt": "fetcher_backfill",
       "source": "database_get_known_tickers",
       "target": "fetcher_backfill"
     },
@@ -4527,8 +4527,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L37",
       "weight": 1.0,
-      "_src": "scheduler_catch_up",
-      "_tgt": "database_last_fetch_date",
+      "_src": "database_last_fetch_date",
+      "_tgt": "scheduler_catch_up",
       "source": "database_last_fetch_date",
       "target": "scheduler_catch_up"
     },
@@ -4539,8 +4539,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L155",
       "weight": 1.0,
-      "_src": "fetcher_fetch_day",
-      "_tgt": "database_log_fetch",
+      "_src": "database_log_fetch",
+      "_tgt": "fetcher_fetch_day",
       "source": "database_log_fetch",
       "target": "fetcher_fetch_day"
     },
@@ -4551,8 +4551,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L181",
       "weight": 1.0,
-      "_src": "fetcher_backfill",
-      "_tgt": "database_log_fetch",
+      "_src": "database_log_fetch",
+      "_tgt": "fetcher_backfill",
       "source": "database_log_fetch",
       "target": "fetcher_backfill"
     },
@@ -4671,8 +4671,8 @@
       "source_file": "psx_tracker\\main.py",
       "source_location": "L57",
       "weight": 1.0,
-      "_src": "main_main",
-      "_tgt": "fetcher_refresh_tickers",
+      "_src": "fetcher_refresh_tickers",
+      "_tgt": "main_main",
       "source": "fetcher_refresh_tickers",
       "target": "main_main"
     },
@@ -4683,8 +4683,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L30",
       "weight": 1.0,
-      "_src": "scheduler_ticker_refresh_job",
-      "_tgt": "fetcher_refresh_tickers",
+      "_src": "fetcher_refresh_tickers",
+      "_tgt": "scheduler_ticker_refresh_job",
       "source": "fetcher_refresh_tickers",
       "target": "scheduler_ticker_refresh_job"
     },
@@ -4695,8 +4695,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L55",
       "weight": 1.0,
-      "_src": "scheduler_run",
-      "_tgt": "fetcher_refresh_tickers",
+      "_src": "fetcher_refresh_tickers",
+      "_tgt": "scheduler_run",
       "source": "fetcher_refresh_tickers",
       "target": "scheduler_run"
     },
@@ -4791,8 +4791,8 @@
       "source_file": "psx_tracker\\main.py",
       "source_location": "L40",
       "weight": 1.0,
-      "_src": "main_main",
-      "_tgt": "fetcher_fetch_day",
+      "_src": "fetcher_fetch_day",
+      "_tgt": "main_main",
       "source": "fetcher_fetch_day",
       "target": "main_main"
     },
@@ -4803,8 +4803,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L26",
       "weight": 1.0,
-      "_src": "scheduler_eod_job",
-      "_tgt": "fetcher_fetch_day",
+      "_src": "fetcher_fetch_day",
+      "_tgt": "scheduler_eod_job",
       "source": "fetcher_fetch_day",
       "target": "scheduler_eod_job"
     },
@@ -4827,8 +4827,8 @@
       "source_file": "psx_tracker\\main.py",
       "source_location": "L51",
       "weight": 1.0,
-      "_src": "main_main",
-      "_tgt": "fetcher_backfill",
+      "_src": "fetcher_backfill",
+      "_tgt": "main_main",
       "source": "fetcher_backfill",
       "target": "main_main"
     },
@@ -4839,8 +4839,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L48",
       "weight": 1.0,
-      "_src": "scheduler_catch_up",
-      "_tgt": "fetcher_backfill",
+      "_src": "fetcher_backfill",
+      "_tgt": "scheduler_catch_up",
       "source": "fetcher_backfill",
       "target": "scheduler_catch_up"
     },
