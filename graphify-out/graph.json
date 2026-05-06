@@ -184,27 +184,27 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\database.py",
       "source_location": "L102",
-      "id": "database_rationale_102",
       "community": 3,
-      "norm_label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume"
+      "norm_label": "rows: list of dicts with keys symbol, date, open, high, low, close, volume",
+      "id": "database_rationale_102"
     },
     {
       "label": "Return ticker symbols. By default only active series (status=1) are returned.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\database.py",
       "source_location": "L124",
-      "id": "database_rationale_124",
       "community": 3,
-      "norm_label": "return ticker symbols. by default only active series (status=1) are returned."
+      "norm_label": "return ticker symbols. by default only active series (status=1) are returned.",
+      "id": "database_rationale_124"
     },
     {
       "label": "Mark `active_symbols` with status=1 and every other known ticker with status=0.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\database.py",
       "source_location": "L135",
-      "id": "database_rationale_135",
       "community": 3,
-      "norm_label": "mark `active_symbols` with status=1 and every other known ticker with status=0."
+      "norm_label": "mark `active_symbols` with status=1 and every other known ticker with status=0.",
+      "id": "database_rationale_135"
     },
     {
       "label": "fetcher.py",
@@ -292,63 +292,63 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L40",
-      "id": "fetcher_rationale_40",
       "community": 3,
-      "norm_label": "scrape psx /market-watch for the set of currently quoted (active) series.     th"
+      "norm_label": "scrape psx /market-watch for the set of currently quoted (active) series.     th",
+      "id": "fetcher_rationale_40"
     },
     {
       "label": "Pull the full ticker list from PSX and persist any new ones.     Does NOT touch",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L65",
-      "id": "fetcher_rationale_65",
       "community": 3,
-      "norm_label": "pull the full ticker list from psx and persist any new ones.     does not touch"
+      "norm_label": "pull the full ticker list from psx and persist any new ones.     does not touch",
+      "id": "fetcher_rationale_65"
     },
     {
       "label": "Sync active/inactive status from PSX market-watch.     Only call this on confirm",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L80",
-      "id": "fetcher_rationale_80",
       "community": 3,
-      "norm_label": "sync active/inactive status from psx market-watch.     only call this on confirm"
+      "norm_label": "sync active/inactive status from psx market-watch.     only call this on confirm",
+      "id": "fetcher_rationale_80"
     },
     {
       "label": "Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L115",
-      "id": "fetcher_rationale_115",
       "community": 3,
-      "norm_label": "fetch one month of ohlcv for a single symbol via psx html endpoint."
+      "norm_label": "fetch one month of ohlcv for a single symbol via psx html endpoint.",
+      "id": "fetcher_rationale_115"
     },
     {
       "label": "Fetch all months covering from_date..to_date for a single symbol.",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L169",
-      "id": "fetcher_rationale_169",
       "community": 3,
-      "norm_label": "fetch all months covering from_date..to_date for a single symbol."
+      "norm_label": "fetch all months covering from_date..to_date for a single symbol.",
+      "id": "fetcher_rationale_169"
     },
     {
       "label": "Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L190",
-      "id": "fetcher_rationale_190",
       "community": 3,
-      "norm_label": "fetch eod ohlcv for all known tickers on target_date.     defaults to yesterday"
+      "norm_label": "fetch eod ohlcv for all known tickers on target_date.     defaults to yesterday",
+      "id": "fetcher_rationale_190"
     },
     {
       "label": "Fetch all trading days between from_date and to_date (inclusive).",
       "file_type": "rationale",
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L224",
-      "id": "fetcher_rationale_224",
       "community": 3,
-      "norm_label": "fetch all trading days between from_date and to_date (inclusive)."
+      "norm_label": "fetch all trading days between from_date and to_date (inclusive).",
+      "id": "fetcher_rationale_224"
     },
     {
       "label": "main.py",
@@ -445,9 +445,9 @@
       "file_type": "rationale",
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L39",
-      "id": "scheduler_rationale_39",
       "community": 3,
-      "norm_label": "if the process was offline, backfill missing trading days."
+      "norm_label": "if the process was offline, backfill missing trading days.",
+      "id": "scheduler_rationale_39"
     },
     {
       "label": "test_pipeline.py",
@@ -4665,8 +4665,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L98",
       "weight": 1.0,
-      "_src": "fetcher_sync_active_flags",
-      "_tgt": "database_get_known_tickers",
+      "_src": "database_get_known_tickers",
+      "_tgt": "fetcher_sync_active_flags",
       "source": "database_get_known_tickers",
       "target": "fetcher_sync_active_flags"
     },
@@ -4713,8 +4713,8 @@
       "source_file": "psx_tracker\\fetcher.py",
       "source_location": "L104",
       "weight": 1.0,
-      "_src": "fetcher_sync_active_flags",
-      "_tgt": "database_set_active_tickers",
+      "_src": "database_set_active_tickers",
+      "_tgt": "fetcher_sync_active_flags",
       "source": "database_set_active_tickers",
       "target": "fetcher_sync_active_flags"
     },
@@ -5001,8 +5001,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L28",
       "weight": 1.0,
-      "_src": "scheduler_eod_job",
-      "_tgt": "fetcher_sync_active_flags",
+      "_src": "fetcher_sync_active_flags",
+      "_tgt": "scheduler_eod_job",
       "source": "fetcher_sync_active_flags",
       "target": "scheduler_eod_job"
     },
@@ -5013,8 +5013,8 @@
       "source_file": "psx_tracker\\scheduler.py",
       "source_location": "L61",
       "weight": 1.0,
-      "_src": "scheduler_run",
-      "_tgt": "fetcher_sync_active_flags",
+      "_src": "fetcher_sync_active_flags",
+      "_tgt": "scheduler_run",
       "source": "fetcher_sync_active_flags",
       "target": "scheduler_run"
     },
