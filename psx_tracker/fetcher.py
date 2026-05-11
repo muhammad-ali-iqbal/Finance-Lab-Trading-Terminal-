@@ -16,7 +16,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import psx as _psx                        # only for tickers()
-from config import BATCH_SIZE, BATCH_DELAY
+from config import BATCH_SIZE, BATCH_DELAY, SIMTRADER_URL, INTERNAL_SECRET
 from database import (
     upsert_ohlcv,
     upsert_tickers,
@@ -203,6 +203,7 @@ def fetch_day(target_date: date | None = None):
         return
 
     total_rows = 0
+    all_rows_collected: list[dict] = []
     batches = [symbols[i:i + BATCH_SIZE] for i in range(0, len(symbols), BATCH_SIZE)]
 
     for i, batch in enumerate(batches, 1):
@@ -211,6 +212,7 @@ def fetch_day(target_date: date | None = None):
         for sym in batch:
             batch_rows.extend(_fetch_symbol_range(sym, target_date, target_date))
         saved = upsert_ohlcv(batch_rows)
+        all_rows_collected.extend(batch_rows)
         total_rows += saved
         print(f" {saved} rows")
         if i < len(batches):
@@ -218,6 +220,42 @@ def fetch_day(target_date: date | None = None):
 
     log_fetch(target_date, "ok", total_rows)
     print(f"[Fetcher] Done. {total_rows} rows saved for {target_date}.")
+    _push_to_simtrader(target_date, all_rows_collected)
+
+
+def _push_to_simtrader(target_date: date, rows: list[dict]):
+    """Push today's EOD prices to the SimTrader backend so the challenge
+    reconciler can fill pending orders. Silently logs and continues on failure."""
+    if not rows:
+        return
+    prices = [
+        {
+            "symbol": r["symbol"],
+            "open":   r["open"]   or 0,
+            "high":   r["high"]   or 0,
+            "low":    r["low"]    or 0,
+            "close":  r["close"]  or 0,
+            "volume": int(r["volume"] or 0),
+        }
+        for r in rows
+        if r.get("close")  # skip rows with missing close
+    ]
+    if not prices:
+        return
+    payload = {"date": str(target_date), "prices": prices}
+    url = f"{SIMTRADER_URL}/api/internal/eod-prices"
+    try:
+        resp = _SESSION.post(
+            url,
+            json=payload,
+            headers={"X-Internal-Secret": INTERNAL_SECRET},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        print(f"[Fetcher] SimTrader notified: {data.get('ingested', '?')} prices ingested for {target_date}.")
+    except Exception as e:
+        print(f"[Fetcher] WARN: failed to push prices to SimTrader ({url}): {e}")
 
 
 def backfill(from_date: date, to_date: date | None = None):

@@ -35,7 +35,10 @@ migrate:
 	@if [ -z "$$DATABASE_URL" ]; then \
 		export $$(cat .env | grep DATABASE_URL | xargs); \
 	fi; \
-	psql $$DATABASE_URL -f migrations/001_create_users.sql
+	for f in migrations/*.sql; do \
+		echo "→ $$f"; \
+		psql $$DATABASE_URL -f $$f; \
+	done
 	@echo "✓ Migrations applied"
 
 # Generate bcrypt hash: make hash p=MyPassword123

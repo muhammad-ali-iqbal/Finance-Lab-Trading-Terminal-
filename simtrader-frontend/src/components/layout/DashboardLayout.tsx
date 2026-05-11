@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
-  User, LogOut, Menu, X, ChevronRight, Activity, Briefcase
+  User, LogOut, Menu, X, ChevronRight, Activity, Briefcase, Trophy
 } from 'lucide-react'
 
 // Compact sidebar widget — reads active sim from shared React Query cache
@@ -50,13 +50,14 @@ function SimulationSidebarWidget() {
 }
 
 const navItems = [
-  { to: '/dashboard',            icon: LayoutDashboard, label: 'Overview'    },
-  { to: '/dashboard/portfolio',  icon: Briefcase,       label: 'Portfolio'   },
-  { to: '/dashboard/trade',      icon: TrendingUp,      label: 'Order Entry' },
-  { to: '/dashboard/chart',      icon: BarChart3,       label: 'Charts'      },
-  { to: '/dashboard/book',       icon: BookOpen,        label: 'Order Book'  },
-  { to: '/dashboard/orders',     icon: Activity,        label: 'My Orders'   },
-  { to: '/dashboard/profile',    icon: User,            label: 'Profile'     },
+  { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview'    },
+  { to: '/dashboard/portfolio',    icon: Briefcase,       label: 'Portfolio'   },
+  { to: '/dashboard/trade',        icon: TrendingUp,      label: 'Order Entry' },
+  { to: '/dashboard/chart',        icon: BarChart3,       label: 'Charts'      },
+  { to: '/dashboard/book',         icon: BookOpen,        label: 'Order Book'  },
+  { to: '/dashboard/orders',       icon: Activity,        label: 'My Orders'   },
+  { to: '/dashboard/challenges',   icon: Trophy,          label: 'Challenges'  },
+  { to: '/dashboard/profile',      icon: User,            label: 'Profile'     },
 ]
 
 // Detects simulation restarts (simulationTime jumping backwards) and flushes

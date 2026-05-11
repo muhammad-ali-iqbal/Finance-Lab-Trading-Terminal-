@@ -7,12 +7,13 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   LayoutDashboard, Users, PlayCircle,
-  LogOut, ChevronRight, Settings
+  LogOut, ChevronRight, Settings, Trophy
 } from 'lucide-react'
 
 const navItems = [
   { to: '/admin',             icon: LayoutDashboard, label: 'Overview',    end: true },
   { to: '/admin/simulations', icon: PlayCircle,      label: 'Simulations'       },
+  { to: '/admin/challenges',  icon: Trophy,          label: 'Challenges'        },
   { to: '/admin/users',       icon: Users,           label: 'Students'          },
   { to: '/admin/settings',    icon: Settings,        label: 'Settings'          },
 ]

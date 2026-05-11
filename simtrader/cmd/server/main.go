@@ -14,7 +14,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"context"
+
 	"github.com/simtrader/backend/internal/auth"
+	"github.com/simtrader/backend/internal/challenge"
 	"github.com/simtrader/backend/internal/config"
 	"github.com/simtrader/backend/internal/db"
 	"github.com/simtrader/backend/internal/middleware"
@@ -71,6 +74,13 @@ func main() {
 	portfolioRepo := portfolio.NewRepository(db.Pool)
 	portfolioHandler := portfolio.NewHandler(portfolioRepo, simRepo)
 
+	// Challenge
+	challengeRepo := challenge.NewRepository(db.Pool)
+	challengeReconciler := challenge.NewReconciler(challengeRepo, db.Pool)
+	challengeHandler := challenge.NewHandler(challengeRepo, challengeReconciler, cfg.InternalSecret)
+	ctx, cancelReconciler := context.WithCancel(context.Background())
+	go challengeReconciler.Start(ctx)
+
 	// ── 4. HTTP server ─────────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
 		ErrorHandler: jsonErrorHandler,
@@ -114,6 +124,7 @@ func main() {
 	simHandler.RegisterRoutes(app, authMW, adminMW)
 	orderHandler.RegisterRoutes(app, authMW)
 	portfolioHandler.RegisterRoutes(app, authMW)
+	challengeHandler.RegisterRoutes(app, authMW, adminMW)
 
 	// 404
 	app.Use(func(c *fiber.Ctx) error {
@@ -135,6 +146,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 	log.Println("→ Shutdown signal received. Draining connections...")
+	cancelReconciler()
 	if err := app.ShutdownWithTimeout(10 * time.Second); err != nil {
 		log.Printf("shutdown error: %v", err)
 	}

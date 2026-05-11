@@ -1,6 +1,10 @@
 import os
 from datetime import date
 
+# SimTrader integration — push EOD prices after each successful fetch
+SIMTRADER_URL = os.getenv("SIMTRADER_URL", "http://localhost:8080")
+INTERNAL_SECRET = os.getenv("INTERNAL_SECRET", "dev-internal-secret")
+
 # Database path — sits next to this file
 DB_PATH = os.path.join(os.path.dirname(__file__), "psx_data.db")
 

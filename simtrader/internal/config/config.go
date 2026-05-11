@@ -33,6 +33,9 @@ type Config struct {
 	EmailFrom string
 
 	FrontendURL string
+
+	// InternalSecret is the shared secret psx_tracker sends with EOD price ingestion.
+	InternalSecret string
 }
 
 // Load reads .env (if present) then environment variables.
@@ -48,6 +51,7 @@ func Load() (*Config, error) {
 	cfg.Port = getEnv("PORT", "8080")
 	cfg.Env = getEnv("ENV", "development")
 	cfg.FrontendURL = getEnv("FRONTEND_URL", "http://localhost:5173")
+	cfg.InternalSecret = getEnv("INTERNAL_SECRET", "dev-internal-secret")
 
 	// Required — app cannot function without these
 	cfg.DatabaseURL = requireEnv("DATABASE_URL", &missing)

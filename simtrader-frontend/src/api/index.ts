@@ -126,6 +126,104 @@ export interface OrderBook {
   spread: number
 }
 
+// ── Challenge types ────────────────────────────────────────────────────────
+
+export type ChallengeStatus = 'draft' | 'active' | 'completed'
+export type ChallengeSide = 'buy' | 'sell'
+export type ChallengeOrderType = 'market' | 'limit'
+export type ChallengeOrderStatus = 'pending' | 'filled' | 'cancelled' | 'rejected'
+
+export interface Challenge {
+  id: string
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  initialCapital: number
+  status: ChallengeStatus
+  createdBy: string
+  createdAt: string
+}
+
+export interface ChallengeWithMeta extends Challenge {
+  participantCount: number
+  joined?: boolean        // present on student list endpoint
+}
+
+export interface ChallengeOrder {
+  id: string
+  challengeId: string
+  participantId: string
+  symbol: string
+  side: ChallengeSide
+  orderType: ChallengeOrderType
+  quantity: number
+  limitPrice: number | null
+  status: ChallengeOrderStatus
+  fillPrice: number | null
+  fillDate: string | null
+  rejectReason?: string
+  createdAt: string
+}
+
+export interface ChallengePosition {
+  id: string
+  challengeId: string
+  participantId: string
+  symbol: string
+  quantity: number
+  avgCost: number
+  currentPrice: number
+  marketValue: number
+  unrealizedPnL: number
+  unrealizedPnLPct: number
+}
+
+export interface ChallengePortfolio {
+  cashBalance: number
+  marketValue: number
+  totalValue: number
+  initialCapital: number
+  returnPct: number
+  positions: ChallengePosition[]
+}
+
+export interface ChallengeSnapshot {
+  id: string
+  challengeId: string
+  participantId: string
+  date: string
+  portfolioValue: number
+  cashBalance: number
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  participantId: string
+  displayName: string
+  email?: string          // admin view only
+  cashBalance: number
+  portfolioValue: number
+  returnPct: number
+}
+
+export interface EODBar {
+  time: string   // 'YYYY-MM-DD'
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+export interface CreateChallengeInput {
+  name: string
+  description: string
+  startDate: string
+  endDate: string
+  initialCapital: number
+}
+
 // API error shape from the Go backend
 export interface ApiError {
   error: string
@@ -148,4 +246,5 @@ export type { CreateOrderInput, OrdersListResponse } from './order'
 export { portfolioApi } from './portfolio'
 export { userApi } from './user'
 export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
+export { challengeApi } from './challenge'
 export { client } from './client'

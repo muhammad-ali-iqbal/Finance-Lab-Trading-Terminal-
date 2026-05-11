@@ -20,12 +20,15 @@ import ChartPage from '@/pages/student/ChartPage'
 import OrderBookPage from '@/pages/student/OrderBookPage'
 import { OrdersPage } from '@/pages/student/OrdersPage'
 import { ProfilePage } from '@/pages/student/ProfilePage'
+import ChallengePage from '@/pages/student/ChallengePage'
+import ChallengeDetailPage from '@/pages/student/ChallengeDetailPage'
 
 // Admin pages
 import AdminOverviewPage from '@/pages/admin/AdminOverviewPage'
 import AdminSimulationsPage from '@/pages/admin/AdminSimulationsPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage'
+import AdminChallengePage from '@/pages/admin/AdminChallengePage'
 
 // Guards
 import { RequireAuth } from '@/components/auth/RequireAuth'
@@ -71,8 +74,10 @@ export default function App() {
             <Route path="trade"        element={<OrderEntryPage />} />
             <Route path="chart"   element={<ChartPage />} />
             <Route path="book"    element={<OrderBookPage />} />
-            <Route path="orders"  element={<OrdersPage />} />
-            <Route path="profile" element={<ProfilePage />} />
+            <Route path="orders"       element={<OrdersPage />} />
+            <Route path="challenges"   element={<ChallengePage />} />
+            <Route path="challenges/:id" element={<ChallengeDetailPage />} />
+            <Route path="profile"      element={<ProfilePage />} />
           </Route>
 
           {/* ── Admin panel ─────────────────────────────────────────── */}
@@ -84,8 +89,9 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route index               element={<AdminOverviewPage />} />
+            <Route index                element={<AdminOverviewPage />} />
             <Route path="simulations"  element={<AdminSimulationsPage />} />
+            <Route path="challenges"   element={<AdminChallengePage />} />
             <Route path="users"        element={<AdminUsersPage />} />
             <Route path="settings"     element={<AdminSettingsPage />} />
           </Route>
