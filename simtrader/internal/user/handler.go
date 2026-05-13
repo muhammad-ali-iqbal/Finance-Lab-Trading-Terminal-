@@ -8,6 +8,9 @@ package user
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -39,6 +42,9 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	me.Get("/", h.GetMyProfile)
 	me.Put("/", h.UpdateMyProfile)
 	me.Put("/password", h.ChangeMyPassword)
+	me.Post("/avatar", h.UploadAvatar)
+	me.Put("/avatar/preset", h.SetPresetAvatar)
+	me.Delete("/avatar", h.RemoveAvatar)
 
 	// Admin user management
 	admin := app.Group("/api/admin/users", authMW, adminMW)
@@ -241,6 +247,100 @@ func (h *Handler) BlockUser(c *fiber.Ctx) error {
 // POST /api/admin/users/:id/unblock
 func (h *Handler) UnblockUser(c *fiber.Ctx) error {
 	return h.setUserStatus(c, StatusActive)
+}
+
+// UploadAvatar godoc
+// POST /api/me/avatar
+// Multipart form field: "file" (JPEG, PNG, WebP or GIF)
+func (h *Handler) UploadAvatar(c *fiber.Ctx) error {
+	claims := middleware.GetClaims(c)
+	uid, _ := uuid.Parse(claims.UserID)
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return httputil.BadRequest(c, "file field is required")
+	}
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
+	if !allowed[ext] {
+		return httputil.BadRequest(c, "only JPEG, PNG, WebP or GIF images are allowed")
+	}
+
+	dir := "./uploads/avatars"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return httputil.InternalError(c)
+	}
+	filename := uid.String() + ext
+	dest := filepath.Join(dir, filename)
+	if err := c.SaveFile(file, dest); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	avatarURL := "/uploads/avatars/" + filename
+	if err := h.repo.SetAvatarURL(c.Context(), uid, avatarURL); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	u, err := h.repo.GetByID(c.Context(), uid)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(u.ToPublicProfile())
+}
+
+type setPresetRequest struct {
+	Preset string `json:"preset"`
+}
+
+var validPresets = map[string]bool{
+	"avatar-01": true, "avatar-02": true, "avatar-03": true, "avatar-04": true,
+	"avatar-05": true, "avatar-06": true, "avatar-07": true, "avatar-08": true,
+}
+
+// SetPresetAvatar godoc
+// PUT /api/me/avatar/preset
+// Body: { preset: "avatar-01" }
+func (h *Handler) SetPresetAvatar(c *fiber.Ctx) error {
+	claims := middleware.GetClaims(c)
+	uid, _ := uuid.Parse(claims.UserID)
+
+	var req setPresetRequest
+	if err := c.BodyParser(&req); err != nil {
+		return httputil.BadRequest(c, "invalid request body")
+	}
+	if !validPresets[req.Preset] {
+		return httputil.BadRequest(c, "invalid preset name")
+	}
+
+	avatarURL := "/avatars/" + req.Preset + ".svg"
+	if err := h.repo.SetAvatarURL(c.Context(), uid, avatarURL); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	u, err := h.repo.GetByID(c.Context(), uid)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(u.ToPublicProfile())
+}
+
+// RemoveAvatar godoc
+// DELETE /api/me/avatar
+// Clears the avatar_url so the sidebar falls back to initials.
+func (h *Handler) RemoveAvatar(c *fiber.Ctx) error {
+	claims := middleware.GetClaims(c)
+	uid, _ := uuid.Parse(claims.UserID)
+
+	if err := h.repo.SetAvatarURL(c.Context(), uid, ""); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	u, err := h.repo.GetByID(c.Context(), uid)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(u.ToPublicProfile())
 }
 
 func (h *Handler) setUserStatus(c *fiber.Ctx, status Status) error {

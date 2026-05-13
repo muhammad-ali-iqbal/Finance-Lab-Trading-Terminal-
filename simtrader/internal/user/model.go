@@ -40,6 +40,7 @@ type User struct {
 	LastName     string     `json:"lastName"`
 	Role         Role       `json:"role"`
 	Status       Status     `json:"status"`
+	AvatarUrl    string     `json:"avatarUrl"`
 	InviteToken  *string    `json:"-"`         // Non-nil until registration complete
 	ResetToken   *string    `json:"-"`
 	ResetExpiry  *time.Time `json:"-"`
@@ -55,6 +56,7 @@ type PublicProfile struct {
 	LastName  string    `json:"lastName"`
 	Role      Role      `json:"role"`
 	Status    Status    `json:"status"`
+	AvatarUrl string    `json:"avatarUrl"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -66,6 +68,7 @@ func (u *User) ToPublicProfile() PublicProfile {
 		LastName:  u.LastName,
 		Role:      u.Role,
 		Status:    u.Status,
+		AvatarUrl: u.AvatarUrl,
 		CreatedAt: u.CreatedAt,
 	}
 }

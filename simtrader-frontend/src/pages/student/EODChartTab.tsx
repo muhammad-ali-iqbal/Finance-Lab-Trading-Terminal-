@@ -2,7 +2,7 @@
 // Daily candlestick chart for PSX stocks using eod_prices data.
 // Same indicators as ChartPage but driven by EOD data instead of WebSocket ticks.
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   createChart, type IChartApi, type ISeriesApi,
@@ -35,7 +35,7 @@ const INDICATOR_DEFS: { id: IndicatorId; label: string; color: string }[] = [
 const RSI_SCALE  = 'eod-rsi'
 const MACD_SCALE = 'eod-macd'
 
-// ── Convert EODBar (string date) to OHLCBar (unix seconds) for indicators ────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toOHLC(bars: EODBar[]): OHLCBar[] {
   return bars.map(b => ({
@@ -53,20 +53,19 @@ function toDateStr(unixSec: number): string {
   return new Date(unixSec * 1000).toISOString().slice(0, 10)
 }
 
-// ── Layout helper (mirrors ChartPage's computeLayout) ────────────────────────
-
 function computeLayout(rsi: boolean, macd: boolean) {
   const extras = (rsi ? 1 : 0) + (macd ? 1 : 0)
   if (extras === 0) return {
     price:  { top: 0.10, bottom: 0.28 },
     volume: { top: 0.78, bottom: 0.00 },
-    pane1:  null, pane2: null,
+    pane1:  null as null | { top: number; bottom: number },
+    pane2:  null as null | { top: number; bottom: number },
   }
   if (extras === 1) return {
     price:  { top: 0.05, bottom: 0.45 },
     volume: { top: 0.58, bottom: 0.30 },
     pane1:  { top: 0.75, bottom: 0.00 },
-    pane2:  null,
+    pane2:  null as null | { top: number; bottom: number },
   }
   return {
     price:  { top: 0.04, bottom: 0.42 },
@@ -78,9 +77,7 @@ function computeLayout(rsi: boolean, macd: boolean) {
 
 // ── Symbol picker ─────────────────────────────────────────────────────────────
 
-function SymbolPicker({
-  symbols, value, onChange,
-}: {
+function SymbolPicker({ symbols, value, onChange }: {
   symbols: string[]
   value: string
   onChange: (s: string) => void
@@ -160,9 +157,7 @@ function SymbolPicker({
 
 // ── Indicator picker ──────────────────────────────────────────────────────────
 
-function IndicatorPicker({
-  active, onChange,
-}: {
+function IndicatorPicker({ active, onChange }: {
   active: Set<IndicatorId>
   onChange: (next: Set<IndicatorId>) => void
 }) {
@@ -226,29 +221,30 @@ export default function EODChartTab() {
   const chartRef     = useRef<IChartApi | null>(null)
 
   // Series refs
-  const candleRef  = useRef<ISeriesApi<'Candlestick'> | null>(null)
-  const volumeRef  = useRef<ISeriesApi<'Histogram'> | null>(null)
-  const sma20Ref   = useRef<ISeriesApi<'Line'> | null>(null)
-  const sma50Ref   = useRef<ISeriesApi<'Line'> | null>(null)
-  const ema20Ref   = useRef<ISeriesApi<'Line'> | null>(null)
-  const bbUpperRef = useRef<ISeriesApi<'Line'> | null>(null)
-  const bbMidRef   = useRef<ISeriesApi<'Line'> | null>(null)
-  const bbLowerRef = useRef<ISeriesApi<'Line'> | null>(null)
-  const rsiRef     = useRef<ISeriesApi<'Line'> | null>(null)
-  const rsiHiRef   = useRef<ISeriesApi<'Line'> | null>(null)
-  const rsiLoRef   = useRef<ISeriesApi<'Line'> | null>(null)
+  const candleRef   = useRef<ISeriesApi<'Candlestick'> | null>(null)
+  const volumeRef   = useRef<ISeriesApi<'Histogram'> | null>(null)
+  const sma20Ref    = useRef<ISeriesApi<'Line'> | null>(null)
+  const sma50Ref    = useRef<ISeriesApi<'Line'> | null>(null)
+  const ema20Ref    = useRef<ISeriesApi<'Line'> | null>(null)
+  const bbUpperRef  = useRef<ISeriesApi<'Line'> | null>(null)
+  const bbMidRef    = useRef<ISeriesApi<'Line'> | null>(null)
+  const bbLowerRef  = useRef<ISeriesApi<'Line'> | null>(null)
+  const rsiRef      = useRef<ISeriesApi<'Line'> | null>(null)
+  const rsiHiRef    = useRef<ISeriesApi<'Line'> | null>(null)
+  const rsiLoRef    = useRef<ISeriesApi<'Line'> | null>(null)
   const macdLineRef = useRef<ISeriesApi<'Line'> | null>(null)
   const macdSigRef  = useRef<ISeriesApi<'Line'> | null>(null)
   const macdHistRef = useRef<ISeriesApi<'Histogram'> | null>(null)
 
-  const [symbol, setSymbol]     = useState('')
+  const [symbol, setSymbol]         = useState('')
   const [indicators, setIndicators] = useState<Set<IndicatorId>>(new Set())
+  const [activeRange, setActiveRange] = useState<string>('All')
 
   // Fetch symbol list
   const { data: symData } = useQuery({
     queryKey: ['eod-symbols'],
     queryFn: challengeApi.getEODSymbols,
-    staleTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 60 * 60 * 1000,
   })
   const symbols = symData?.symbols ?? []
 
@@ -257,177 +253,29 @@ export default function EODChartTab() {
     if (!symbol && symbols.length > 0) setSymbol(symbols[0])
   }, [symbols, symbol])
 
+  // Reset range to All when symbol changes so the full history is shown
+  useEffect(() => { setActiveRange('All') }, [symbol])
+
   // Fetch OHLCV history for selected symbol
   const { data: histData, isFetching } = useQuery({
     queryKey: ['eod-history', symbol],
     queryFn: () => challengeApi.getEODHistory(symbol),
     enabled: !!symbol,
-    staleTime: 8 * 60 * 60 * 1000, // 8 hours — refresh once per working day
+    staleTime: 8 * 60 * 60 * 1000,
   })
   const bars: EODBar[] = histData?.bars ?? []
 
-  // ── Chart theme helpers ─────────────────────────────────────────────────────
-
-  const chartColors = useCallback(() => ({
-    bg:   isDark ? '#0f1117' : '#ffffff',
-    text: isDark ? '#94a3b8' : '#64748b',
-    grid: isDark ? '#1e293b' : '#f1f5f9',
-    up:   '#22c55e',
-    dn:   '#ef4444',
-  }), [isDark])
-
-  // ── Layout ──────────────────────────────────────────────────────────────────
-
-  const applyLayout = useCallback(() => {
-    if (!chartRef.current) return
-    const rsiOn  = indicators.has('rsi')
-    const macdOn = indicators.has('macd')
-    const layout = computeLayout(rsiOn, macdOn)
-    const c = chartRef.current
-
-    c.priceScale('right').applyOptions({ scaleMargins: layout.price })
-    c.priceScale('volume').applyOptions({ scaleMargins: layout.volume })
-    if (layout.pane1) {
-      const id = rsiOn ? RSI_SCALE : MACD_SCALE
-      c.priceScale(id).applyOptions({ scaleMargins: layout.pane1 })
-    }
-    if (layout.pane2) {
-      c.priceScale(MACD_SCALE).applyOptions({ scaleMargins: layout.pane2 })
-    }
-  }, [indicators])
-
-  // ── Sync indicator series (add/remove on toggle) ────────────────────────────
-
-  const syncSeries = useCallback(() => {
-    if (!chartRef.current) return
-    const c = chartRef.current
-    const col = chartColors()
-
-    function addLine(
-      ref: React.MutableRefObject<ISeriesApi<'Line'> | null>,
-      color: string,
-      priceScaleId = 'right',
-      lineStyle = LineStyle.Solid,
-    ) {
-      if (!ref.current) {
-        ref.current = c.addLineSeries({ color, lineWidth: 1, priceScaleId, lineStyle, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false })
-      }
-    }
-    function removeLine(ref: React.MutableRefObject<ISeriesApi<'Line'> | null>) {
-      if (ref.current) { try { c.removeSeries(ref.current) } catch { /* already gone */ } ref.current = null }
-    }
-    function removeHist(ref: React.MutableRefObject<ISeriesApi<'Histogram'> | null>) {
-      if (ref.current) { try { c.removeSeries(ref.current) } catch { /* already gone */ } ref.current = null }
-    }
-
-    // SMA 20
-    if (indicators.has('sma20')) addLine(sma20Ref, '#f97316')
-    else removeLine(sma20Ref)
-
-    // SMA 50
-    if (indicators.has('sma50')) addLine(sma50Ref, '#a855f7')
-    else removeLine(sma50Ref)
-
-    // EMA 20
-    if (indicators.has('ema20')) addLine(ema20Ref, '#22c55e')
-    else removeLine(ema20Ref)
-
-    // Bollinger Bands
-    if (indicators.has('bb')) {
-      addLine(bbUpperRef, col.grid)
-      addLine(bbMidRef,   col.grid, 'right', LineStyle.Dashed)
-      addLine(bbLowerRef, col.grid)
-    } else {
-      removeLine(bbUpperRef); removeLine(bbMidRef); removeLine(bbLowerRef)
-    }
-
-    // RSI
-    if (indicators.has('rsi')) {
-      addLine(rsiRef,   '#3b82f6', RSI_SCALE)
-      addLine(rsiHiRef, '#ef444460' as string, RSI_SCALE, LineStyle.Dashed)
-      addLine(rsiLoRef, '#22c55e60' as string, RSI_SCALE, LineStyle.Dashed)
-    } else {
-      removeLine(rsiRef); removeLine(rsiHiRef); removeLine(rsiLoRef)
-    }
-
-    // MACD
-    if (indicators.has('macd')) {
-      addLine(macdLineRef, '#ec4899', MACD_SCALE)
-      addLine(macdSigRef,  '#f97316', MACD_SCALE)
-      if (!macdHistRef.current) {
-        macdHistRef.current = c.addHistogramSeries({ priceScaleId: MACD_SCALE, lastValueVisible: false, priceLineVisible: false })
-      }
-    } else {
-      removeLine(macdLineRef); removeLine(macdSigRef); removeHist(macdHistRef)
-    }
-
-    applyLayout()
-  }, [indicators, chartColors, applyLayout])
-
-  // ── Push data to all active series ──────────────────────────────────────────
-
-  const pushData = useCallback((eodBars: EODBar[]) => {
-    if (!chartRef.current || eodBars.length === 0) return
-    const col = chartColors()
-
-    // Candlestick data (string YYYY-MM-DD time — lightweight-charts handles it)
-    const candleData = eodBars.map(b => ({
-      time: b.time as any,
-      open: b.open, high: b.high, low: b.low, close: b.close,
-    }))
-    const volData = eodBars.map(b => ({
-      time: b.time as any,
-      value: b.volume,
-      color: b.close >= b.open ? col.up + '80' : col.dn + '80',
-    }))
-
-    candleRef.current?.setData(candleData)
-    volumeRef.current?.setData(volData)
-
-    // Indicators — compute with numeric time, map back to 'YYYY-MM-DD' strings
-    // so all series share the same time axis format as candlestick/volume.
-    const ohlc = toOHLC(eodBars)
-    const td = (t: number) => toDateStr(t) as any
-
-    if (sma20Ref.current) sma20Ref.current.setData(calcSMA(ohlc, 20).map(p => ({ time: td(p.time), value: p.value })))
-    if (sma50Ref.current) sma50Ref.current.setData(calcSMA(ohlc, 50).map(p => ({ time: td(p.time), value: p.value })))
-    if (ema20Ref.current) ema20Ref.current.setData(calcEMA(ohlc, 20).map(p => ({ time: td(p.time), value: p.value })))
-
-    if (bbUpperRef.current || bbMidRef.current || bbLowerRef.current) {
-      const bb = calcBollingerBands(ohlc, 20, 2)
-      bbUpperRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.upper })))
-      bbMidRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.middle })))
-      bbLowerRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.lower })))
-    }
-
-    if (rsiRef.current) {
-      const rsiData = calcRSI(ohlc, 14)
-      rsiRef.current.setData(rsiData.map(p => ({ time: td(p.time), value: p.value })))
-      if (rsiData.length > 0) {
-        const t0 = td(rsiData[0].time)
-        const tN = td(rsiData[rsiData.length - 1].time)
-        rsiHiRef.current?.setData([{ time: t0, value: 70 }, { time: tN, value: 70 }])
-        rsiLoRef.current?.setData([{ time: t0, value: 30 }, { time: tN, value: 30 }])
-      }
-    }
-
-    if (macdLineRef.current) {
-      const macdData = calcMACD(ohlc)
-      macdLineRef.current.setData(macdData.map(p => ({ time: td(p.time), value: p.macd })))
-      macdSigRef.current?.setData(macdData.map(p => ({ time: td(p.time), value: p.signal })))
-      macdHistRef.current?.setData(macdData.map(p => ({
-        time: td(p.time),
-        value: p.histogram,
-        color: p.histogram >= 0 ? '#22c55e80' : '#ef444480',
-      })))
-    }
-  }, [chartColors])
-
-  // ── Init chart ──────────────────────────────────────────────────────────────
-
+  // ── Init chart (once on mount) ──────────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current) return
-    const col = chartColors()
+
+    const col = {
+      bg:   isDark ? '#0f1117' : '#ffffff',
+      text: isDark ? '#94a3b8' : '#64748b',
+      grid: isDark ? '#1e293b' : '#f1f5f9',
+      up:   '#22c55e',
+      dn:   '#ef4444',
+    }
 
     const chart = createChart(containerRef.current, {
       layout: {
@@ -468,33 +316,188 @@ export default function EODChartTab() {
     return () => {
       ro.disconnect()
       chart.remove()
-      chartRef.current = null
+      chartRef.current  = null
       candleRef.current = null
       volumeRef.current = null
+      // Clear all indicator refs so they're recreated on remount
+      sma20Ref.current = null; sma50Ref.current = null; ema20Ref.current = null
+      bbUpperRef.current = null; bbMidRef.current = null; bbLowerRef.current = null
+      rsiRef.current = null; rsiHiRef.current = null; rsiLoRef.current = null
+      macdLineRef.current = null; macdSigRef.current = null; macdHistRef.current = null
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-apply theme when dark mode changes
+  // ── Theme update ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!chartRef.current) return
-    const col = chartColors()
+    const col = {
+      bg:   isDark ? '#0f1117' : '#ffffff',
+      text: isDark ? '#94a3b8' : '#64748b',
+      grid: isDark ? '#1e293b' : '#f1f5f9',
+    }
     chartRef.current.applyOptions({
       layout: { background: { type: ColorType.Solid, color: col.bg }, textColor: col.text },
       grid: { vertLines: { color: col.grid }, horzLines: { color: col.grid } },
     })
-  }, [isDark, chartColors])
+  }, [isDark])
 
-  // Sync series then immediately populate — must be one effect so newly created
-  // series receive data in the same render cycle rather than waiting for the next.
+  // ── Sync indicator series + push all data ──────────────────────────────────
+  // Single flat effect — no useCallback chains. Runs whenever indicators,
+  // bars, or theme changes. Syncs series first, then pushes data so newly
+  // created series are immediately populated.
   useEffect(() => {
-    syncSeries()
-    pushData(bars)
-  }, [syncSeries, pushData, bars])
+    if (!chartRef.current) return
+    const chart = chartRef.current
+    const gridColor = isDark ? '#1e293b' : '#f1f5f9'
+    const up = '#22c55e'
+    const dn = '#ef4444'
 
-  // ── Price ticker (last bar summary) ─────────────────────────────────────────
+    // Helper: add or keep a line series
+    function addLine(
+      ref: React.MutableRefObject<ISeriesApi<'Line'> | null>,
+      color: string,
+      priceScaleId = 'right',
+      lineStyle = LineStyle.Solid,
+    ) {
+      if (!ref.current) {
+        ref.current = chart.addLineSeries({
+          color, lineWidth: 1, priceScaleId, lineStyle,
+          lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false,
+        })
+      }
+    }
+    function removeLine(ref: React.MutableRefObject<ISeriesApi<'Line'> | null>) {
+      if (ref.current) { try { chart.removeSeries(ref.current) } catch { /* already gone */ } ref.current = null }
+    }
+    function removeHist(ref: React.MutableRefObject<ISeriesApi<'Histogram'> | null>) {
+      if (ref.current) { try { chart.removeSeries(ref.current) } catch { /* already gone */ } ref.current = null }
+    }
 
+    // ── Sync series ────────────────────────────────────────────────────────
+    if (indicators.has('sma20')) addLine(sma20Ref, '#f97316')
+    else removeLine(sma20Ref)
+
+    if (indicators.has('sma50')) addLine(sma50Ref, '#a855f7')
+    else removeLine(sma50Ref)
+
+    if (indicators.has('ema20')) addLine(ema20Ref, '#22c55e')
+    else removeLine(ema20Ref)
+
+    if (indicators.has('bb')) {
+      addLine(bbUpperRef, gridColor)
+      addLine(bbMidRef,   gridColor, 'right', LineStyle.Dashed)
+      addLine(bbLowerRef, gridColor)
+    } else {
+      removeLine(bbUpperRef); removeLine(bbMidRef); removeLine(bbLowerRef)
+    }
+
+    if (indicators.has('rsi')) {
+      addLine(rsiRef,   '#3b82f6', RSI_SCALE)
+      addLine(rsiHiRef, '#ef444460', RSI_SCALE, LineStyle.Dashed)
+      addLine(rsiLoRef, '#22c55e60', RSI_SCALE, LineStyle.Dashed)
+    } else {
+      removeLine(rsiRef); removeLine(rsiHiRef); removeLine(rsiLoRef)
+    }
+
+    if (indicators.has('macd')) {
+      addLine(macdLineRef, '#ec4899', MACD_SCALE)
+      addLine(macdSigRef,  '#f97316', MACD_SCALE)
+      if (!macdHistRef.current) {
+        macdHistRef.current = chart.addHistogramSeries({
+          priceScaleId: MACD_SCALE, lastValueVisible: false, priceLineVisible: false,
+        })
+      }
+    } else {
+      removeLine(macdLineRef); removeLine(macdSigRef); removeHist(macdHistRef)
+    }
+
+    // ── Apply layout ───────────────────────────────────────────────────────
+    const rsiOn  = indicators.has('rsi')
+    const macdOn = indicators.has('macd')
+    const layout = computeLayout(rsiOn, macdOn)
+    chart.priceScale('right').applyOptions({ scaleMargins: layout.price })
+    chart.priceScale('volume').applyOptions({ scaleMargins: layout.volume })
+    if (layout.pane1) {
+      chart.priceScale(rsiOn ? RSI_SCALE : MACD_SCALE).applyOptions({ scaleMargins: layout.pane1 })
+    }
+    if (layout.pane2) {
+      chart.priceScale(MACD_SCALE).applyOptions({ scaleMargins: layout.pane2 })
+    }
+
+    // ── Push data ──────────────────────────────────────────────────────────
+    if (bars.length === 0) return
+
+    candleRef.current?.setData(bars.map(b => ({
+      time: b.time as unknown as import('lightweight-charts').Time,
+      open: b.open, high: b.high, low: b.low, close: b.close,
+    })))
+    volumeRef.current?.setData(bars.map(b => ({
+      time: b.time as unknown as import('lightweight-charts').Time,
+      value: b.volume,
+      color: b.close >= b.open ? up + '80' : dn + '80',
+    })))
+
+    const ohlc = toOHLC(bars)
+    const td = (t: number) => toDateStr(t) as unknown as import('lightweight-charts').Time
+
+    if (sma20Ref.current)
+      sma20Ref.current.setData(calcSMA(ohlc, 20).map(p => ({ time: td(p.time), value: p.value })))
+    if (sma50Ref.current)
+      sma50Ref.current.setData(calcSMA(ohlc, 50).map(p => ({ time: td(p.time), value: p.value })))
+    if (ema20Ref.current)
+      ema20Ref.current.setData(calcEMA(ohlc, 20).map(p => ({ time: td(p.time), value: p.value })))
+
+    if (bbUpperRef.current || bbMidRef.current || bbLowerRef.current) {
+      const bb = calcBollingerBands(ohlc, 20, 2)
+      bbUpperRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.upper })))
+      bbMidRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.middle })))
+      bbLowerRef.current?.setData(bb.map(p => ({ time: td(p.time), value: p.lower })))
+    }
+
+    if (rsiRef.current) {
+      const rsiData = calcRSI(ohlc, 14)
+      rsiRef.current.setData(rsiData.map(p => ({ time: td(p.time), value: p.value })))
+      if (rsiData.length > 0) {
+        const t0 = td(rsiData[0].time)
+        const tN = td(rsiData[rsiData.length - 1].time)
+        rsiHiRef.current?.setData([{ time: t0, value: 70 }, { time: tN, value: 70 }])
+        rsiLoRef.current?.setData([{ time: t0, value: 30 }, { time: tN, value: 30 }])
+      }
+    }
+
+    if (macdLineRef.current) {
+      const macdData = calcMACD(ohlc)
+      macdLineRef.current.setData(macdData.map(p => ({ time: td(p.time), value: p.macd })))
+      macdSigRef.current?.setData(macdData.map(p => ({ time: td(p.time), value: p.signal })))
+      macdHistRef.current?.setData(macdData.map(p => ({
+        time: td(p.time),
+        value: p.histogram,
+        color: p.histogram >= 0 ? '#22c55e80' : '#ef444480',
+      })))
+    }
+  }, [indicators, bars, isDark]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Range selector ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!chartRef.current || bars.length === 0) return
+    const ts = chartRef.current.timeScale()
+    if (activeRange === 'All') {
+      ts.fitContent()
+      return
+    }
+    const months = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '3Y': 36 }[activeRange] ?? 12
+    const to   = new Date()
+    const from = new Date()
+    from.setMonth(from.getMonth() - months)
+    ts.setVisibleRange({
+      from: from.toISOString().slice(0, 10) as import('lightweight-charts').Time,
+      to:   to.toISOString().slice(0, 10)   as import('lightweight-charts').Time,
+    })
+  }, [activeRange, bars]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Price ticker ─────────────────────────────────────────────────────────────
   const lastBar = bars.length > 0 ? bars[bars.length - 1] : null
-  const dayChg  = lastBar ? lastBar.close - lastBar.open : 0
+  const dayChg    = lastBar ? lastBar.close - lastBar.open : 0
   const dayChgPct = lastBar ? (dayChg / lastBar.open) * 100 : 0
 
   return (
@@ -503,6 +506,24 @@ export default function EODChartTab() {
       <div className="flex items-center gap-3 flex-wrap">
         <SymbolPicker symbols={symbols} value={symbol} onChange={setSymbol} />
         <IndicatorPicker active={indicators} onChange={setIndicators} />
+
+        {/* Range buttons */}
+        <div className="flex items-center rounded border border-border dark:border-dark-border overflow-hidden">
+          {(['1M', '3M', '6M', '1Y', '3Y', 'All'] as const).map(r => (
+            <button
+              key={r}
+              onClick={() => setActiveRange(r)}
+              className={clsx(
+                'px-2.5 py-1 text-xs font-medium transition-colors',
+                activeRange === r
+                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
+              )}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
 
         {/* Legend chips */}
         <div className="flex items-center gap-1.5 flex-wrap">

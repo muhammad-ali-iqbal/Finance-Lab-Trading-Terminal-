@@ -69,4 +69,23 @@ export const userApi = {
     const { data } = await client.put('/me/password', { currentPassword, newPassword })
     return data
   },
+
+  uploadAvatar: async (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    const { data } = await client.post<User>('/me/avatar', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return data
+  },
+
+  setPresetAvatar: async (preset: string) => {
+    const { data } = await client.put<User>('/me/avatar/preset', { preset })
+    return data
+  },
+
+  removeAvatar: async () => {
+    const { data } = await client.delete<User>('/me/avatar')
+    return data
+  },
 }

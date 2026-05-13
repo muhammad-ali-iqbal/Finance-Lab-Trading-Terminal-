@@ -5,8 +5,8 @@ from datetime import date
 SIMTRADER_URL = os.getenv("SIMTRADER_URL", "http://localhost:8080")
 INTERNAL_SECRET = os.getenv("INTERNAL_SECRET", "dev-internal-secret")
 
-# Database path — sits next to this file
-DB_PATH = os.path.join(os.path.dirname(__file__), "psx_data.db")
+# Database path — override with PSX_DB_PATH env var for Docker deployments
+DB_PATH = os.getenv("PSX_DB_PATH", os.path.join(os.path.dirname(__file__), "psx_data.db"))
 
 # The earliest date we care about (set to today on first run)
 START_DATE = date(2026, 4, 29)

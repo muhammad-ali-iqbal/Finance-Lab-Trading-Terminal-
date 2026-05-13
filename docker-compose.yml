@@ -1,0 +1,82 @@
+services:
+
+  # ── PostgreSQL ────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: simtrader
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: simtrader
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simtrader"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Go backend ────────────────────────────────────────────────────────────────
+  # Build context is the project root so the Dockerfile can reach both
+  # simtrader/ (Go code) and psx_tracker/ (Python scripts).
+  backend:
+    build:
+      context: .
+      dockerfile: simtrader/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      ENV: production
+      DATABASE_URL: postgres://simtrader:${POSTGRES_PASSWORD}@postgres:5432/simtrader
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 168h
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@simtrader.app}
+      PSX_TRACKER_DIR: /app/psx_tracker
+      PYTHON_CMD: python3
+      PSX_DB_PATH: /data/psx_data.db
+    volumes:
+      - uploads:/app/uploads       # user avatar uploads
+      - psx_data:/data             # SQLite database shared with psx_tracker
+
+  # ── React frontend (Nginx) ────────────────────────────────────────────────────
+  frontend:
+    build: ./simtrader-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+  # ── PSX tracker (daily EOD scheduler) ────────────────────────────────────────
+  # Runs python3 main.py which starts the scheduler and fetches at 16:00 PKT.
+  # On startup it also backfills any trading days missed since the last run.
+  # One-off commands (backfill, status, etc.) can be run with:
+  #   docker compose run --rm psx_tracker python3 main.py fetch
+  #   docker compose run --rm psx_tracker python3 main.py backfill 2026-01-01
+  psx_tracker:
+    build: ./psx_tracker
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      SIMTRADER_URL: http://backend:8080
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      PSX_DB_PATH: /data/psx_data.db
+    volumes:
+      - psx_data:/data             # same volume as backend so both see the SQLite DB
+
+volumes:
+  postgres_data:
+  uploads:
+  psx_data:

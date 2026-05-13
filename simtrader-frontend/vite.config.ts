@@ -19,6 +19,10 @@ export default defineConfig({
         changeOrigin: true,
         ws: true, // Forward WebSocket upgrades
       },
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
   },
 })

@@ -7,13 +7,14 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   LayoutDashboard, Users, PlayCircle,
-  LogOut, ChevronRight, Settings, Trophy
+  LogOut, ChevronRight, Settings, Trophy, Database
 } from 'lucide-react'
 
 const navItems = [
   { to: '/admin',             icon: LayoutDashboard, label: 'Overview',    end: true },
   { to: '/admin/simulations', icon: PlayCircle,      label: 'Simulations'       },
   { to: '/admin/challenges',  icon: Trophy,          label: 'Challenges'        },
+  { to: '/admin/psx',         icon: Database,        label: 'PSX Data'          },
   { to: '/admin/users',       icon: Users,           label: 'Students'          },
   { to: '/admin/settings',    icon: Settings,        label: 'Settings'          },
 ]
@@ -79,11 +80,19 @@ export default function AdminLayout() {
         {/* User footer */}
         <div className="border-t border-border dark:border-dark-border p-3 space-y-2">
           <div className="flex items-center gap-2.5 px-1">
-            <div className="w-7 h-7 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
-              <span className="text-[10px] font-semibold text-surface dark:text-dark-surface">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </span>
-            </div>
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt="Avatar"
+                className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
+                <span className="text-[10px] font-semibold text-surface dark:text-dark-surface">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </span>
+              </div>
+            )}
             <div className="min-w-0">
               <p className="text-xs font-medium text-ink dark:text-dark-ink truncate">{user?.firstName} {user?.lastName}</p>
               <p className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary truncate">Administrator</p>

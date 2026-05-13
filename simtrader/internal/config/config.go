@@ -36,6 +36,13 @@ type Config struct {
 
 	// InternalSecret is the shared secret psx_tracker sends with EOD price ingestion.
 	InternalSecret string
+
+	// PSXTrackerDir is the absolute path to the psx_tracker directory.
+	// Used by the admin PSX panel to run tracker commands from the UI.
+	PSXTrackerDir string
+
+	// PythonCmd is the Python executable name (python or python3).
+	PythonCmd string
 }
 
 // Load reads .env (if present) then environment variables.
@@ -52,17 +59,19 @@ func Load() (*Config, error) {
 	cfg.Env = getEnv("ENV", "development")
 	cfg.FrontendURL = getEnv("FRONTEND_URL", "http://localhost:5173")
 	cfg.InternalSecret = getEnv("INTERNAL_SECRET", "dev-internal-secret")
+	cfg.PSXTrackerDir = getEnv("PSX_TRACKER_DIR", "../psx_tracker")
+	cfg.PythonCmd = getEnv("PYTHON_CMD", "python")
 
 	// Required — app cannot function without these
 	cfg.DatabaseURL = requireEnv("DATABASE_URL", &missing)
 	cfg.JWTAccessSecret = requireEnv("JWT_ACCESS_SECRET", &missing)
 	cfg.JWTRefreshSecret = requireEnv("JWT_REFRESH_SECRET", &missing)
 
-	// Email — required for invite flow
-	cfg.SMTPHost = requireEnv("SMTP_HOST", &missing)
-	cfg.SMTPPort = getEnv("SMTP_PORT", "587")
-	cfg.SMTPUser = requireEnv("SMTP_USER", &missing)
-	cfg.SMTPPass = requireEnv("SMTP_PASS", &missing)
+	// Email — optional in development (NoOpMailer is used instead)
+	cfg.SMTPHost  = getEnv("SMTP_HOST",  "")
+	cfg.SMTPPort  = getEnv("SMTP_PORT",  "587")
+	cfg.SMTPUser  = getEnv("SMTP_USER",  "")
+	cfg.SMTPPass  = getEnv("SMTP_PASS",  "")
 	cfg.EmailFrom = getEnv("EMAIL_FROM", "noreply@simtrader.app")
 
 	if len(missing) > 0 {

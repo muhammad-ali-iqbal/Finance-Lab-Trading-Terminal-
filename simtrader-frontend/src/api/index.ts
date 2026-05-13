@@ -16,6 +16,7 @@ export interface User {
   lastName: string
   role: Role
   status: UserStatus
+  avatarUrl: string
   createdAt: string
 }
 
@@ -247,4 +248,6 @@ export { portfolioApi } from './portfolio'
 export { userApi } from './user'
 export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
 export { challengeApi } from './challenge'
+export { psxApi } from './psx'
+export type { PSXResult } from './psx'
 export { client } from './client'

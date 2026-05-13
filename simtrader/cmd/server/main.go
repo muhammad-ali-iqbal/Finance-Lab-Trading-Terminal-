@@ -23,6 +23,7 @@ import (
 	"github.com/simtrader/backend/internal/middleware"
 	"github.com/simtrader/backend/internal/order"
 	"github.com/simtrader/backend/internal/portfolio"
+	"github.com/simtrader/backend/internal/psxtracker"
 	"github.com/simtrader/backend/internal/simulation"
 	"github.com/simtrader/backend/internal/types"
 	"github.com/simtrader/backend/internal/user"
@@ -81,6 +82,9 @@ func main() {
 	ctx, cancelReconciler := context.WithCancel(context.Background())
 	go challengeReconciler.Start(ctx)
 
+	// PSX Tracker admin panel
+	psxHandler := psxtracker.NewHandler(cfg.PSXTrackerDir, cfg.PythonCmd)
+
 	// ── 4. HTTP server ─────────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
 		ErrorHandler: jsonErrorHandler,
@@ -108,6 +112,9 @@ func main() {
 		MaxAge:           86400,
 	}))
 
+	// Serve uploaded user avatars as static files.
+	app.Static("/uploads", "./uploads")
+
 	// ── Health check ───────────────────────────────────────────────────────────
 	app.Get("/health", func(c *fiber.Ctx) error {
 		if err := db.Pool.Ping(c.Context()); err != nil {
@@ -125,6 +132,7 @@ func main() {
 	orderHandler.RegisterRoutes(app, authMW)
 	portfolioHandler.RegisterRoutes(app, authMW)
 	challengeHandler.RegisterRoutes(app, authMW, adminMW)
+	psxHandler.RegisterRoutes(app, authMW, adminMW)
 
 	// 404
 	app.Use(func(c *fiber.Ctx) error {
