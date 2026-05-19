@@ -4,15 +4,18 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
-import { Button, Input, Alert, ThemeToggle } from '@/components/ui'
+import { ThemeToggle } from '@/components/ui'
+import { useTheme } from '@/context/ThemeContext'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const setAuth = useAuthStore(s => s.setAuth)
+  const navigate  = useNavigate()
+  const setAuth   = useAuthStore(s => s.setAuth)
+  const { theme } = useTheme()
+  const dark      = theme === 'dark'
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail]               = useState('')
+  const [password, setPassword]         = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
   const login = useMutation({
@@ -29,11 +32,45 @@ export default function LoginPage() {
     login.mutate()
   }
 
+  const inputBase: React.CSSProperties = {
+    width: '100%',
+    borderRadius: 6,
+    padding: '0.5rem 0.75rem',
+    fontSize: '0.875rem',
+    outline: 'none',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
+    backgroundColor: dark ? '#3a2535' : '#ffffff',
+    border:          `1px solid ${dark ? 'rgba(255,255,255,0.08)' : '#E4E4E0'}`,
+    color:           dark ? 'rgba(255,255,255,0.9)' : '#0F0F0E',
+    caretColor:      dark ? '#b81481' : '#1A5CFF',
+  }
+  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => Object.assign(e.currentTarget.style, {
+    borderColor: dark ? '#b81481' : '#1A5CFF',
+    boxShadow:   dark ? '0 0 0 3px rgba(184,20,129,0.2)' : '0 0 0 2px rgba(26,92,255,0.15)',
+  })
+  const onBlur = (e: React.FocusEvent<HTMLInputElement>) => Object.assign(e.currentTarget.style, {
+    borderColor: dark ? 'rgba(255,255,255,0.08)' : '#E4E4E0',
+    boxShadow:   'none',
+  })
+
   return (
-    <div className="min-h-screen bg-surface-secondary dark:bg-dark-surface-secondary flex">
-      {/* Left panel — branding */}
-      <div className="hidden lg:flex w-[480px] flex-shrink-0 bg-ink dark:bg-dark-ink flex-col justify-between p-12">
-        <div className="flex items-center gap-3">
+    <div
+      className="min-h-screen flex"
+      style={{ backgroundColor: dark ? '#21111c' : '#F8F8F7' }}
+    >
+      {/* ── Left branding panel ── */}
+      <div
+        className="hidden lg:flex w-[480px] flex-shrink-0 flex-col justify-between p-12 relative overflow-hidden"
+        style={{ backgroundColor: dark ? '#2d1b28' : '#0F0F0E' }}
+      >
+        {dark && <>
+          <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full blur-3xl pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(184,20,129,0.25), transparent)' }} />
+          <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full blur-3xl pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.18), transparent)' }} />
+        </>}
+
+        <div className="relative z-10 flex items-center gap-3">
           <img
             src="/iba-logo.png"
             alt="IBA"
@@ -41,34 +78,51 @@ export default function LoginPage() {
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
           <div>
-            <p className="text-surface dark:text-dark-surface font-semibold tracking-tight text-sm leading-tight">SimTrader</p>
-            <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight" style={{ color: '#C4526A' }}>Finance Lab</p>
+            <p className="font-semibold tracking-tight text-sm leading-tight"
+              style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
+              SimTrader
+            </p>
+            <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
+              style={{ color: dark ? '#b81481' : '#C4526A' }}>
+              Finance Lab
+            </p>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="w-8 h-0.5 bg-iba" />
-          <p className="font-display text-4xl text-surface dark:text-dark-surface leading-snug italic">
+        <div className="relative z-10 space-y-6">
+          <div className="w-8 h-0.5" style={{ backgroundColor: dark ? '#b81481' : '#8B1A2A' }} />
+          <p className="font-display text-4xl leading-snug italic"
+            style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
             Learn markets by<br />participating in them.
           </p>
-          <p className="text-sm text-surface/50 dark:text-dark-surface/50 leading-relaxed max-w-xs">
-            A controlled simulation environment built for IBA students to understand order types, portfolio mechanics, and market microstructure using real PSX data.
+          <p className="text-sm leading-relaxed max-w-xs"
+            style={{ color: dark ? 'rgba(255,255,255,0.45)' : 'rgba(242,241,239,0.5)' }}>
+            A controlled simulation environment built for IBA students to understand order types,
+            portfolio mechanics, and market microstructure using real PSX data.
           </p>
         </div>
 
-        <div className="text-xs text-surface/30 dark:text-dark-surface/30">
+        <div className="relative z-10 text-xs"
+          style={{ color: dark ? 'rgba(255,255,255,0.22)' : 'rgba(242,241,239,0.3)' }}>
           © {new Date().getFullYear()} Institute of Business Administration, Karachi
         </div>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center p-6 relative">
-        {/* Theme toggle — top right */}
-        <div className="absolute top-4 right-4">
+      {/* ── Right form panel ── */}
+      <div
+        className="flex-1 flex items-center justify-center p-6 relative"
+        style={{ backgroundColor: dark ? '#21111c' : '#F8F8F7' }}
+      >
+        {dark && (
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none"
+            style={{ backgroundColor: '#b81481', opacity: 0.06 }} />
+        )}
+
+        <div className="absolute top-4 right-4 z-10">
           <ThemeToggle />
         </div>
 
-        <div className="w-full max-w-sm animate-fade-up">
+        <div className="relative z-10 w-full max-w-sm animate-fade-up">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2.5 mb-10">
             <img
@@ -78,68 +132,137 @@ export default function LoginPage() {
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
             <div>
-              <p className="font-semibold tracking-tight text-ink dark:text-dark-ink text-sm leading-tight">SimTrader</p>
-              <p className="text-[9px] font-semibold tracking-widest uppercase text-iba dark:text-dark-iba leading-tight">Finance Lab</p>
+              <p className="font-semibold tracking-tight text-sm leading-tight"
+                style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
+                SimTrader
+              </p>
+              <p className="text-[9px] font-semibold tracking-widest uppercase leading-tight"
+                style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
+                Finance Lab
+              </p>
             </div>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-ink dark:text-dark-ink tracking-tight">Sign in</h1>
-            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-1">
+            <h1 className="text-2xl font-semibold tracking-tight"
+              style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
+              Sign in
+            </h1>
+            <p className="text-sm mt-1"
+              style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
               Enter your credentials to access your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {login.isError && (
-              <Alert
-                variant="error"
-                message={(login.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Login failed. Please try again.'}
-              />
+              <div
+                className="rounded px-3 py-2.5 text-sm font-medium"
+                style={dark ? {
+                  backgroundColor: 'rgba(224,64,46,0.12)',
+                  color: '#f87171',
+                  border: '1px solid rgba(224,64,46,0.25)',
+                } : {
+                  backgroundColor: '#FEF0EE',
+                  color: '#C8291A',
+                  border: '1px solid rgba(200,41,26,0.15)',
+                }}
+              >
+                {(login.error as { response?: { data?: { error?: string } } })?.response?.data?.error
+                  ?? 'Login failed. Please try again.'}
+              </div>
             )}
 
-            <Input
-              label="Email address"
-              type="email"
-              placeholder="you@university.edu"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              autoComplete="email"
-              autoFocus
-              required
-            />
+            {/* Email */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium"
+                style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
+                Email address
+              </label>
+              <input
+                type="email"
+                placeholder="you@university.edu"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                autoComplete="email"
+                autoFocus
+                required
+                style={inputBase}
+                onFocus={onFocus}
+                onBlur={onBlur}
+              />
+            </div>
 
-            <Input
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-              rightIcon={
-                <button type="button" onClick={() => setShowPassword(s => !s)} tabIndex={-1}>
-                  {showPassword
-                    ? <EyeOff className="w-4 h-4" />
-                    : <Eye className="w-4 h-4" />}
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium"
+                style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  style={{ ...inputBase, paddingRight: '2.5rem' }}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                  style={{ color: dark ? 'rgba(255,255,255,0.35)' : '#8A8A85' }}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
-              }
-            />
+              </div>
+            </div>
 
             <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-xs text-accent dark:text-dark-accent hover:underline">
+              <Link
+                to="/forgot-password"
+                className="text-xs hover:underline"
+                style={{ color: dark ? '#b81481' : '#1A5CFF' }}
+              >
                 Forgot password?
               </Link>
             </div>
 
-            <Button type="submit" fullWidth size="lg" loading={login.isPending}>
-              Sign in
-            </Button>
+            <button
+              type="submit"
+              disabled={login.isPending || !email || !password}
+              className="w-full h-11 px-6 text-sm font-medium rounded transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              style={dark ? {
+                background: 'linear-gradient(135deg, #b81481, #d91b98)',
+                color: '#ffffff',
+                boxShadow: '0 8px 24px rgba(184,20,129,0.25)',
+              } : {
+                backgroundColor: '#0F0F0E',
+                color: '#F2F1EF',
+                border: '1px solid #0F0F0E',
+              }}
+            >
+              {login.isPending ? (
+                <>
+                  <svg className="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Signing in…
+                </>
+              ) : 'Sign in'}
+            </button>
           </form>
 
-          <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary text-center mt-6">
+          <p className="text-xs text-center mt-6"
+            style={{ color: dark ? 'rgba(255,255,255,0.25)' : '#8A8A85' }}>
             Don't have an account?{' '}
-            <span className="text-ink-secondary dark:text-dark-ink-secondary">
+            <span style={{ color: dark ? 'rgba(255,255,255,0.45)' : '#4A4A47' }}>
               Contact your instructor to receive an invite link.
             </span>
           </p>
