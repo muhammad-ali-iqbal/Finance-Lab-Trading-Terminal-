@@ -32,7 +32,9 @@
       "Bash(claude doctor *)",
       "PowerShell(head *)",
       "Bash(psql *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader-frontend\\\\src\\\\pages\" -Filter \"*.tsx\")",
+      "Bash(Select-Object Name, FullName)"
     ]
   }
 }

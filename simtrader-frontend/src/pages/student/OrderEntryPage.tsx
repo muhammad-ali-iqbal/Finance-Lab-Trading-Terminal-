@@ -147,28 +147,19 @@ export default function OrderEntryPage() {
               {/* Symbol */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Symbol</label>
-                <div className="grid grid-cols-3 gap-1.5 flex-wrap">
-                  {symbols.length === 0 && (
-                    <p className="col-span-3 text-xs text-ink-tertiary dark:text-dark-ink-tertiary py-1">
-                      Waiting for simulation data…
-                    </p>
-                  )}
+                <select
+                  value={symbol}
+                  onChange={e => setSymbol(e.target.value)}
+                  disabled={symbols.length === 0}
+                  className="w-full rounded-md border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-ink dark:text-dark-ink text-sm font-mono px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:focus:ring-dark-accent/40 focus:border-accent dark:focus:border-dark-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="" disabled>
+                    {symbols.length === 0 ? 'Waiting for simulation data…' : 'Select a symbol'}
+                  </option>
                   {symbols.map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setSymbol(s)}
-                      className={clsx(
-                        'px-2 py-1.5 rounded border text-xs font-mono font-semibold transition-all',
-                        symbol === s
-                          ? 'border-accent bg-accent-muted text-accent dark:border-dark-accent dark:bg-dark-accent-muted dark:text-dark-accent'
-                          : 'border-border dark:border-dark-border text-ink-secondary dark:text-dark-ink-secondary hover:border-border-strong dark:hover:border-dark-border-strong hover:text-ink dark:hover:text-dark-ink'
-                      )}
-                    >
-                      {s}
-                    </button>
+                    <option key={s} value={s}>{s}</option>
                   ))}
-                </div>
+                </select>
                 {symbol && currentPrice !== undefined && (
                   <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
                     Last price: <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(currentPrice)}</span>

@@ -10,11 +10,13 @@ import {
 } from 'lightweight-charts'
 import { challengeApi } from '@/api'
 import type { ChallengeOrder, ChallengePosition, LeaderboardEntry } from '@/api'
-import { Spinner, Badge, Button } from '@/components/ui'
+import { Spinner, Badge, Button, Input, Alert, Card, EmptyState } from '@/components/ui'
+import { SymbolPicker } from '@/components/ui/SymbolPicker'
 import { useTheme } from '@/context/ThemeContext'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
+  CheckCircle2, XCircle, Clock, Activity,
 } from 'lucide-react'
 import EODChartTab from './EODChartTab'
 import clsx from 'clsx'
@@ -208,6 +210,28 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
 
 // ── Orders tab ────────────────────────────────────────────────────────────────
 
+const CHALLENGE_ORDER_TYPES: { value: 'market' | 'limit'; label: string; description: string }[] = [
+  { value: 'market', label: 'Market', description: 'Fills at the day\'s closing price after 16:35 PKT' },
+  { value: 'limit',  label: 'Limit',  description: 'Fill only if the day\'s low/high reaches your price' },
+]
+
+function ChallengeOrderStatusBadge({ status }: { status: string }) {
+  const map: Record<string, { icon: typeof CheckCircle2; label: string; variant: 'success' | 'danger' | 'warning' | 'neutral' }> = {
+    filled:    { icon: CheckCircle2, label: 'Filled',    variant: 'success' },
+    pending:   { icon: Clock,        label: 'Pending',   variant: 'neutral'  },
+    cancelled: { icon: XCircle,      label: 'Cancelled', variant: 'neutral'  },
+    rejected:  { icon: XCircle,      label: 'Rejected',  variant: 'danger'   },
+  }
+  const cfg = map[status] ?? map.pending
+  const Icon = cfg.icon
+  return (
+    <Badge variant={cfg.variant} size="sm">
+      <Icon className="w-2.5 h-2.5 mr-0.5 inline" />
+      {cfg.label}
+    </Badge>
+  )
+}
+
 function OrdersTab({ challengeId }: { challengeId: string }) {
   const qc = useQueryClient()
   const [symbol, setSymbol] = useState('')
@@ -215,7 +239,30 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
   const [quantity, setQuantity] = useState('')
   const [limitPrice, setLimitPrice] = useState('')
-  const [formError, setFormError] = useState('')
+  const [submitted, setSubmitted] = useState<'success' | 'error' | null>(null)
+  const [submitError, setSubmitError] = useState('')
+
+  const { data: eodSymbols } = useQuery({
+    queryKey: ['eod-symbols'],
+    queryFn: () => challengeApi.getEODSymbols(),
+    staleTime: 5 * 60_000,
+  })
+
+  const { data: portfolio } = useQuery({
+    queryKey: ['challenge-portfolio', challengeId],
+    queryFn: () => challengeApi.getPortfolio(challengeId),
+    staleTime: 30_000,
+  })
+
+  const { data: eodHistory } = useQuery({
+    queryKey: ['eod-history', symbol],
+    queryFn: () => challengeApi.getEODHistory(symbol),
+    enabled: !!symbol,
+    staleTime: 8 * 60 * 60_000,
+  })
+  const lastPrice = eodHistory?.bars?.length
+    ? eodHistory.bars[eodHistory.bars.length - 1].close
+    : undefined
 
   const { data, isLoading } = useQuery({
     queryKey: ['challenge-orders', challengeId],
@@ -223,21 +270,33 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
     staleTime: 15_000,
   })
 
+  const qty = parseInt(quantity) || 0
+  const lp  = parseFloat(limitPrice) || 0
+  const estimatedValue = orderType === 'limit' ? qty * lp : 0
+  const canAfford = side === 'buy' && orderType === 'limit' && estimatedValue > 0
+    ? (portfolio?.cashBalance ?? 0) >= estimatedValue
+    : true
+
   const placeMutation = useMutation({
     mutationFn: () => challengeApi.placeOrder(challengeId, {
-      symbol: symbol.toUpperCase(),
+      symbol: symbol.toUpperCase().trim(),
       side,
       orderType,
-      quantity: parseInt(quantity),
-      limitPrice: orderType === 'limit' ? parseFloat(limitPrice) : undefined,
+      quantity: qty,
+      limitPrice: orderType === 'limit' ? lp : undefined,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['challenge-orders', challengeId] })
       qc.invalidateQueries({ queryKey: ['challenge-portfolio', challengeId] })
-      setSymbol(''); setQuantity(''); setLimitPrice('')
-      setFormError('')
+      setQuantity(''); setLimitPrice('')
+      setSubmitted('success')
+      setTimeout(() => setSubmitted(null), 3000)
     },
-    onError: (e: any) => setFormError(e?.response?.data?.error ?? 'Failed to place order'),
+    onError: (e: any) => {
+      setSubmitError(e?.response?.data?.error ?? 'Failed to place order')
+      setSubmitted('error')
+      setTimeout(() => setSubmitted(null), 4000)
+    },
   })
 
   const cancelMutation = useMutation({
@@ -247,179 +306,217 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setFormError('')
-    if (!symbol.trim()) { setFormError('Symbol is required'); return }
-    const qty = parseInt(quantity)
-    if (!qty || qty <= 0) { setFormError('Quantity must be a positive number'); return }
-    if (orderType === 'limit' && (!limitPrice || parseFloat(limitPrice) <= 0)) {
-      setFormError('Limit price is required for limit orders')
-      return
-    }
+    if (!symbol.trim() || qty <= 0) return
     placeMutation.mutate()
   }
 
-  function statusBadgeVariant(s: string): 'success' | 'danger' | 'warning' | 'neutral' {
-    if (s === 'filled') return 'success'
-    if (s === 'rejected' || s === 'cancelled') return 'danger'
-    return 'warning'
-  }
-
   return (
-    <div className="space-y-5">
+    <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
       {/* Order form */}
-      <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg p-5">
-        <p className="text-sm font-medium text-ink dark:text-dark-ink mb-4">Place Order</p>
-        <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mb-4">
-          Orders fill at the end of each trading day using live PSX closing prices.
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {/* Symbol */}
-            <div>
-              <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Symbol</label>
-              <input
-                value={symbol}
-                onChange={e => setSymbol(e.target.value.toUpperCase())}
-                placeholder="e.g. PSO"
-                className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink placeholder:text-ink-disabled dark:placeholder:text-dark-ink-disabled focus:outline-none focus:border-ink dark:focus:border-dark-ink font-mono"
-              />
-            </div>
-            {/* Side */}
-            <div>
-              <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Side</label>
-              <select
-                value={side}
-                onChange={e => setSide(e.target.value as 'buy' | 'sell')}
-                className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink focus:outline-none focus:border-ink dark:focus:border-dark-ink"
-              >
-                <option value="buy">Buy</option>
-                <option value="sell">Sell</option>
-              </select>
-            </div>
-            {/* Type */}
-            <div>
-              <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Type</label>
-              <select
-                value={orderType}
-                onChange={e => setOrderType(e.target.value as 'market' | 'limit')}
-                className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink focus:outline-none focus:border-ink dark:focus:border-dark-ink"
-              >
-                <option value="market">Market</option>
-                <option value="limit">Limit</option>
-              </select>
-            </div>
-            {/* Quantity */}
-            <div>
-              <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Quantity</label>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={e => setQuantity(e.target.value)}
-                placeholder="100"
-                className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink placeholder:text-ink-disabled dark:placeholder:text-dark-ink-disabled focus:outline-none focus:border-ink dark:focus:border-dark-ink font-mono"
-              />
-            </div>
-          </div>
+      <div className="space-y-4">
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* EOD fill notice */}
+            <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary border border-border dark:border-dark-border rounded px-3 py-2 bg-surface-secondary dark:bg-dark-surface-secondary">
+              Orders fill at end-of-day (16:35 PKT) using live PSX closing prices.
+            </p>
 
-          {orderType === 'limit' && (
-            <div className="max-w-[200px]">
-              <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Limit Price</label>
-              <input
+            {/* Buy / Sell toggle */}
+            <div className="grid grid-cols-2 gap-1 p-1 bg-surface-secondary dark:bg-dark-surface-secondary rounded-md">
+              {(['buy', 'sell'] as const).map(s => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSide(s)}
+                  className={clsx(
+                    'py-2 rounded text-sm font-semibold capitalize transition-all',
+                    side === s
+                      ? s === 'buy'
+                        ? 'bg-success text-white shadow-sm'
+                        : 'bg-danger text-white shadow-sm'
+                      : 'text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink'
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            {/* Symbol */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Symbol</label>
+              <SymbolPicker
+                symbols={eodSymbols?.symbols ?? []}
+                value={symbol}
+                onChange={setSymbol}
+                placeholder={eodSymbols?.symbols?.length ? 'Select a symbol' : 'Loading symbols…'}
+              />
+              {symbol && lastPrice !== undefined && (
+                <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
+                  Last close: <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(lastPrice)}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Order type */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary">Order type</label>
+              <div className="space-y-1">
+                {CHALLENGE_ORDER_TYPES.map(ot => (
+                  <button
+                    key={ot.value}
+                    type="button"
+                    onClick={() => setOrderType(ot.value)}
+                    className={clsx(
+                      'w-full flex items-start gap-3 p-2.5 rounded border text-left transition-all',
+                      orderType === ot.value
+                        ? 'border-accent bg-accent-muted dark:border-dark-accent dark:bg-dark-accent-muted'
+                        : 'border-border dark:border-dark-border hover:border-border-strong dark:hover:border-dark-border-strong'
+                    )}
+                  >
+                    <div className={clsx(
+                      'w-3.5 h-3.5 rounded-full border-2 mt-0.5 flex-shrink-0 transition-colors',
+                      orderType === ot.value ? 'border-accent bg-accent' : 'border-border dark:border-dark-border'
+                    )} />
+                    <div>
+                      <p className={clsx('text-xs font-semibold', orderType === ot.value ? 'text-accent dark:text-dark-accent' : 'text-ink dark:text-dark-ink')}>
+                        {ot.label}
+                      </p>
+                      <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5">{ot.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity */}
+            <Input
+              label="Quantity (shares)"
+              type="number"
+              placeholder="100"
+              value={quantity}
+              onChange={e => setQuantity(e.target.value)}
+              min="1"
+              step="1"
+              required
+            />
+
+            {/* Limit price */}
+            {orderType === 'limit' && (
+              <Input
+                label="Limit price (PKR)"
                 type="number"
-                step="0.01"
+                placeholder="0.00"
                 value={limitPrice}
                 onChange={e => setLimitPrice(e.target.value)}
-                placeholder="0.00"
-                className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink placeholder:text-ink-disabled dark:placeholder:text-dark-ink-disabled focus:outline-none focus:border-ink dark:focus:border-dark-ink font-mono"
+                step="0.01"
+                required
+                hint={side === 'buy' ? 'Buy if day\'s low reaches this price' : 'Sell if day\'s high reaches this price'}
               />
-            </div>
-          )}
+            )}
 
-          {formError && (
-            <p className="text-xs text-danger dark:text-dark-danger">{formError}</p>
-          )}
+            {/* Estimated cost + cash balance */}
+            {qty > 0 && orderType === 'limit' && lp > 0 && (
+              <div className="rounded border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary p-3 space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Estimated {side === 'buy' ? 'cost' : 'proceeds'}</span>
+                  <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(estimatedValue)}</span>
+                </div>
+                {side === 'buy' && portfolio && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Available cash</span>
+                    <span className={clsx('font-mono font-medium', canAfford ? 'text-ink dark:text-dark-ink' : 'text-danger dark:text-dark-danger')}>
+                      PKR {fmt(portfolio.cashBalance ?? 0)}
+                    </span>
+                  </div>
+                )}
+                {!canAfford && (
+                  <p className="text-[11px] text-danger dark:text-dark-danger font-medium">Insufficient cash for this order</p>
+                )}
+              </div>
+            )}
 
-          <div className="flex justify-end">
+            {/* Feedback */}
+            {submitted === 'success' && (
+              <Alert variant="success" message="Order placed successfully. It will fill at today's close." />
+            )}
+            {submitted === 'error' && (
+              <Alert variant="error" message={submitError} />
+            )}
+
             <Button
               type="submit"
-              variant={side === 'buy' ? 'primary' : 'danger'}
-              size="sm"
-              disabled={placeMutation.isPending}
+              fullWidth
+              size="lg"
+              variant={side === 'sell' ? 'danger' : 'primary'}
+              loading={placeMutation.isPending}
+              disabled={!symbol.trim() || qty <= 0 || !canAfford}
             >
-              {placeMutation.isPending ? 'Placing…' : `Place ${side === 'buy' ? 'Buy' : 'Sell'} Order`}
+              {side === 'buy' ? 'Place Buy Order' : 'Place Sell Order'}
             </Button>
-          </div>
-        </form>
+          </form>
+        </Card>
       </div>
 
       {/* Order history */}
-      <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-border dark:border-dark-border">
-          <p className="text-sm font-medium text-ink dark:text-dark-ink">Order History</p>
+      <Card padding="none">
+        <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Order History</h2>
+          {data && (
+            <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">{data.orders.length} orders</span>
+          )}
         </div>
+
         {isLoading ? (
           <div className="flex justify-center py-10"><Spinner /></div>
         ) : !data?.orders?.length ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2">
-            <ListOrdered className="w-6 h-6 text-ink-disabled dark:text-dark-ink-disabled" />
-            <p className="text-sm text-ink-tertiary dark:text-dark-ink-tertiary">No orders placed yet</p>
-          </div>
+          <EmptyState
+            icon={<Activity className="w-8 h-8" />}
+            title="No orders yet"
+            description="Your submitted orders will appear here."
+          />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border dark:border-dark-border text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide">
-                  <th className="text-left px-4 py-2">Symbol</th>
-                  <th className="text-left px-4 py-2">Side</th>
-                  <th className="text-left px-4 py-2">Type</th>
-                  <th className="text-right px-4 py-2">Qty</th>
-                  <th className="text-right px-4 py-2">Limit</th>
-                  <th className="text-right px-4 py-2">Fill</th>
-                  <th className="text-left px-4 py-2">Status</th>
-                  <th className="text-left px-4 py-2">Date</th>
-                  <th className="px-4 py-2" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border dark:divide-dark-border">
-                {data.orders.map((o: ChallengeOrder) => (
-                  <tr key={o.id} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
-                    <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{o.symbol}</td>
-                    <td className={clsx('px-4 py-2.5 font-medium capitalize', o.side === 'buy' ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
-                      {o.side}
-                    </td>
-                    <td className="px-4 py-2.5 capitalize text-ink-secondary dark:text-dark-ink-secondary">{o.orderType}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{o.quantity.toLocaleString()}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-ink-secondary dark:text-dark-ink-secondary">
-                      {o.limitPrice != null ? fmt(o.limitPrice) : '—'}
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">
-                      {o.fillPrice != null ? fmt(o.fillPrice) : '—'}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <Badge variant={statusBadgeVariant(o.status)} size="sm">{o.status}</Badge>
-                    </td>
-                    <td className="px-4 py-2.5 text-ink-tertiary dark:text-dark-ink-tertiary text-xs">
-                      {new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                    </td>
-                    <td className="px-4 py-2.5">
-                      {o.status === 'pending' && (
-                        <button
-                          onClick={() => cancelMutation.mutate(o.id)}
-                          disabled={cancelMutation.isPending}
-                          className="text-[11px] text-danger dark:text-dark-danger hover:underline disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="divide-y divide-border dark:divide-dark-border">
+            {data.orders.map((o: ChallengeOrder) => (
+              <div key={o.id} className="px-4 py-3 flex items-center gap-4 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{o.symbol}</span>
+                    <Badge variant={o.side === 'buy' ? 'success' : 'danger'} size="sm">
+                      {o.side.toUpperCase()}
+                    </Badge>
+                    <Badge variant="neutral" size="sm">{o.orderType}</Badge>
+                  </div>
+                  <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5 font-mono">
+                    {o.quantity.toLocaleString()} shares
+                    {o.limitPrice != null && ` @ PKR ${fmt(o.limitPrice)}`}
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0 space-y-1">
+                  <ChallengeOrderStatusBadge status={o.status} />
+                  {o.fillPrice != null && (
+                    <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary font-mono">
+                      filled @ PKR {fmt(o.fillPrice)}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary">
+                    {new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  </p>
+                  {o.status === 'pending' && (
+                    <button
+                      onClick={() => cancelMutation.mutate(o.id)}
+                      disabled={cancelMutation.isPending}
+                      className="text-[11px] text-danger dark:text-dark-danger hover:underline disabled:opacity-50 block"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

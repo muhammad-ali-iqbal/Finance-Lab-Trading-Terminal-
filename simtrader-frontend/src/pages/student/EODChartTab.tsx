@@ -1,8 +1,8 @@
 // src/pages/student/EODChartTab.tsx
-// Daily candlestick chart for PSX stocks using eod_prices data.
+// Daily candlestick/line chart for PSX stocks using eod_prices data.
 // Same indicators as ChartPage but driven by EOD data instead of WebSocket ticks.
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   createChart, type IChartApi, type ISeriesApi,
@@ -12,7 +12,8 @@ import { challengeApi } from '@/api'
 import type { EODBar } from '@/api'
 import { Spinner } from '@/components/ui'
 import { useTheme } from '@/context/ThemeContext'
-import { Search, BarChart3, ChevronDown, X } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import { SymbolPicker } from '@/components/ui/SymbolPicker'
 import {
   calcSMA, calcEMA, calcBollingerBands, calcRSI, calcMACD,
   type OHLCBar,
@@ -22,6 +23,7 @@ import clsx from 'clsx'
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type IndicatorId = 'sma20' | 'sma50' | 'ema20' | 'bb' | 'rsi' | 'macd'
+type ChartType   = 'candle' | 'line'
 
 const INDICATOR_DEFS: { id: IndicatorId; label: string; color: string }[] = [
   { id: 'sma20', label: 'SMA 20',          color: '#f97316' },
@@ -73,86 +75,6 @@ function computeLayout(rsi: boolean, macd: boolean) {
     pane1:  { top: 0.45, bottom: 0.30 },
     pane2:  { top: 0.75, bottom: 0.00 },
   }
-}
-
-// ── Symbol picker ─────────────────────────────────────────────────────────────
-
-function SymbolPicker({ symbols, value, onChange }: {
-  symbols: string[]
-  value: string
-  onChange: (s: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const ref = useRef<HTMLDivElement>(null)
-
-  const filtered = useMemo(() =>
-    query.trim() === ''
-      ? symbols
-      : symbols.filter(s => s.toLowerCase().includes(query.toLowerCase())),
-    [symbols, query],
-  )
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', onClickOutside)
-    return () => document.removeEventListener('mousedown', onClickOutside)
-  }, [])
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-sm font-medium text-ink dark:text-dark-ink hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors min-w-[140px]"
-      >
-        <BarChart3 className="w-3.5 h-3.5 text-ink-secondary dark:text-dark-ink-secondary flex-shrink-0" />
-        <span className="flex-1 text-left truncate">{value || 'Select symbol'}</span>
-        <ChevronDown className="w-3.5 h-3.5 text-ink-secondary dark:text-dark-ink-secondary flex-shrink-0" />
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 w-64 bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg overflow-hidden">
-          <div className="p-2 border-b border-border dark:border-dark-border">
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-surface-secondary dark:bg-dark-surface-secondary">
-              <Search className="w-3.5 h-3.5 text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0" />
-              <input
-                autoFocus
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search symbol…"
-                className="flex-1 bg-transparent text-sm text-ink dark:text-dark-ink placeholder:text-ink-disabled dark:placeholder:text-dark-ink-disabled outline-none"
-              />
-              {query && (
-                <button onClick={() => setQuery('')}>
-                  <X className="w-3 h-3 text-ink-tertiary dark:text-dark-ink-tertiary" />
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="max-h-56 overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary px-3 py-2">No results</p>
-            ) : filtered.map(s => (
-              <button
-                key={s}
-                onClick={() => { onChange(s); setOpen(false); setQuery('') }}
-                className={clsx(
-                  'w-full text-left px-3 py-1.5 text-sm transition-colors',
-                  s === value
-                    ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
-                    : 'text-ink dark:text-dark-ink hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
-                )}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
 }
 
 // ── Indicator picker ──────────────────────────────────────────────────────────
@@ -212,6 +134,33 @@ function IndicatorPicker({ active, onChange }: {
   )
 }
 
+// ── Chart type picker ─────────────────────────────────────────────────────────
+
+function ChartTypePicker({ value, onChange }: { value: ChartType; onChange: (t: ChartType) => void }) {
+  const options: { value: ChartType; label: string }[] = [
+    { value: 'candle', label: 'Candles' },
+    { value: 'line',   label: 'Line'    },
+  ]
+  return (
+    <div className="flex items-center rounded border border-border dark:border-dark-border overflow-hidden">
+      {options.map(o => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={clsx(
+            'px-2.5 py-1 text-xs font-medium transition-colors',
+            value === o.value
+              ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface'
+              : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 // ── Main chart component ──────────────────────────────────────────────────────
 
 export default function EODChartTab() {
@@ -222,6 +171,7 @@ export default function EODChartTab() {
 
   // Series refs
   const candleRef   = useRef<ISeriesApi<'Candlestick'> | null>(null)
+  const lineRef     = useRef<ISeriesApi<'Line'> | null>(null)
   const volumeRef   = useRef<ISeriesApi<'Histogram'> | null>(null)
   const sma20Ref    = useRef<ISeriesApi<'Line'> | null>(null)
   const sma50Ref    = useRef<ISeriesApi<'Line'> | null>(null)
@@ -239,6 +189,7 @@ export default function EODChartTab() {
   const [symbol, setSymbol]         = useState('')
   const [indicators, setIndicators] = useState<Set<IndicatorId>>(new Set())
   const [activeRange, setActiveRange] = useState<string>('All')
+  const [chartType, setChartType]   = useState<ChartType>('candle')
 
   // Fetch symbol list
   const { data: symData } = useQuery({
@@ -273,8 +224,6 @@ export default function EODChartTab() {
       bg:   isDark ? '#0f1117' : '#ffffff',
       text: isDark ? '#94a3b8' : '#64748b',
       grid: isDark ? '#1e293b' : '#f1f5f9',
-      up:   '#22c55e',
-      dn:   '#ef4444',
     }
 
     const chart = createChart(containerRef.current, {
@@ -294,12 +243,6 @@ export default function EODChartTab() {
     })
     chartRef.current = chart
 
-    candleRef.current = chart.addCandlestickSeries({
-      upColor: col.up, downColor: col.dn,
-      borderUpColor: col.up, borderDownColor: col.dn,
-      wickUpColor: col.up, wickDownColor: col.dn,
-    })
-
     volumeRef.current = chart.addHistogramSeries({
       priceScaleId: 'volume',
       priceFormat: { type: 'volume' },
@@ -318,8 +261,8 @@ export default function EODChartTab() {
       chart.remove()
       chartRef.current  = null
       candleRef.current = null
+      lineRef.current   = null
       volumeRef.current = null
-      // Clear all indicator refs so they're recreated on remount
       sma20Ref.current = null; sma50Ref.current = null; ema20Ref.current = null
       bbUpperRef.current = null; bbMidRef.current = null; bbLowerRef.current = null
       rsiRef.current = null; rsiHiRef.current = null; rsiLoRef.current = null
@@ -341,16 +284,35 @@ export default function EODChartTab() {
     })
   }, [isDark])
 
-  // ── Sync indicator series + push all data ──────────────────────────────────
-  // Single flat effect — no useCallback chains. Runs whenever indicators,
-  // bars, or theme changes. Syncs series first, then pushes data so newly
-  // created series are immediately populated.
+  // ── Sync price series type + indicators + push all data ────────────────────
   useEffect(() => {
     if (!chartRef.current) return
     const chart = chartRef.current
     const gridColor = isDark ? '#1e293b' : '#f1f5f9'
     const up = '#22c55e'
     const dn = '#ef4444'
+    const lineColor = isDark ? '#4D88FF' : '#1A5CFF'
+
+    // ── Sync price series type ──────────────────────────────────────────────
+    if (chartType === 'candle') {
+      if (lineRef.current) { try { chart.removeSeries(lineRef.current) } catch { /* already gone */ } lineRef.current = null }
+      if (!candleRef.current) {
+        candleRef.current = chart.addCandlestickSeries({
+          upColor: up, downColor: dn,
+          borderUpColor: up, borderDownColor: dn,
+          wickUpColor: up, wickDownColor: dn,
+        })
+      }
+    } else {
+      if (candleRef.current) { try { chart.removeSeries(candleRef.current) } catch { /* already gone */ } candleRef.current = null }
+      if (!lineRef.current) {
+        lineRef.current = chart.addLineSeries({
+          color: lineColor, lineWidth: 2,
+          priceLineVisible: false, lastValueVisible: true,
+          crosshairMarkerRadius: 4,
+        })
+      }
+    }
 
     // Helper: add or keep a line series
     function addLine(
@@ -373,7 +335,7 @@ export default function EODChartTab() {
       if (ref.current) { try { chart.removeSeries(ref.current) } catch { /* already gone */ } ref.current = null }
     }
 
-    // ── Sync series ────────────────────────────────────────────────────────
+    // ── Sync indicator series ──────────────────────────────────────────────
     if (indicators.has('sma20')) addLine(sma20Ref, '#f97316')
     else removeLine(sma20Ref)
 
@@ -427,10 +389,19 @@ export default function EODChartTab() {
     // ── Push data ──────────────────────────────────────────────────────────
     if (bars.length === 0) return
 
-    candleRef.current?.setData(bars.map(b => ({
-      time: b.time as unknown as import('lightweight-charts').Time,
-      open: b.open, high: b.high, low: b.low, close: b.close,
-    })))
+    if (candleRef.current) {
+      candleRef.current.setData(bars.map(b => ({
+        time: b.time as unknown as import('lightweight-charts').Time,
+        open: b.open, high: b.high, low: b.low, close: b.close,
+      })))
+    }
+    if (lineRef.current) {
+      lineRef.current.setData(bars.map(b => ({
+        time:  b.time as unknown as import('lightweight-charts').Time,
+        value: b.close,
+      })))
+    }
+
     volumeRef.current?.setData(bars.map(b => ({
       time: b.time as unknown as import('lightweight-charts').Time,
       value: b.volume,
@@ -475,7 +446,7 @@ export default function EODChartTab() {
         color: p.histogram >= 0 ? '#22c55e80' : '#ef444480',
       })))
     }
-  }, [indicators, bars, isDark]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [indicators, bars, isDark, chartType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Range selector ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -505,6 +476,10 @@ export default function EODChartTab() {
       {/* Toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
         <SymbolPicker symbols={symbols} value={symbol} onChange={setSymbol} />
+
+        {/* Chart type toggle */}
+        <ChartTypePicker value={chartType} onChange={setChartType} />
+
         <IndicatorPicker active={indicators} onChange={setIndicators} />
 
         {/* Range buttons */}

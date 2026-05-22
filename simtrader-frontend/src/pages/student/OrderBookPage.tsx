@@ -1,17 +1,19 @@
 // src/pages/student/OrderBookPage.tsx
 import { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import { orderApi, simulationApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
 import { Spinner, EmptyState } from '@/components/ui'
 import clsx from 'clsx'
-import { BookOpen, TrendingUp, TrendingDown } from 'lucide-react'
+import { BookOpen, LayoutGrid } from 'lucide-react'
+
+const ALL = '__ALL__'
 
 function fmt(n: number, d = 2) {
   return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
 }
 
-const ROWS = 12
+const ROWS = 15
 
 export default function OrderBookPage() {
   const { data: simulation } = useQuery({
@@ -24,43 +26,53 @@ export default function OrderBookPage() {
   const symbols = Object.keys(priceMap)
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null)
 
-  const symbol = selectedSymbol ?? symbols[0] ?? null
+  const isAllMode = (selectedSymbol ?? symbols[0]) === ALL
+  const symbol = isAllMode ? null : (selectedSymbol ?? symbols[0] ?? null)
   const tick   = symbol ? priceMap[symbol] : undefined
 
   const { data: book, isLoading } = useQuery({
     queryKey: ['orderbook', simulation?.id, symbol],
     queryFn: () => orderApi.getBook(simulation!.id, symbol!),
-    enabled: !!simulation?.id && !!symbol,
+    enabled: !!simulation?.id && !!symbol && !isAllMode,
     refetchInterval: 2000,
   })
 
-  // Asks: sorted asc from API (lowest ask first). We want lowest ask closest
-  // to the mid-price bar, so we reverse for display: highest ask at top, lowest at bottom.
-  const displayAsks = useMemo(() => {
-    if (!book) return []
-    let cum = 0
-    const withCum = (book.asks ?? []).slice(0, ROWS).map(a => ({ ...a, cum: (cum += a.quantity) }))
-    return withCum.reverse() // highest ask at top of block
-  }, [book])
+  const allBookResults = useQueries({
+    queries: symbols.map(s => ({
+      queryKey: ['orderbook', simulation?.id, s],
+      queryFn: () => orderApi.getBook(simulation!.id, s),
+      enabled: !!simulation?.id && isAllMode,
+      refetchInterval: 2000,
+    })),
+  })
+  const allBooksLoading = isAllMode && allBookResults.some(r => r.isLoading)
 
-  // Bids: sorted desc from API (highest bid first). Highest bid stays at top (closest to mid).
+  // Bids: desc (best bid at top), Asks: asc (best ask at top) — Binance side-by-side layout
   const displayBids = useMemo(() => {
     if (!book) return []
     let cum = 0
     return (book.bids ?? []).slice(0, ROWS).map(b => ({ ...b, cum: (cum += b.quantity) }))
   }, [book])
 
-  const maxCum = Math.max(
-    ...displayAsks.map(a => a.cum),
-    ...displayBids.map(b => b.cum),
-    1,
-  )
+  const displayAsks = useMemo(() => {
+    if (!book) return []
+    let cum = 0
+    return (book.asks ?? []).slice(0, ROWS).map(a => ({ ...a, cum: (cum += a.quantity) }))
+  }, [book])
 
-  const lastPrice  = book?.lastPrice ?? tick?.close
-  const bestBid    = book?.bids?.[0]?.price
-  const bestAsk    = book?.asks?.[0]?.price
-  const spread     = book?.spread ?? (bestBid && bestAsk ? bestAsk - bestBid : undefined)
-  const spreadPct  = bestBid && spread ? (spread / bestBid) * 100 : undefined
+  const maxBidCum = Math.max(...displayBids.map(b => b.cum), 1)
+  const maxAskCum = Math.max(...displayAsks.map(a => a.cum), 1)
+
+  const bidVol   = (book?.bids ?? []).reduce((s, b) => s + b.quantity, 0)
+  const askVol   = (book?.asks ?? []).reduce((s, a) => s + a.quantity, 0)
+  const totalVol = bidVol + askVol || 1
+  const bidPct   = (bidVol / totalVol) * 100
+  const askPct   = (askVol / totalVol) * 100
+
+  const lastPrice = book?.lastPrice ?? tick?.close
+  const bestBid   = book?.bids?.[0]?.price
+  const bestAsk   = book?.asks?.[0]?.price
+  const spread    = book?.spread ?? (bestBid && bestAsk ? bestAsk - bestBid : undefined)
 
   return (
     <div className="p-6 max-w-3xl space-y-5">
@@ -75,6 +87,19 @@ export default function OrderBookPage() {
       {/* Symbol tabs */}
       {symbols.length > 0 && (
         <div className="flex gap-1.5 flex-wrap">
+          <button
+            onClick={() => setSelectedSymbol(ALL)}
+            className={clsx(
+              'px-3 py-1.5 rounded border text-xs font-semibold transition-all flex items-center gap-1.5',
+              (selectedSymbol ?? symbols[0]) === ALL
+                ? 'border-ink bg-ink text-surface dark:border-dark-ink dark:bg-dark-ink dark:text-dark-surface'
+                : 'border-border dark:border-dark-border text-ink-secondary dark:text-dark-ink-secondary hover:border-border-strong dark:hover:border-dark-border-strong hover:text-ink dark:hover:text-dark-ink'
+            )}
+          >
+            <LayoutGrid className="w-3 h-3" />
+            All
+          </button>
+          <div className="w-px bg-border dark:bg-dark-border self-stretch mx-0.5" />
           {symbols.map(s => (
             <button
               key={s}
@@ -92,7 +117,13 @@ export default function OrderBookPage() {
         </div>
       )}
 
-      {isLoading ? (
+      {isAllMode ? (
+        allBooksLoading ? (
+          <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        ) : (
+          <AllBooksView symbols={symbols} bookResults={allBookResults} onSelect={s => setSelectedSymbol(s)} />
+        )
+      ) : isLoading ? (
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       ) : !book ? (
         <EmptyState
@@ -101,122 +132,103 @@ export default function OrderBookPage() {
           description="Order book appears once the simulation is active and limit orders have been placed."
         />
       ) : (
-        <div className="space-y-4">
-          {/* Stats row */}
-          <div className="grid grid-cols-4 gap-3">
-            <StatPill label="Best Bid" value={bestBid ? fmt(bestBid) : '—'} color="success" />
-            <StatPill
-              label="Spread"
-              value={spread != null ? fmt(spread) : '—'}
-              sub={spreadPct != null ? `${fmt(spreadPct, 3)}%` : undefined}
-              color="neutral"
-            />
-            <StatPill label="Best Ask" value={bestAsk ? fmt(bestAsk) : '—'} color="danger" />
-            <StatPill label="Last Price" value={lastPrice ? fmt(lastPrice) : '—'} color="neutral" />
-          </div>
-
-          {/* Merged order book */}
+        <div className="space-y-3">
           <div className="rounded-lg border border-border dark:border-dark-border overflow-hidden bg-surface dark:bg-dark-surface">
-            {/* Column headers */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto] px-4 py-2 bg-surface-secondary dark:bg-dark-surface-secondary border-b border-border dark:border-dark-border">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary">Depth</span>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-28 text-right">Price (PKR)</span>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-20 text-right">Shares</span>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-16 text-right">Orders</span>
+
+            {/* Bid/Ask volume ratio bar */}
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+              <span className="text-[11px] font-mono font-semibold text-success dark:text-dark-success w-14 shrink-0">
+                {bidPct.toFixed(2)}%
+              </span>
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden flex bg-danger/25 dark:bg-dark-danger/25">
+                <div
+                  className="bg-success dark:bg-dark-success h-full transition-all duration-500"
+                  style={{ width: `${bidPct}%` }}
+                />
+              </div>
+              <span className="text-[11px] font-mono font-semibold text-danger dark:text-dark-danger w-14 shrink-0 text-right">
+                {askPct.toFixed(2)}%
+              </span>
             </div>
 
-            {/* ASKS — displayed highest price at top, lowest ask (closest to mid) at bottom */}
-            {displayAsks.length === 0 ? (
-              <div className="px-4 py-5 text-center text-xs text-ink-tertiary dark:text-dark-ink-tertiary border-b border-border dark:border-dark-border">
-                No sell orders
-              </div>
-            ) : (
-              displayAsks.map((ask, i) => (
+            {/* Column headers */}
+            <div className="grid grid-cols-[1fr_1fr_1fr_1fr] border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary px-3 py-1.5">
+                Qty (Bid)
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-success/70 dark:text-dark-success/70 px-3 py-1.5 text-right">
+                Bid (PKR)
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-danger/70 dark:text-dark-danger/70 px-3 py-1.5">
+                Ask (PKR)
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary px-3 py-1.5 text-right">
+                Qty (Ask)
+              </span>
+            </div>
+
+            {/* Rows — bid and ask at same depth level rendered side by side */}
+            {Array.from({ length: ROWS }).map((_, i) => {
+              const bid = displayBids[i]
+              const ask = displayAsks[i]
+              if (!bid && !ask) return null
+              return (
                 <div
-                  key={ask.price}
-                  className="relative grid grid-cols-[1fr_auto_auto_auto] px-4 py-2 border-b border-border/40 dark:border-dark-border/40 last:border-b-0"
+                  key={i}
+                  className="relative grid grid-cols-[1fr_1fr_1fr_1fr] border-t border-border/25 dark:border-dark-border/25"
                 >
-                  {/* Depth bar — grows upward from mid (bottom row has smallest bar) */}
-                  <div
-                    className="absolute inset-y-0 right-0 bg-danger/10 dark:bg-dark-danger/10 pointer-events-none transition-all duration-300"
-                    style={{ width: `${(ask.cum / maxCum) * 100}%` }}
-                  />
-                  {/* Depth label */}
-                  <span className="text-[10px] font-mono text-danger/40 dark:text-dark-danger/40 relative z-10 flex items-center">
-                    {i === 0 && <TrendingDown className="w-2.5 h-2.5 mr-1" />}
-                    {fmt(ask.cum, 0)}
+                  {/* Bid depth bar: right edge anchored at center, grows leftward */}
+                  {bid && (
+                    <div
+                      className="absolute top-0 bottom-0 bg-success/10 dark:bg-dark-success/10 pointer-events-none transition-all duration-300"
+                      style={{ right: '50%', width: `${(bid.cum / maxBidCum) * 50}%` }}
+                    />
+                  )}
+                  {/* Ask depth bar: left edge anchored at center, grows rightward */}
+                  {ask && (
+                    <div
+                      className="absolute top-0 bottom-0 bg-danger/10 dark:bg-dark-danger/10 pointer-events-none transition-all duration-300"
+                      style={{ left: '50%', width: `${(ask.cum / maxAskCum) * 50}%` }}
+                    />
+                  )}
+
+                  <span className="relative z-10 px-3 py-1 text-xs font-mono text-ink dark:text-dark-ink">
+                    {bid ? bid.quantity.toLocaleString() : ''}
                   </span>
-                  <span className="font-mono text-xs font-semibold text-danger dark:text-dark-danger relative z-10 w-28 text-right">
-                    {fmt(ask.price)}
+                  <span className="relative z-10 px-3 py-1 text-xs font-mono font-semibold text-success dark:text-dark-success text-right">
+                    {bid ? fmt(bid.price) : ''}
                   </span>
-                  <span className="font-mono text-xs text-ink dark:text-dark-ink relative z-10 w-20 text-right">
-                    {ask.quantity.toLocaleString()}
+                  <span className="relative z-10 px-3 py-1 text-xs font-mono font-semibold text-danger dark:text-dark-danger">
+                    {ask ? fmt(ask.price) : ''}
                   </span>
-                  <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary relative z-10 w-16 text-right">
-                    {ask.orderCount}
+                  <span className="relative z-10 px-3 py-1 text-xs font-mono text-ink dark:text-dark-ink text-right">
+                    {ask ? ask.quantity.toLocaleString() : ''}
                   </span>
                 </div>
-              ))
-            )}
+              )
+            })}
 
-            {/* Mid-price / last trade row */}
-            <div className="flex items-center justify-between px-4 py-2.5 bg-surface-secondary dark:bg-dark-surface-secondary border-y border-border dark:border-dark-border">
+            {/* Last trade / spread bar */}
+            <div className="flex items-center justify-between px-4 py-2 bg-surface-secondary dark:bg-dark-surface-secondary border-t border-border dark:border-dark-border">
               <span className="text-xs font-medium text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wider">
                 Last Trade
               </span>
-              <span className="font-mono font-bold text-base text-ink dark:text-dark-ink">
+              <span className="font-mono font-bold text-sm text-ink dark:text-dark-ink">
                 {lastPrice ? `PKR ${fmt(lastPrice)}` : '—'}
               </span>
-              {spread != null && (
-                <span className="text-xs font-mono text-ink-tertiary dark:text-dark-ink-tertiary">
-                  Spread: {fmt(spread)}
-                </span>
-              )}
+              <span className="text-xs font-mono text-ink-tertiary dark:text-dark-ink-tertiary">
+                {spread != null ? `Spread ${fmt(spread)}` : ''}
+              </span>
             </div>
-
-            {/* BIDS — highest bid (closest to mid) at top */}
-            {displayBids.length === 0 ? (
-              <div className="px-4 py-5 text-center text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
-                No buy orders
-              </div>
-            ) : (
-              displayBids.map((bid, i) => (
-                <div
-                  key={bid.price}
-                  className="relative grid grid-cols-[1fr_auto_auto_auto] px-4 py-2 border-t border-border/40 dark:border-dark-border/40 first:border-t-0"
-                >
-                  {/* Depth bar — grows as you go away from mid */}
-                  <div
-                    className="absolute inset-y-0 right-0 bg-success/10 dark:bg-dark-success/10 pointer-events-none transition-all duration-300"
-                    style={{ width: `${(bid.cum / maxCum) * 100}%` }}
-                  />
-                  <span className="text-[10px] font-mono text-success/40 dark:text-dark-success/40 relative z-10 flex items-center">
-                    {i === 0 && <TrendingUp className="w-2.5 h-2.5 mr-1" />}
-                    {fmt(bid.cum, 0)}
-                  </span>
-                  <span className="font-mono text-xs font-semibold text-success dark:text-dark-success relative z-10 w-28 text-right">
-                    {fmt(bid.price)}
-                  </span>
-                  <span className="font-mono text-xs text-ink dark:text-dark-ink relative z-10 w-20 text-right">
-                    {bid.quantity.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary relative z-10 w-16 text-right">
-                    {bid.orderCount}
-                  </span>
-                </div>
-              ))
-            )}
           </div>
 
-          {/* Book totals */}
-          <div className="flex justify-between text-xs text-ink-tertiary dark:text-dark-ink-tertiary px-1">
-            <span>
-              {(book.bids ?? []).length} bid level{(book.bids ?? []).length !== 1 ? 's' : ''} ·{' '}
-              {(book.bids ?? []).reduce((s, b) => s + b.quantity, 0).toLocaleString()} shares
+          {/* Totals footer */}
+          <div className="flex justify-between text-[11px] px-1">
+            <span className="text-success/70 dark:text-dark-success/70">
+              {(book.bids ?? []).length} bid level{(book.bids ?? []).length !== 1 ? 's' : ''} &middot; {bidVol.toLocaleString()} shares
             </span>
-            <span>
-              {(book.asks ?? []).length} ask level{(book.asks ?? []).length !== 1 ? 's' : ''} ·{' '}
-              {(book.asks ?? []).reduce((s, a) => s + a.quantity, 0).toLocaleString()} shares
+            <span className="text-danger/70 dark:text-dark-danger/70">
+              {(book.asks ?? []).length} ask level{(book.asks ?? []).length !== 1 ? 's' : ''} &middot; {askVol.toLocaleString()} shares
             </span>
           </div>
         </div>
@@ -225,27 +237,90 @@ export default function OrderBookPage() {
   )
 }
 
-function StatPill({
-  label, value, sub, color,
+type BookData = {
+  bids?: { price: number; quantity: number; orderCount: number }[]
+  asks?: { price: number; quantity: number; orderCount: number }[]
+  lastPrice?: number
+  spread?: number
+}
+
+function AllBooksView({
+  symbols,
+  bookResults,
+  onSelect,
 }: {
-  label: string
-  value: string
-  sub?: string
-  color: 'success' | 'danger' | 'neutral'
+  symbols: string[]
+  bookResults: { data?: BookData; isLoading: boolean }[]
+  onSelect: (s: string) => void
 }) {
-  const valueClass = color === 'success'
-    ? 'text-success dark:text-dark-success'
-    : color === 'danger'
-    ? 'text-danger dark:text-dark-danger'
-    : 'text-ink dark:text-dark-ink'
+  if (symbols.length === 0) {
+    return (
+      <EmptyState
+        icon={<LayoutGrid className="w-8 h-8" />}
+        title="No symbols available"
+        description="Waiting for the simulation to broadcast price data."
+      />
+    )
+  }
 
   return (
-    <div className="rounded-lg border border-border dark:border-dark-border bg-surface dark:bg-dark-surface px-3 py-2.5">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary mb-1">
-        {label}
+    <div className="space-y-3">
+      <div className="rounded-lg border border-border dark:border-dark-border overflow-hidden bg-surface dark:bg-dark-surface">
+        <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] px-4 py-2 bg-surface-secondary dark:bg-dark-surface-secondary border-b border-border dark:border-dark-border">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary">Symbol</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-24 text-right">Best Bid</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-20 text-right">Bid Qty</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-24 text-right">Best Ask</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-20 text-right">Ask Qty</span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary w-24 text-right">Spread</span>
+        </div>
+
+        {symbols.map((s, i) => {
+          const result = bookResults[i]
+          const book = result?.data
+          const bestBid = book?.bids?.[0]
+          const bestAsk = book?.asks?.[0]
+          const spread = book?.spread ?? (bestBid && bestAsk ? bestAsk.price - bestBid.price : undefined)
+
+          return (
+            <button
+              key={s}
+              onClick={() => onSelect(s)}
+              className="w-full grid grid-cols-[1fr_auto_auto_auto_auto_auto] px-4 py-3 border-t border-border/40 dark:border-dark-border/40 first:border-t-0 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors text-left group"
+            >
+              <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink group-hover:underline underline-offset-2">
+                {s}
+              </span>
+              {result?.isLoading ? (
+                <span className="col-span-5 text-xs text-ink-tertiary dark:text-dark-ink-tertiary text-right">Loading&hellip;</span>
+              ) : !book ? (
+                <span className="col-span-5 text-xs text-ink-tertiary dark:text-dark-ink-tertiary text-right">No orders</span>
+              ) : (
+                <>
+                  <span className="font-mono text-xs font-semibold text-success dark:text-dark-success w-24 text-right">
+                    {bestBid ? fmt(bestBid.price) : '—'}
+                  </span>
+                  <span className="font-mono text-xs text-ink dark:text-dark-ink w-20 text-right">
+                    {bestBid ? bestBid.quantity.toLocaleString() : '—'}
+                  </span>
+                  <span className="font-mono text-xs font-semibold text-danger dark:text-dark-danger w-24 text-right">
+                    {bestAsk ? fmt(bestAsk.price) : '—'}
+                  </span>
+                  <span className="font-mono text-xs text-ink dark:text-dark-ink w-20 text-right">
+                    {bestAsk ? bestAsk.quantity.toLocaleString() : '—'}
+                  </span>
+                  <span className="font-mono text-xs text-ink-tertiary dark:text-dark-ink-tertiary w-24 text-right">
+                    {spread != null ? fmt(spread) : '—'}
+                  </span>
+                </>
+              )}
+            </button>
+          )
+        })}
+      </div>
+      <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary px-1">
+        Click any row to view the full depth for that symbol.
       </p>
-      <p className={clsx('font-mono font-semibold text-sm', valueClass)}>{value}</p>
-      {sub && <p className="text-[10px] font-mono text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5">{sub}</p>}
     </div>
   )
 }
