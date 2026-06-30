@@ -3,7 +3,7 @@
 # Common development commands. Run `make help` to see all options.
 # Requires: Go 1.22+, psql (PostgreSQL client), make
 
-.PHONY: help run build migrate seed hash tidy lint clean
+.PHONY: help run build migrate seed hash tidy lint audit clean
 
 # Default target
 help:
@@ -54,6 +54,12 @@ tidy:
 lint:
 	go vet ./...
 	@echo "✓ Vet passed"
+
+# Dependency vulnerability scan (DEP-03). Installs govulncheck if absent.
+audit:
+	@command -v govulncheck >/dev/null 2>&1 || go install golang.org/x/vuln/cmd/govulncheck@latest
+	govulncheck ./...
+	@echo "✓ govulncheck passed"
 
 # Remove build artifacts
 clean:

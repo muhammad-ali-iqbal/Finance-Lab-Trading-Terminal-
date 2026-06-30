@@ -35,6 +35,23 @@ import (
 	"github.com/simtrader/backend/internal/types"
 )
 
+// PSX brokerage fee schedule (applied on every fill, both buy and sell).
+const (
+	feeCDCRate   = 0.0001  // 0.01% — Central Depository Company
+	feeCDCMax    = 10.0    // PKR 10 cap per transaction
+	feeNCCPLRate = 0.00017 // 0.017% — NCCPL clearing
+	feePSXRate   = 0.00003 // 0.003% — PSX transaction fee
+)
+
+// calcFees returns total PSX brokerage fees for a transaction value.
+func calcFees(tradeValue float64) float64 {
+	cdc := tradeValue * feeCDCRate
+	if cdc > feeCDCMax {
+		cdc = feeCDCMax
+	}
+	return cdc + tradeValue*feeNCCPLRate + tradeValue*feePSXRate
+}
+
 // Engine processes orders. Implements types.OrderFiller.
 type Engine struct {
 	db *pgxpool.Pool
@@ -192,6 +209,7 @@ func (e *Engine) executeFill(
 	fillTime time.Time,
 ) error {
 	totalCost := float64(quantity) * fillPrice
+	fees := calcFees(totalCost)
 
 	tx, err := e.db.Begin(ctx)
 	if err != nil {
@@ -210,11 +228,11 @@ func (e *Engine) executeFill(
 	}
 
 	if side == "buy" {
-		if cashBalance < totalCost {
-			// Reject — not enough cash
+		if cashBalance < totalCost+fees {
+			// Reject — not enough cash (trade cost + brokerage fees)
 			_, err = tx.Exec(ctx,
 				`UPDATE orders SET status='rejected', rejection_reason=$2, updated_at=NOW() WHERE id=$1`,
-				orderID, fmt.Sprintf("insufficient cash: need $%.2f, have $%.2f", totalCost, cashBalance),
+				orderID, fmt.Sprintf("insufficient cash: need %.2f (%.2f trade + %.2f fees), have %.2f", totalCost+fees, totalCost, fees, cashBalance),
 			)
 			if err != nil {
 				return err
@@ -291,9 +309,12 @@ func (e *Engine) executeFill(
 	}
 
 	// ── 4. Update cash balance ────────────────────────────────────
-	cashDelta := totalCost
+	// Buy:  debit trade cost + fees  Sell: credit proceeds - fees
+	var cashDelta float64
 	if side == "buy" {
-		cashDelta = -totalCost // debit
+		cashDelta = -(totalCost + fees)
+	} else {
+		cashDelta = totalCost - fees
 	}
 	var newBalance float64
 	err = tx.QueryRow(ctx, `
@@ -313,9 +334,9 @@ func (e *Engine) executeFill(
 		txType = "sell_fill"
 	}
 	_, err = tx.Exec(ctx, `
-		INSERT INTO transactions (id, portfolio_id, order_id, type, symbol, quantity, price, amount, balance_after)
-		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8)`,
-		portfolioID, orderID, txType, symbol, quantity, fillPrice, cashDelta, newBalance,
+		INSERT INTO transactions (id, portfolio_id, order_id, type, symbol, quantity, price, amount, fees, balance_after)
+		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		portfolioID, orderID, txType, symbol, quantity, fillPrice, cashDelta, fees, newBalance,
 	)
 	if err != nil {
 		return fmt.Errorf("insert transaction: %w", err)

@@ -186,9 +186,9 @@ On the frontend, we hit an unexpected issue: React's StrictMode + multiple compo
 - **JWT middleware** (`RequireAuth`) on protected routes; **role middleware** (`RequireRole("admin")`) on admin routes.
 
 ### Q: How do you prevent SQL injection / XSS?  **[CS]**
-- All DB access through Go's `database/sql` package with parameterized queries — no string interpolation.
+- All DB access goes through the `pgx` driver with parameterized (positional) queries — no string interpolation, so there is no SQL-injection vector.
 - React escapes interpolated values by default, so XSS is mostly a non-issue unless someone uses `dangerouslySetInnerHTML` (we don't).
-- We set `Content-Security-Policy` headers and `X-Frame-Options: DENY` on the backend.
+- The backend sets security response headers via Fiber's `helmet` middleware — `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, and HSTS (over HTTPS). The nginx frontend sets an equivalent CSP and the same headers for the SPA, and TLS is terminated by a Caddy reverse proxy that owns the HSTS header.
 
 ### Q: What's the test strategy?  **[CS]**
 Currently:

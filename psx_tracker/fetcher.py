@@ -6,6 +6,7 @@ in 2024, breaking psx-data-reader 0.0.6).
 tickers() still works fine so we use it for symbol discovery.
 """
 
+import sys
 import time
 import traceback
 from collections import defaultdict
@@ -30,6 +31,21 @@ _HISTORICAL_URL = "https://dps.psx.com.pk/historical"
 _MARKET_WATCH_URL = "https://dps.psx.com.pk/market-watch"
 _SESSION = requests.Session()
 _SESSION.headers.update({"User-Agent": "Mozilla/5.0 (psx-tracker)"})
+
+# Expected OHLCV columns. If a historical page has headers but none of these,
+# PSX has changed its HTML layout and we must fail loudly rather than silently
+# record zero rows (AVAIL-03).
+_OHLCV_COLS = {"OPEN", "HIGH", "LOW", "CLOSE", "VOLUME"}
+
+
+class ScraperError(Exception):
+    """Raised when the PSX page shape is unrecognised (likely a site redesign),
+    so the caller can flag the run as failed instead of treating it as 'no data'."""
+
+
+class PushAuthError(Exception):
+    """Raised when the backend rejects the EOD push with 401 — signals an
+    INTERNAL_SECRET mismatch, distinct from a transient network failure (SECRET-01)."""
 
 
 # ---------------------------------------------------------------------------
@@ -127,12 +143,26 @@ def _fetch_month(symbol: str, year: int, month: int) -> list[dict]:
     soup = BeautifulSoup(resp.text, "html.parser")
     headers = [th.get_text(strip=True) for th in soup.select("th")]
     if not headers:
+        # No table at all — typically a symbol with no data for that month.
         return []
+
+    # Header-shape assertion (AVAIL-03): if the page has a header row but none of
+    # the expected OHLCV columns, PSX has redesigned the page. Fail loudly so the
+    # run is recorded as an error instead of silently logging zero rows.
+    upper = {h.upper() for h in headers}
+    if not (_OHLCV_COLS & upper):
+        raise ScraperError(
+            f"PSX historical page for {symbol} {year}-{month:02d} has no OHLCV "
+            f"columns (got {headers}); the page layout may have changed."
+        )
 
     # Detect the date column name (changed from TIME -> DATE in 2024)
     date_col = next((h for h in headers if h in ("DATE", "TIME")), None)
     if date_col is None:
-        return []
+        raise ScraperError(
+            f"PSX historical page for {symbol} {year}-{month:02d} has OHLCV "
+            f"columns but no DATE/TIME column (got {headers})."
+        )
 
     rows = []
     for tr in soup.select("tr"):
@@ -200,27 +230,59 @@ def fetch_day(target_date: date | None = None):
         symbols = refresh_tickers()
     if not symbols:
         print("[Fetcher] No tickers to fetch.")
-        return
+        log_fetch(target_date, "error", 0, error="no tickers in registry")
+        _alert(f"fetch {target_date} aborted: ticker registry is empty")
+        return False
 
     total_rows = 0
     all_rows_collected: list[dict] = []
     batches = [symbols[i:i + BATCH_SIZE] for i in range(0, len(symbols), BATCH_SIZE)]
 
-    for i, batch in enumerate(batches, 1):
-        print(f"[Fetcher] Batch {i}/{len(batches)} ({len(batch)} symbols) ...", end="", flush=True)
-        batch_rows = []
-        for sym in batch:
-            batch_rows.extend(_fetch_symbol_range(sym, target_date, target_date))
-        saved = upsert_ohlcv(batch_rows)
-        all_rows_collected.extend(batch_rows)
-        total_rows += saved
-        print(f" {saved} rows")
-        if i < len(batches):
-            time.sleep(BATCH_DELAY)
+    try:
+        for i, batch in enumerate(batches, 1):
+            print(f"[Fetcher] Batch {i}/{len(batches)} ({len(batch)} symbols) ...", end="", flush=True)
+            batch_rows = []
+            for sym in batch:
+                batch_rows.extend(_fetch_symbol_range(sym, target_date, target_date))
+            saved = upsert_ohlcv(batch_rows)
+            all_rows_collected.extend(batch_rows)
+            total_rows += saved
+            print(f" {saved} rows")
+            if i < len(batches):
+                time.sleep(BATCH_DELAY)
+    except ScraperError as e:
+        # PSX layout change detected — record the failure and alert rather than
+        # logging a misleading 'ok' with zero rows (AVAIL-03).
+        log_fetch(target_date, "error", total_rows, error=str(e))
+        _alert(f"fetch {target_date} FAILED — PSX layout change: {e}")
+        raise
+
+    # Treat zero / implausibly-low row counts on a confirmed trading day as a
+    # failure: a silent empty fetch otherwise looks 'ok' and the reconciler
+    # would fill nothing or snapshot stale prices (AVAIL-03).
+    expected_min = max(1, int(len(symbols) * 0.5))
+    if _is_trading_day(target_date) and total_rows < expected_min:
+        log_fetch(target_date, "error", total_rows,
+                  error=f"only {total_rows} rows on a trading day (expected ≥ {expected_min})")
+        _alert(f"fetch {target_date}: only {total_rows} rows (expected ≥ {expected_min}) — PSX down or layout changed?")
+        return False
 
     log_fetch(target_date, "ok", total_rows)
     print(f"[Fetcher] Done. {total_rows} rows saved for {target_date}.")
     _push_to_simtrader(target_date, all_rows_collected)
+    return True
+
+
+def _is_trading_day(d: date) -> bool:
+    """Weekday that is not a known PSX holiday — i.e. a day we expect data."""
+    from config import PSX_HOLIDAYS
+    return d.weekday() < 5 and d not in PSX_HOLIDAYS
+
+
+def _alert(message: str) -> None:
+    """Emit a high-visibility alert. Today this is a clearly-tagged stderr line
+    (greppable by log-based alerting); wire to email/Slack/healthcheck as needed."""
+    print(f"[Fetcher][ALERT] {message}", file=sys.stderr, flush=True)
 
 
 def _push_to_simtrader(target_date: date, rows: list[dict]):
@@ -251,15 +313,27 @@ def _push_to_simtrader(target_date: date, rows: list[dict]):
             headers={"X-Internal-Secret": INTERNAL_SECRET},
             timeout=30,
         )
+        # Surface an auth failure distinctly from a network failure (SECRET-01):
+        # a 401 means the tracker's INTERNAL_SECRET does not match the backend's,
+        # which is a misconfiguration that would otherwise silently drop all data.
+        if resp.status_code == 401:
+            _alert(
+                f"backend rejected EOD push with 401 for {target_date} — "
+                f"INTERNAL_SECRET mismatch between psx_tracker and the backend."
+            )
+            raise PushAuthError("backend returned 401 (INTERNAL_SECRET mismatch)")
         resp.raise_for_status()
         data = resp.json()
         print(f"[Fetcher] SimTrader notified: {data.get('ingested', '?')} prices ingested for {target_date}.")
+    except PushAuthError:
+        raise
     except Exception as e:
-        print(f"[Fetcher] WARN: failed to push prices to SimTrader ({url}): {e}")
+        print(f"[Fetcher] WARN: failed to push prices to SimTrader ({url}): {e}", file=sys.stderr)
 
 
 def backfill(from_date: date, to_date: date | None = None):
-    """Fetch all trading days between from_date and to_date (inclusive)."""
+    """Fetch all trading days between from_date and to_date (inclusive),
+    then push each day's rows to SimTrader so the reconciler can fill orders."""
     if to_date is None:
         to_date = date.today() - timedelta(days=1)
 
@@ -269,7 +343,8 @@ def backfill(from_date: date, to_date: date | None = None):
 
     print(f"[Fetcher] Backfill: {from_date} -> {to_date}, {len(symbols)} symbols")
 
-    # Fetch per-symbol across the full range (one call per month per symbol)
+    # Collect all rows grouped by date
+    rows_by_date: dict[str, list[dict]] = defaultdict(list)
     total = 0
     for i, sym in enumerate(symbols, 1):
         if i % 50 == 0:
@@ -278,6 +353,8 @@ def backfill(from_date: date, to_date: date | None = None):
             rows = _fetch_symbol_range(sym, from_date, to_date)
             saved = upsert_ohlcv(rows)
             total += saved
+            for r in rows:
+                rows_by_date[r["date"]].append(r)
         except Exception:
             err = traceback.format_exc()
             log_fetch(from_date, "error", error=f"{sym}: {err}")
@@ -286,3 +363,7 @@ def backfill(from_date: date, to_date: date | None = None):
 
     log_fetch(from_date, "ok", total)
     print(f"[Fetcher] Backfill complete. {total} rows saved.")
+
+    # Push each day's data to SimTrader so the challenge reconciler can process it
+    for day_str in sorted(rows_by_date.keys()):
+        _push_to_simtrader(date.fromisoformat(day_str), rows_by_date[day_str])

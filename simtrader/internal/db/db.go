@@ -12,6 +12,11 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -22,8 +27,23 @@ import (
 var Pool *pgxpool.Pool
 
 // Connect opens the connection pool and verifies the database is reachable.
-// Call this once at application startup.
-func Connect(databaseURL string) error {
+// Call this once at application startup. In production it refuses a DATABASE_URL
+// that would connect without TLS, so student PII/credentials are never sent in
+// cleartext to a managed database (DATA-03).
+func Connect(databaseURL, env string) error {
+	// In production, require TLS to the database so PII/credentials are never
+	// sent in cleartext (DATA-03). The single-host compose deployment runs
+	// Postgres on a private docker network with no TLS; that specific case can
+	// opt out with DB_REQUIRE_TLS=false (logged loudly). A managed/remote DB
+	// must keep TLS on.
+	if env == "production" && os.Getenv("DB_REQUIRE_TLS") != "false" {
+		if err := requireTLS(databaseURL); err != nil {
+			return err
+		}
+	} else if env == "production" {
+		log.Println("⚠  DB_REQUIRE_TLS=false — database TLS enforcement disabled (only safe on a trusted private network)")
+	}
+
 	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		return fmt.Errorf("failed to parse database URL: %w", err)
@@ -56,6 +76,95 @@ func Connect(databaseURL string) error {
 	}
 
 	Pool = pool
+	return nil
+}
+
+// requireTLS rejects a DATABASE_URL whose sslmode would permit an unencrypted
+// connection (disable/allow/prefer, or unset which defaults to prefer in pgx).
+func requireTLS(databaseURL string) error {
+	cfg, err := pgxpool.ParseConfig(databaseURL)
+	if err != nil {
+		return fmt.Errorf("failed to parse database URL: %w", err)
+	}
+	mode := ""
+	if cfg.ConnConfig.TLSConfig == nil {
+		mode = "disabled"
+	}
+	// Inspect the raw sslmode for a precise, actionable error message.
+	lower := strings.ToLower(databaseURL)
+	for _, weak := range []string{"sslmode=disable", "sslmode=allow", "sslmode=prefer"} {
+		if strings.Contains(lower, weak) {
+			return fmt.Errorf("DATABASE_URL has %s but ENV=production requires TLS — use sslmode=require (or verify-full)", weak)
+		}
+	}
+	if !strings.Contains(lower, "sslmode=") || mode == "disabled" {
+		return fmt.Errorf("DATABASE_URL does not enforce TLS but ENV=production requires it — append sslmode=require")
+	}
+	return nil
+}
+
+// Migrate runs only the *.sql files in migrationsDir that have not been
+// applied before. Applied filenames are recorded in a schema_migrations table
+// so re-running the server never touches already-applied migrations.
+func Migrate(migrationsDir string) error {
+	ctx := context.Background()
+
+	// Ensure the tracking table exists.
+	_, err := Pool.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS schema_migrations (
+			filename   TEXT        PRIMARY KEY,
+			applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		)`)
+	if err != nil {
+		return fmt.Errorf("create schema_migrations: %w", err)
+	}
+
+	// Load the set of already-applied filenames.
+	rows, err := Pool.Query(ctx, `SELECT filename FROM schema_migrations`)
+	if err != nil {
+		return fmt.Errorf("query schema_migrations: %w", err)
+	}
+	applied := make(map[string]bool)
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			rows.Close()
+			return err
+		}
+		applied[name] = true
+	}
+	rows.Close()
+
+	// Collect and sort migration files.
+	entries, err := os.ReadDir(migrationsDir)
+	if err != nil {
+		return fmt.Errorf("read migrations dir: %w", err)
+	}
+	var files []string
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(e.Name(), ".sql") {
+			files = append(files, e.Name())
+		}
+	}
+	sort.Strings(files)
+
+	// Run only new files, recording each in schema_migrations.
+	for _, name := range files {
+		if applied[name] {
+			continue
+		}
+		sql, err := os.ReadFile(filepath.Join(migrationsDir, name))
+		if err != nil {
+			return fmt.Errorf("read %s: %w", name, err)
+		}
+		if _, err := Pool.Exec(ctx, string(sql)); err != nil {
+			return fmt.Errorf("apply %s: %w", name, err)
+		}
+		if _, err := Pool.Exec(ctx, `INSERT INTO schema_migrations (filename) VALUES ($1)`, name); err != nil {
+			return fmt.Errorf("record %s: %w", name, err)
+		}
+		log.Printf("[migrate] ✓ %s", name)
+	}
 	return nil
 }
 

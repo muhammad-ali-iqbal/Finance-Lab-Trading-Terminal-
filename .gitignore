@@ -1,3 +1,23 @@
 # AI assistant context files (personalized per user)
 QWEN.md
 CLAUDE.md
+
+# Environment files — never commit real secrets.
+# Generic glob catches .env, .env.local, .env.staging, .env.production, etc.
+.env
+.env.*
+# ...but keep the committed template.
+!.env.example
+
+# SQLite databases
+*.db
+*.sqlite
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.rar

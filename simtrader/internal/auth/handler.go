@@ -12,8 +12,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/simtrader/backend/internal/httputil"
+	"github.com/simtrader/backend/internal/passwords"
 	"github.com/simtrader/backend/internal/user"
 )
+
+// maxNameLen bounds free-text name fields to prevent DB bloat (INPUT-01).
+const maxNameLen = 100
 
 type Handler struct {
 	service *Service
@@ -24,15 +28,16 @@ func NewHandler(service *Service) *Handler {
 }
 
 // RegisterRoutes attaches all auth routes to a Fiber app.
-// Public routes — no auth middleware.
-func (h *Handler) RegisterRoutes(app *fiber.App) {
+// rateLimiter is applied to login, register, forgot-password, and reset-password
+// to prevent brute-force and credential-stuffing attacks.
+func (h *Handler) RegisterRoutes(app *fiber.App, rateLimiter, refreshLimiter fiber.Handler) {
 	auth := app.Group("/api/auth")
-	auth.Post("/login", h.Login)
-	auth.Post("/register", h.CompleteRegistration) // student clicks invite link
-	auth.Post("/refresh", h.RefreshTokens)
-	auth.Post("/logout", h.Logout)
-	auth.Post("/forgot-password", h.ForgotPassword)
-	auth.Post("/reset-password", h.ResetPassword)
+	auth.Post("/login", rateLimiter, h.Login)
+	auth.Post("/register", rateLimiter, h.CompleteRegistration)
+	auth.Post("/refresh", refreshLimiter, h.RefreshTokens)
+	auth.Post("/logout", refreshLimiter, h.Logout)
+	auth.Post("/forgot-password", rateLimiter, h.ForgotPassword)
+	auth.Post("/reset-password", rateLimiter, h.ResetPassword)
 }
 
 // ── Request / Response shapes ────────────────────────────────────────────────
@@ -115,8 +120,11 @@ func (h *Handler) CompleteRegistration(c *fiber.Ctx) error {
 	if req.FirstName == "" || req.LastName == "" {
 		return httputil.BadRequest(c, "first name and last name are required")
 	}
-	if len(req.Password) < 8 {
-		return httputil.BadRequest(c, "password must be at least 8 characters")
+	if len(req.FirstName) > maxNameLen || len(req.LastName) > maxNameLen {
+		return httputil.BadRequest(c, "first and last name must be at most 100 characters")
+	}
+	if msg, ok := passwords.Validate(req.Password); !ok {
+		return httputil.BadRequest(c, msg)
 	}
 
 	tokens, u, err := h.service.CompleteRegistration(
@@ -205,8 +213,8 @@ func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	if req.Token == "" {
 		return httputil.BadRequest(c, "reset token is required")
 	}
-	if len(req.NewPassword) < 8 {
-		return httputil.BadRequest(c, "password must be at least 8 characters")
+	if msg, ok := passwords.Validate(req.NewPassword); !ok {
+		return httputil.BadRequest(c, msg)
 	}
 
 	if err := h.service.ResetPassword(c.Context(), req.Token, req.NewPassword); err != nil {

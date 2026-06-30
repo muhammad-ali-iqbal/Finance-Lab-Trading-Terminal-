@@ -3,9 +3,13 @@
 package middleware
 
 import (
+	"context"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/types"
 )
 
@@ -16,8 +20,54 @@ type TokenParser interface {
 	ParseAccessToken(token string) (*types.Claims, error)
 }
 
-// RequireAuth validates the Bearer token and stores claims in the request context.
-func RequireAuth(parser TokenParser) fiber.Handler {
+// StatusGuard answers "is this user still active?" with a short-lived in-memory
+// cache so a blocked student loses access within seconds rather than waiting up
+// to 15 minutes for their access token to expire (AUTH-04). The cache bounds the
+// added DB load to roughly one query per user per TTL.
+type StatusGuard struct {
+	lookup func(ctx context.Context, id uuid.UUID) (string, error)
+	ttl    time.Duration
+	mu     sync.Mutex
+	cache  map[uuid.UUID]statusEntry
+}
+
+type statusEntry struct {
+	blocked bool
+	expires time.Time
+}
+
+// NewStatusGuard builds a guard. lookup returns the user's status string.
+func NewStatusGuard(lookup func(ctx context.Context, id uuid.UUID) (string, error), ttl time.Duration) *StatusGuard {
+	return &StatusGuard{lookup: lookup, ttl: ttl, cache: map[uuid.UUID]statusEntry{}}
+}
+
+// isBlocked reports whether the user is blocked, consulting the cache first.
+// On a lookup error it fails open (returns false) so a transient DB blip does
+// not lock everyone out — the refresh path still re-checks status authoritatively.
+func (g *StatusGuard) isBlocked(ctx context.Context, id uuid.UUID) bool {
+	now := time.Now()
+	g.mu.Lock()
+	if e, ok := g.cache[id]; ok && now.Before(e.expires) {
+		g.mu.Unlock()
+		return e.blocked
+	}
+	g.mu.Unlock()
+
+	status, err := g.lookup(ctx, id)
+	if err != nil {
+		return false
+	}
+	blocked := status == "blocked"
+	g.mu.Lock()
+	g.cache[id] = statusEntry{blocked: blocked, expires: now.Add(g.ttl)}
+	g.mu.Unlock()
+	return blocked
+}
+
+// RequireAuth validates the Bearer token and stores claims in the request
+// context. If guard is non-nil, it also rejects users blocked since the token
+// was issued.
+func RequireAuth(parser TokenParser, guard *StatusGuard) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := extractBearerToken(c)
 		if token == "" {
@@ -30,6 +80,13 @@ func RequireAuth(parser TokenParser) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or expired session. Please log in again.",
 			})
+		}
+		if guard != nil {
+			if id, err := uuid.Parse(claims.UserID); err == nil && guard.isBlocked(c.Context(), id) {
+				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+					"error": "Your account has been suspended. Contact your instructor.",
+				})
+			}
 		}
 		c.Locals(claimsKey, claims)
 		return c.Next()

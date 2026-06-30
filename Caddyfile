@@ -1,0 +1,27 @@
+# Caddyfile — TLS termination + automatic HTTPS for SimTrader (INFRA-01)
+#
+# Caddy obtains and renews Let's Encrypt certificates automatically for the
+# domain set in the DOMAIN env var, redirects HTTP→HTTPS, and reverse-proxies
+# to the nginx frontend container (which serves the SPA and proxies /api to the
+# Go backend). It also adds HSTS, which is only valid on the TLS-terminating hop.
+#
+# Set DOMAIN and ACME_EMAIL in your .env. For a purely local/LAN deployment
+# with no public DNS, set DOMAIN=localhost and Caddy will use a local CA.
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# HTTP Strict Transport Security — 1 year, include subdomains, preload.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		-Server
+	}
+
+	reverse_proxy frontend:80 {
+		header_up X-Forwarded-Proto https
+	}
+}

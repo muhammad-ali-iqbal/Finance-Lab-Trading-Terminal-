@@ -112,12 +112,18 @@ func (s *Service) InviteStudent(ctx context.Context, email string) (*user.User, 
 		return nil, fmt.Errorf("generate invite token: %w", err)
 	}
 
+	// Store only the SHA-256 hash of the token — the raw token lives only in
+	// the email/URL. A DB read therefore cannot be redeemed (AUTH-01).
+	inviteHash := hashToken(inviteToken)
+	inviteExpiry := time.Now().Add(7 * 24 * time.Hour) // matches "expires in 7 days" copy (AUTH-02)
+
 	u := &user.User{
-		ID:          uuid.New(),
-		Email:       email,
-		Role:        user.RoleStudent,
-		Status:      user.StatusPending,
-		InviteToken: &inviteToken,
+		ID:           uuid.New(),
+		Email:        email,
+		Role:         user.RoleStudent,
+		Status:       user.StatusPending,
+		InviteToken:  &inviteHash,
+		InviteExpiry: &inviteExpiry,
 	}
 
 	if err := s.users.Create(ctx, u); err != nil {
@@ -137,7 +143,8 @@ func (s *Service) InviteStudent(ctx context.Context, email string) (*user.User, 
 // CompleteRegistration handles the student clicking their invite link.
 // They supply their name, password, and the token from the URL.
 func (s *Service) CompleteRegistration(ctx context.Context, inviteToken, firstName, lastName, password string) (*TokenPair, *user.User, error) {
-	u, err := s.users.GetByInviteToken(ctx, inviteToken)
+	// Look up by the hash — the DB never holds the raw token (AUTH-01).
+	u, err := s.users.GetByInviteToken(ctx, hashToken(inviteToken))
 	if err != nil {
 		if errors.Is(err, user.ErrNotFound) {
 			return nil, nil, user.ErrInvalidToken
@@ -186,7 +193,8 @@ func (s *Service) ForgotPassword(ctx context.Context, email string) error {
 	}
 
 	expiry := time.Now().Add(1 * time.Hour)
-	if err := s.users.SetResetToken(ctx, u.ID, resetToken, expiry); err != nil {
+	// Persist only the hash; the raw token travels in the email (AUTH-01).
+	if err := s.users.SetResetToken(ctx, u.ID, hashToken(resetToken), expiry); err != nil {
 		return fmt.Errorf("set reset token: %w", err)
 	}
 
@@ -196,7 +204,7 @@ func (s *Service) ForgotPassword(ctx context.Context, email string) error {
 
 // ResetPassword validates the reset token and sets the new password.
 func (s *Service) ResetPassword(ctx context.Context, resetToken, newPassword string) error {
-	u, err := s.users.GetByResetToken(ctx, resetToken)
+	u, err := s.users.GetByResetToken(ctx, hashToken(resetToken))
 	if err != nil {
 		return err // propagates ErrInvalidToken
 	}

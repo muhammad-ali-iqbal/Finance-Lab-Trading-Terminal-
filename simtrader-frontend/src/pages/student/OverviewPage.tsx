@@ -11,8 +11,9 @@ import { useTheme } from '@/context/ThemeContext'
 import { StatCard, Card, EmptyState, Spinner, Button } from '@/components/ui'
 import {
   TrendingUp, TrendingDown, Trophy, Briefcase, Activity,
-  ArrowUpRight, ArrowDownRight,
+  ArrowUpRight, ArrowDownRight, Download,
 } from 'lucide-react'
+import { downloadCSV } from '@/utils/csv'
 import clsx from 'clsx'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -142,7 +143,7 @@ export default function OverviewPage() {
   const isDark = theme === 'dark'
   const user = useAuthStore(s => s.user)
 
-  const { data: sim } = useQuery({
+  const { data: sim, isLoading: simLoading } = useQuery({
     queryKey: ['simulation', 'active'],
     queryFn: simulationApi.getActive,
     retry: false,
@@ -231,6 +232,26 @@ export default function OverviewPage() {
   }, [ordersData])
 
   const isMarketOpen = sim?.status === 'active'
+
+  if (simLoading) {
+    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+  }
+
+  if (!sim) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center px-6">
+        <div className="w-16 h-16 rounded-full bg-surface-secondary dark:bg-dark-surface-secondary flex items-center justify-center">
+          <Briefcase className="w-8 h-8 text-ink-disabled dark:text-dark-ink-disabled" />
+        </div>
+        <div>
+          <p className="text-base font-semibold text-ink dark:text-dark-ink">No simulation running</p>
+          <p className="text-sm text-ink-tertiary dark:text-dark-ink-tertiary mt-1">
+            Your instructor will start a simulation during class. Check back soon.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   if (portfolioLoading || !enriched) {
     return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
@@ -478,6 +499,22 @@ export default function OverviewPage() {
           <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center gap-2">
             <Trophy className="w-4 h-4 text-warning" />
             <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Leaderboard</h2>
+            {leaderboard.length > 0 && (
+              <button
+                onClick={() => {
+                  const rows: string[][] = [['Rank', 'Name', 'Total Equity (PKR)']]
+                  leaderboard.forEach((e: LeaderboardEntry) => {
+                    rows.push([String(e.rank), e.name, String(e.totalEquity.toFixed(2))])
+                  })
+                  downloadCSV(rows, 'simulation-leaderboard.csv')
+                }}
+                className="ml-auto flex items-center gap-1 text-xs text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink transition-colors"
+                title="Download CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
+                CSV
+              </button>
+            )}
           </div>
           {leaderboard.length === 0 ? (
             <div className="px-4 py-8 text-center text-xs text-ink-tertiary dark:text-dark-ink-tertiary">

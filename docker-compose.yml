@@ -6,7 +6,9 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: simtrader
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # SECRET-03: ':?' makes `docker compose up` abort if the value is empty,
+      # instead of silently creating a superuser with a blank password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       POSTGRES_DB: simtrader
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -30,14 +32,22 @@ services:
     environment:
       PORT: 8080
       ENV: production
-      DATABASE_URL: postgres://simtrader:${POSTGRES_PASSWORD}@postgres:5432/simtrader
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      DATABASE_URL: postgres://simtrader:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/simtrader
+      # Postgres here is on the private docker network with no TLS, so DB TLS
+      # enforcement (DATA-03) is explicitly opted out for this hop only. A
+      # managed/remote DB must instead use sslmode=require and drop this line.
+      DB_REQUIRE_TLS: "false"
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET must be set}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET must be set}
       JWT_ACCESS_EXPIRY: 15m
       JWT_REFRESH_EXPIRY: 168h
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
-      INTERNAL_SECRET: ${INTERNAL_SECRET}
-      SMTP_HOST: ${SMTP_HOST:-}
+      FRONTEND_URL: ${FRONTEND_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET:?INTERNAL_SECRET must be set}
+      # Mandatory admin credentials (INFRA-02): the backend refuses to boot in
+      # production if these are unset, so no default admin is ever exposed.
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL must be set}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set}
+      SMTP_HOST: ${SMTP_HOST:?SMTP_HOST is required in production (NoOpMailer leaks tokens)}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
@@ -48,30 +58,58 @@ services:
     volumes:
       - uploads:/app/uploads       # user avatar uploads
       - psx_data:/data             # SQLite database shared with psx_tracker
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health').status==200 else 1)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # ── React frontend (Nginx) ────────────────────────────────────────────────────
   frontend:
     build: ./simtrader-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    # No host port published — Caddy terminates TLS and proxies to this service
+    # over the internal network (INFRA-01).
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ── Caddy reverse proxy — automatic HTTPS / TLS termination (INFRA-01) ─────────
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_healthy
     ports:
       - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN must be set (use localhost for local-only deployments)}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
 
   # ── PSX tracker (daily EOD scheduler) ────────────────────────────────────────
-  # Runs python3 main.py which starts the scheduler and fetches at 16:00 PKT.
-  # On startup it also backfills any trading days missed since the last run.
-  # One-off commands (backfill, status, etc.) can be run with:
-  #   docker compose run --rm psx_tracker python3 main.py fetch
-  #   docker compose run --rm psx_tracker python3 main.py backfill 2026-01-01
   psx_tracker:
     build: ./psx_tracker
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       SIMTRADER_URL: http://backend:8080
-      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      INTERNAL_SECRET: ${INTERNAL_SECRET:?INTERNAL_SECRET must be set}
       PSX_DB_PATH: /data/psx_data.db
     volumes:
       - psx_data:/data             # same volume as backend so both see the SQLite DB
@@ -80,3 +118,5 @@ volumes:
   postgres_data:
   uploads:
   psx_data:
+  caddy_data:
+  caddy_config:

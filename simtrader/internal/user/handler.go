@@ -8,6 +8,8 @@ package user
 import (
 	"context"
 	"errors"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +18,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
+	"github.com/simtrader/backend/internal/passwords"
 )
+
+// maxNameLen bounds free-text name fields to prevent DB bloat (INPUT-01).
+const maxNameLen = 100
 
 // PasswordVerifier breaks the circular dependency between user and auth packages.
 // auth.Service implements this interface — user/handler.go never imports auth directly.
@@ -53,6 +59,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	admin.Get("/:id", h.GetUser)
 	admin.Post("/:id/block", h.BlockUser)
 	admin.Post("/:id/unblock", h.UnblockUser)
+	admin.Delete("/:id", h.DeleteUser)
 }
 
 // ── Request shapes ────────────────────────────────────────────────────────────
@@ -108,6 +115,9 @@ func (h *Handler) UpdateMyProfile(c *fiber.Ctx) error {
 	if req.FirstName == "" || req.LastName == "" {
 		return httputil.BadRequest(c, "first name and last name are required")
 	}
+	if len(req.FirstName) > maxNameLen || len(req.LastName) > maxNameLen {
+		return httputil.BadRequest(c, "first and last name must be at most 100 characters")
+	}
 
 	// We do a targeted UPDATE rather than a full model save.
 	// This prevents accidental overwrites of fields we didn't intend to change.
@@ -134,8 +144,11 @@ func (h *Handler) ChangeMyPassword(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return httputil.BadRequest(c, "invalid request body")
 	}
-	if req.CurrentPassword == "" || len(req.NewPassword) < 8 {
-		return httputil.BadRequest(c, "current password required; new password must be 8+ characters")
+	if req.CurrentPassword == "" {
+		return httputil.BadRequest(c, "current password is required")
+	}
+	if msg, ok := passwords.Validate(req.NewPassword); !ok {
+		return httputil.BadRequest(c, msg)
 	}
 
 	u, err := h.repo.GetByID(c.Context(), uid)
@@ -249,6 +262,29 @@ func (h *Handler) UnblockUser(c *fiber.Ctx) error {
 	return h.setUserStatus(c, StatusActive)
 }
 
+// DeleteUser permanently removes a student account.
+// DELETE /api/admin/users/:id
+func (h *Handler) DeleteUser(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid user id")
+	}
+	u, err := h.repo.GetByID(c.Context(), id)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if u == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "user not found"})
+	}
+	if u.Role == RoleAdmin {
+		return httputil.BadRequest(c, "cannot delete admin accounts")
+	}
+	if err := h.repo.Delete(c.Context(), id); err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
 // UploadAvatar godoc
 // POST /api/me/avatar
 // Multipart form field: "file" (JPEG, PNG, WebP or GIF)
@@ -265,6 +301,13 @@ func (h *Handler) UploadAvatar(c *fiber.Ctx) error {
 	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
 	if !allowed[ext] {
 		return httputil.BadRequest(c, "only JPEG, PNG, WebP or GIF images are allowed")
+	}
+
+	// Verify the actual file bytes, not just the client-supplied extension
+	// (INPUT-02). Sniff the first 512 bytes and confirm a real raster-image
+	// signature, so a non-image payload can't be stored under an image name.
+	if !hasImageSignature(file) {
+		return httputil.BadRequest(c, "file content is not a valid image")
 	}
 
 	dir := "./uploads/avatars"
@@ -341,6 +384,26 @@ func (h *Handler) RemoveAvatar(c *fiber.Ctx) error {
 		return httputil.InternalError(c)
 	}
 	return c.JSON(u.ToPublicProfile())
+}
+
+// hasImageSignature opens the uploaded file, reads the first 512 bytes, and
+// confirms they sniff to a raster image content type (INPUT-02).
+func hasImageSignature(fh *multipart.FileHeader) bool {
+	f, err := fh.Open()
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	buf := make([]byte, 512)
+	n, _ := f.Read(buf)
+	ct := http.DetectContentType(buf[:n])
+	switch ct {
+	case "image/jpeg", "image/png", "image/webp", "image/gif":
+		return true
+	default:
+		return false
+	}
 }
 
 func (h *Handler) setUserStatus(c *fiber.Ctx, status Status) error {

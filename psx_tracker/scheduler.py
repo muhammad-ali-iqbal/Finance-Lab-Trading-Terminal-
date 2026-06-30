@@ -1,20 +1,39 @@
 """
-Runs as a long-lived process.  Every weekday at EOD_FETCH_TIME (PKT) it
-fetches the day's OHLCV for all PSX stocks and writes it to the database.
+Runs as a long-lived process.  Every weekday at EOD_FETCH_TIME (Asia/Karachi)
+it fetches the day's OHLCV for all PSX stocks and writes it to the database.
 
 Also does a ticker refresh every Sunday so new listings are picked up.
 """
 
+import os
 import signal
 import sys
 import time
-from datetime import date
+from datetime import date, timedelta
 
 import schedule
 
-from config import EOD_FETCH_TIME, START_DATE
+from config import (
+    EOD_FETCH_TIME,
+    EOD_RETRY_ATTEMPTS,
+    EOD_RETRY_DELAY_MIN,
+    MAX_BACKFILL_DAYS,
+    START_DATE,
+    TIMEZONE,
+)
 from database import init_db, last_fetch_date
-from fetcher import fetch_day, refresh_tickers, sync_active_flags
+from fetcher import ScraperError, backfill, fetch_day, refresh_tickers, sync_active_flags
+
+
+def _force_timezone():
+    """Pin the process to PSX local time so schedule.every().day.at(...) fires
+    at the right wall-clock moment even on a UTC cloud host (AVAIL-04)."""
+    os.environ["TZ"] = TIMEZONE
+    if hasattr(time, "tzset"):
+        time.tzset()
+        print(f"[Scheduler] Timezone pinned to {TIMEZONE}.")
+    else:
+        print(f"[Scheduler] WARN: time.tzset() unavailable; relying on host TZ for {TIMEZONE}.")
 
 
 def _eod_job():
@@ -22,7 +41,25 @@ def _eod_job():
     if today.weekday() >= 5:  # Sat/Sun — PSX is closed
         print(f"[Scheduler] Weekend ({today}), skipping.")
         return
-    fetch_day(today)
+
+    # Try the fetch, with bounded same-day retries for a transient empty/failed
+    # result (e.g. PSX slow to publish close data). A layout change raises
+    # ScraperError and is not retried — retrying cannot fix a redesign (AVAIL-04).
+    ok = False
+    for attempt in range(1, EOD_RETRY_ATTEMPTS + 1):
+        try:
+            ok = bool(fetch_day(today))
+        except ScraperError as e:
+            print(f"[Scheduler] EOD fetch failed (layout change), not retrying: {e}")
+            ok = False
+            break
+        if ok:
+            break
+        if attempt < EOD_RETRY_ATTEMPTS:
+            print(f"[Scheduler] EOD fetch attempt {attempt} empty/failed; "
+                  f"retrying in {EOD_RETRY_DELAY_MIN} min ...")
+            time.sleep(EOD_RETRY_DELAY_MIN * 60)
+
     # Sync active flags after the fetch — only runs on weekdays that are not
     # PSX holidays (the guard lives inside sync_active_flags).
     sync_active_flags()
@@ -36,26 +73,38 @@ def _ticker_refresh_job():
 
 
 def _catch_up():
-    """If the process was offline, backfill missing trading days."""
-    from fetcher import backfill
-
+    """If the process was offline, backfill missing trading days — bounded so a
+    long outage does not trigger an unbounded multi-month grind (AVAIL-04)."""
     last = last_fetch_date()
     if last is None:
-        # First ever run — start from START_DATE
-        start = START_DATE
+        start = START_DATE  # first ever run
     else:
-        from datetime import timedelta
         start = date.fromisoformat(last) + timedelta(days=1)
 
     today = date.today()
-    if start <= today:
-        print(f"[Scheduler] Catching up from {start} to {today} ...")
-        backfill(start, today)
-    else:
+    if start > today:
         print("[Scheduler] Database is up to date.")
+        return
+
+    gap_days = (today - start).days
+    if gap_days > MAX_BACKFILL_DAYS:
+        capped_start = today - timedelta(days=MAX_BACKFILL_DAYS)
+        print(f"[Scheduler][ALERT] Gap of {gap_days} days exceeds cap "
+              f"({MAX_BACKFILL_DAYS}); backfilling only {capped_start}..{today}. "
+              f"Range {start}..{capped_start - timedelta(days=1)} was skipped — "
+              f"run a manual backfill if you need it.", file=sys.stderr, flush=True)
+        start = capped_start
+
+    print(f"[Scheduler] Catching up from {start} to {today} ...")
+    try:
+        backfill(start, today)
+    except ScraperError as e:
+        print(f"[Scheduler][ALERT] Catch-up backfill aborted (PSX layout change): {e}",
+              file=sys.stderr, flush=True)
 
 
 def run():
+    _force_timezone()
     init_db()
     refresh_tickers()
     sync_active_flags()   # guarded internally — skips weekends and holidays
@@ -67,7 +116,7 @@ def run():
     # Weekly ticker refresh (Sunday midnight)
     schedule.every().sunday.at("00:00").do(_ticker_refresh_job)
 
-    print(f"[Scheduler] Running. EOD fetch scheduled at {EOD_FETCH_TIME} PKT.")
+    print(f"[Scheduler] Running. EOD fetch scheduled at {EOD_FETCH_TIME} {TIMEZONE}.")
     print("[Scheduler] Press Ctrl+C to stop.")
 
     def _stop(sig, frame):

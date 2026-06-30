@@ -10,10 +10,13 @@ package challenge
 
 import (
 	"context"
+	"errors"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -23,6 +26,12 @@ var pktLocation = time.FixedZone("PKT", 5*60*60)
 type Reconciler struct {
 	repo *Repository
 	db   *pgxpool.Pool
+
+	// mu serialises reconciliation runs. Three sources can trigger a run (the
+	// nightly goroutine, the EOD-prices webhook, and admin reconcile); without
+	// this they could fill the same pending order twice (AVAIL-02). Combined
+	// with the per-order transaction + status guard below, fills are idempotent.
+	mu sync.Mutex
 }
 
 func NewReconciler(repo *Repository, db *pgxpool.Pool) *Reconciler {
@@ -85,6 +94,10 @@ func (r *Reconciler) RunForDate(date string) {
 // RunForChallenge processes all pending orders for one challenge on a given date
 // and records daily snapshots. Returns the number of orders filled.
 func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID, date string) (int, error) {
+	// Serialise all reconciliation so concurrent triggers cannot double-fill.
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	orders, err := r.repo.ListPendingOrders(ctx, challengeID)
 	if err != nil {
 		return 0, err
@@ -145,62 +158,18 @@ func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID,
 			continue
 		}
 
-		// Load participant cash
-		participant, err := r.repo.GetParticipantByID(ctx, o.ParticipantID)
-		if err != nil || participant == nil {
-			continue
-		}
-
-		if o.Side == "buy" {
-			cost := float64(o.Quantity) * fillPrice
-			if cost > participant.CashBalance {
-				if err := r.repo.RejectOrder(ctx, o.ID, "insufficient cash at fill time"); err != nil {
-					log.Printf("[challenge] reject order %s: %v", o.ID, err)
-				}
-				continue
-			}
-			// Deduct cash
-			newCash := participant.CashBalance - cost
-			if err := r.repo.UpdateCash(ctx, o.ParticipantID, newCash); err != nil {
-				continue
-			}
-			participant.CashBalance = newCash
-
-			// Update position (weighted avg cost)
-			if err := r.updatePosition(ctx, o, fillPrice); err != nil {
-				continue
-			}
-		} else { // sell
-			positions, _ := r.repo.GetPositions(ctx, o.ParticipantID)
-			held := 0
-			for _, pos := range positions {
-				if pos.Symbol == o.Symbol {
-					held = pos.Quantity
-					break
-				}
-			}
-			if o.Quantity > held {
-				if err := r.repo.RejectOrder(ctx, o.ID, "insufficient shares at fill time"); err != nil {
-					log.Printf("[challenge] reject order %s: %v", o.ID, err)
-				}
-				continue
-			}
-			proceeds := float64(o.Quantity) * fillPrice
-			newCash := participant.CashBalance + proceeds
-			if err := r.repo.UpdateCash(ctx, o.ParticipantID, newCash); err != nil {
-				continue
-			}
-			participant.CashBalance = newCash
-			if err := r.updatePosition(ctx, o, fillPrice); err != nil {
-				continue
-			}
-		}
-
-		if err := r.repo.FillOrder(ctx, o.ID, fillPrice, date); err != nil {
+		// All cash/position/order writes for this order happen in one atomic
+		// transaction so a partial failure can never deduct cash without
+		// granting shares, and the status guard prevents a double-fill
+		// (AVAIL-01 / AVAIL-02).
+		didFill, err := r.fillOrder(ctx, o, fillPrice, date)
+		if err != nil {
 			log.Printf("[challenge] fill order %s: %v", o.ID, err)
 			continue
 		}
-		filled++
+		if didFill {
+			filled++
+		}
 	}
 
 	// Take daily portfolio snapshots for all participants
@@ -211,48 +180,160 @@ func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID,
 	return filled, nil
 }
 
-func (r *Reconciler) updatePosition(ctx context.Context, o ChallengeOrder, fillPrice float64) error {
-	positions, err := r.repo.GetPositions(ctx, o.ParticipantID)
+// fillOrder fills a single pending order inside one database transaction.
+// It locks the order row (idempotency), the participant cash row, and the
+// position row, performs the cash + position + order-status writes atomically,
+// and only commits if the order was still pending. Returns true if the order
+// was filled, false if it was rejected or already processed by another run.
+func (r *Reconciler) fillOrder(ctx context.Context, o ChallengeOrder, fillPrice float64, date string) (bool, error) {
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return err
+		return false, err
+	}
+	defer tx.Rollback(ctx) // no-op once committed
+
+	// Lock the order row and confirm it is still pending. This is the core
+	// idempotency guard: a concurrent run blocks here and then sees a
+	// non-pending status, so the same order is never filled twice.
+	var status string
+	if err := tx.QueryRow(ctx,
+		`SELECT status FROM challenge_orders WHERE id=$1 FOR UPDATE`, o.ID,
+	).Scan(&status); err != nil {
+		return false, err
+	}
+	if status != "pending" {
+		return false, nil // already filled/rejected/cancelled elsewhere
 	}
 
-	var existing *ChallengePosition
-	for i := range positions {
-		if positions[i].Symbol == o.Symbol {
-			existing = &positions[i]
-			break
-		}
-	}
-
-	var pos ChallengePosition
-	if existing != nil {
-		pos = *existing
-	} else {
-		pos = ChallengePosition{
-			ID:            uuid.New(),
-			ChallengeID:   o.ChallengeID,
-			ParticipantID: o.ParticipantID,
-			Symbol:        o.Symbol,
-		}
+	// Lock the participant cash row for the duration of the transaction.
+	var cash float64
+	if err := tx.QueryRow(ctx,
+		`SELECT cash_balance FROM challenge_participants WHERE id=$1 FOR UPDATE`, o.ParticipantID,
+	).Scan(&cash); err != nil {
+		return false, err
 	}
 
 	if o.Side == "buy" {
-		oldValue := float64(pos.Quantity) * pos.AvgCost
+		cost := float64(o.Quantity) * fillPrice
+		if cost > cash {
+			if _, err := tx.Exec(ctx,
+				`UPDATE challenge_orders SET status='rejected', reject_reason=$2 WHERE id=$1 AND status='pending'`,
+				o.ID, "insufficient cash at fill time"); err != nil {
+				return false, err
+			}
+			return false, tx.Commit(ctx)
+		}
+		if _, err := tx.Exec(ctx,
+			`UPDATE challenge_participants SET cash_balance = cash_balance - $2 WHERE id=$1`,
+			o.ParticipantID, cost); err != nil {
+			return false, err
+		}
+		if err := upsertPositionTx(ctx, tx, o, fillPrice, true); err != nil {
+			return false, err
+		}
+	} else { // sell
+		held, err := lockedHeldQty(ctx, tx, o.ParticipantID, o.Symbol)
+		if err != nil {
+			return false, err
+		}
+		if o.Quantity > held {
+			if _, err := tx.Exec(ctx,
+				`UPDATE challenge_orders SET status='rejected', reject_reason=$2 WHERE id=$1 AND status='pending'`,
+				o.ID, "insufficient shares at fill time"); err != nil {
+				return false, err
+			}
+			return false, tx.Commit(ctx)
+		}
+		proceeds := float64(o.Quantity) * fillPrice
+		if _, err := tx.Exec(ctx,
+			`UPDATE challenge_participants SET cash_balance = cash_balance + $2 WHERE id=$1`,
+			o.ParticipantID, proceeds); err != nil {
+			return false, err
+		}
+		if err := upsertPositionTx(ctx, tx, o, fillPrice, false); err != nil {
+			return false, err
+		}
+	}
+
+	// Fill with a status guard — if a concurrent run beat us to it, this
+	// affects zero rows and we roll back rather than double-count.
+	tag, err := tx.Exec(ctx,
+		`UPDATE challenge_orders SET status='filled', fill_price=$2, fill_date=$3 WHERE id=$1 AND status='pending'`,
+		o.ID, fillPrice, date)
+	if err != nil {
+		return false, err
+	}
+	if tag.RowsAffected() == 0 {
+		return false, nil // lost the race; defer rolls back
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// lockedHeldQty returns the quantity currently held for a symbol, locking the
+// position row FOR UPDATE so the sell check and the subsequent write are atomic.
+func lockedHeldQty(ctx context.Context, tx pgx.Tx, participantID uuid.UUID, symbol string) (int, error) {
+	var qty int
+	err := tx.QueryRow(ctx,
+		`SELECT quantity FROM challenge_positions WHERE participant_id=$1 AND symbol=$2 FOR UPDATE`,
+		participantID, symbol,
+	).Scan(&qty)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	return qty, nil
+}
+
+// upsertPositionTx applies a fill to the participant's position within the
+// transaction, recomputing the weighted-average cost on buys.
+func upsertPositionTx(ctx context.Context, tx pgx.Tx, o ChallengeOrder, fillPrice float64, isBuy bool) error {
+	var id uuid.UUID
+	var qty int
+	var avg float64
+	err := tx.QueryRow(ctx,
+		`SELECT id, quantity, avg_cost FROM challenge_positions WHERE participant_id=$1 AND symbol=$2 FOR UPDATE`,
+		o.ParticipantID, o.Symbol,
+	).Scan(&id, &qty, &avg)
+	exists := true
+	if errors.Is(err, pgx.ErrNoRows) {
+		exists = false
+	} else if err != nil {
+		return err
+	}
+
+	newQty := qty
+	newAvg := avg
+	if isBuy {
+		oldValue := float64(qty) * avg
 		newValue := float64(o.Quantity) * fillPrice
-		pos.Quantity += o.Quantity
-		if pos.Quantity > 0 {
-			pos.AvgCost = (oldValue + newValue) / float64(pos.Quantity)
+		newQty = qty + o.Quantity
+		if newQty > 0 {
+			newAvg = (oldValue + newValue) / float64(newQty)
 		}
 	} else {
-		pos.Quantity -= o.Quantity
-		if pos.Quantity < 0 {
-			pos.Quantity = 0
+		newQty = qty - o.Quantity
+		if newQty < 0 {
+			newQty = 0
 		}
 		// avg_cost unchanged on sell
 	}
 
-	return r.repo.UpsertPosition(ctx, &pos)
+	if exists {
+		_, err = tx.Exec(ctx,
+			`UPDATE challenge_positions SET quantity=$2, avg_cost=$3 WHERE id=$1`,
+			id, newQty, newAvg)
+		return err
+	}
+	_, err = tx.Exec(ctx,
+		`INSERT INTO challenge_positions (id, challenge_id, participant_id, symbol, quantity, avg_cost)
+		 VALUES ($1,$2,$3,$4,$5,$6)`,
+		uuid.New(), o.ChallengeID, o.ParticipantID, o.Symbol, newQty, newAvg)
+	return err
 }
 
 func (r *Reconciler) takeSnapshots(ctx context.Context, challengeID uuid.UUID, date string) error {

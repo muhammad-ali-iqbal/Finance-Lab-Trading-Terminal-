@@ -14,11 +14,46 @@ function fmtCurrency(n: number) {
   return 'PKR ' + fmt(n)
 }
 
+function NoSimulationGraphic() {
+  return (
+    <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-48 h-36 opacity-80">
+      {/* Grid lines */}
+      <line x1="20" y1="130" x2="180" y2="130" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.15" />
+      <line x1="20" y1="100" x2="180" y2="100" stroke="currentColor" strokeWidth="1" strokeOpacity="0.1" />
+      <line x1="20" y1="70"  x2="180" y2="70"  stroke="currentColor" strokeWidth="1" strokeOpacity="0.1" />
+      <line x1="20" y1="40"  x2="180" y2="40"  stroke="currentColor" strokeWidth="1" strokeOpacity="0.1" />
+      {/* Y axis */}
+      <line x1="20" y1="20" x2="20" y2="130" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.15" />
+      {/* Dashed flat line — waiting for data */}
+      <line x1="20" y1="100" x2="180" y2="100"
+        stroke="#6b7280" strokeWidth="2" strokeDasharray="6 4" strokeOpacity="0.4" />
+      {/* Clock circle */}
+      <circle cx="100" cy="85" r="28" fill="none" stroke="#6b7280" strokeWidth="2" strokeOpacity="0.25" />
+      <circle cx="100" cy="85" r="22" className="fill-surface-secondary dark:fill-dark-surface-secondary" />
+      {/* Clock hands */}
+      <line x1="100" y1="85" x2="100" y2="68" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.6" />
+      <line x1="100" y1="85" x2="112" y2="90" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.6" />
+      <circle cx="100" cy="85" r="2" fill="#6b7280" fillOpacity="0.6" />
+      {/* Tick marks on clock */}
+      {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => {
+        const rad = (deg - 90) * Math.PI / 180
+        const r1 = i % 3 === 0 ? 19 : 21
+        const x1 = 100 + r1 * Math.cos(rad)
+        const y1 = 85 + r1 * Math.sin(rad)
+        const x2 = 100 + 22 * Math.cos(rad)
+        const y2 = 85 + 22 * Math.sin(rad)
+        return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6b7280" strokeWidth={i % 3 === 0 ? 1.5 : 0.8} strokeOpacity="0.4" />
+      })}
+    </svg>
+  )
+}
+
 export default function PortfolioPage() {
-  const { data: simulation } = useQuery({
+  const { data: simulation, isLoading: simLoading } = useQuery({
     queryKey: ['simulation', 'active'],
     queryFn: simulationApi.getActive,
     retry: false,
+    refetchInterval: 15_000,
   })
 
   // Backend provides cash balance + position quantities/avg costs.
@@ -59,12 +94,28 @@ export default function PortfolioPage() {
     return { ...portfolio, positions, totalMarketValue, totalEquity, unrealizedPnL, unrealizedPnLPct }
   }, [portfolio, priceMap])
 
-  if (isLoading || !enriched) {
+  if (simLoading) {
+    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+  }
+
+  if (!simulation) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Spinner size="lg" />
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center px-6">
+        <div className="text-ink-disabled dark:text-dark-ink-disabled">
+          <NoSimulationGraphic />
+        </div>
+        <div>
+          <p className="text-base font-semibold text-ink dark:text-dark-ink">No simulation running</p>
+          <p className="text-sm text-ink-tertiary dark:text-dark-ink-tertiary mt-1 max-w-xs">
+            Your instructor will start a simulation during class. Your portfolio will appear here once it begins.
+          </p>
+        </div>
       </div>
     )
+  }
+
+  if (isLoading || !enriched) {
+    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
   }
 
   const pnlPositive = enriched.unrealizedPnL >= 0

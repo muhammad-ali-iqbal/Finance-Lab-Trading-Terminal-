@@ -8,7 +8,10 @@ package challenge
 
 import (
 	"context"
+	"crypto/subtle"
+	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +21,23 @@ import (
 	"github.com/simtrader/backend/internal/middleware"
 	"github.com/simtrader/backend/internal/types"
 )
+
+// reDateYMD matches a strict YYYY-MM-DD calendar date. Shared with the date
+// validation on the internal EOD ingest endpoint (INPUT-04).
+var reDateYMD = regexp.MustCompile(`^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$`)
+
+// reSymbol bounds a PSX ticker to letters, digits and a few separators,
+// max 12 chars — used to normalise/validate order symbols (INPUT-03).
+var reSymbol = regexp.MustCompile(`^[A-Z0-9.\-]{1,12}$`)
+
+// lastInitial returns the uppercased first rune of a (possibly empty) last
+// name, or "" when there is none — avoids an out-of-range rune slice (INPUT-01).
+func lastInitial(lastName string) string {
+	for _, r := range strings.TrimSpace(lastName) {
+		return strings.ToUpper(string(r))
+	}
+	return ""
+}
 
 // ── Domain types ─────────────────────────────────────────────────────────────
 
@@ -96,9 +116,10 @@ func NewHandler(repo *Repository, reconciler *Reconciler, internalKey string) *H
 	return &Handler{repo: repo, reconciler: reconciler, internalKey: internalKey}
 }
 
-func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) {
-	// Internal — psx_tracker webhook (no JWT, shared secret header)
-	app.Post("/api/internal/eod-prices", h.IngestEODPrices)
+func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW, internalLimiter fiber.Handler) {
+	// Internal — psx_tracker webhook (no JWT, shared secret header).
+	// Rate-limited because it is reachable through the public nginx proxy (NET-01).
+	app.Post("/api/internal/eod-prices", internalLimiter, h.IngestEODPrices)
 
 	// EOD chart data — auth required, not challenge-specific
 	eod := app.Group("/api/eod", authMW)
@@ -133,7 +154,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 // ── Internal ──────────────────────────────────────────────────────────────────
 
 func (h *Handler) IngestEODPrices(c *fiber.Ctx) error {
-	if c.Get("X-Internal-Secret") != h.internalKey {
+	if subtle.ConstantTimeCompare([]byte(c.Get("X-Internal-Secret")), []byte(h.internalKey)) != 1 {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
 	}
 
@@ -146,6 +167,12 @@ func (h *Handler) IngestEODPrices(c *fiber.Ctx) error {
 	}
 	if req.Date == "" || len(req.Prices) == 0 {
 		return httputil.BadRequest(c, "date and prices required")
+	}
+	// Validate the date shape before it is persisted / passed to the reconciler
+	// so a malformed value fails fast with 400 rather than a Postgres cast error
+	// (INPUT-04).
+	if !reDateYMD.MatchString(req.Date) {
+		return httputil.BadRequest(c, "date must be YYYY-MM-DD")
 	}
 
 	if err := h.repo.UpsertEODPrices(c.Context(), req.Date, req.Prices); err != nil {
@@ -176,6 +203,9 @@ func (h *Handler) AdminCreate(c *fiber.Ctx) error {
 	}
 	if req.Name == "" || req.StartDate == "" || req.EndDate == "" {
 		return httputil.BadRequest(c, "name, startDate and endDate are required")
+	}
+	if len(req.Name) > 200 || len(req.Description) > 2000 {
+		return httputil.BadRequest(c, "name must be ≤200 and description ≤2000 characters")
 	}
 	if req.InitialCapital <= 0 {
 		req.InitialCapital = 100000
@@ -248,6 +278,9 @@ func (h *Handler) AdminUpdate(c *fiber.Ctx) error {
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return httputil.BadRequest(c, "invalid body")
+	}
+	if len(req.Name) > 200 || len(req.Description) > 2000 {
+		return httputil.BadRequest(c, "name must be ≤200 and description ≤2000 characters")
 	}
 	if req.Name != "" {
 		ch.Name = req.Name
@@ -525,8 +558,27 @@ func (h *Handler) StudentPlaceOrder(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return httputil.BadRequest(c, "invalid body")
 	}
+	// Normalise and validate the symbol (INPUT-03): uppercase, trimmed, bounded.
+	req.Symbol = strings.ToUpper(strings.TrimSpace(req.Symbol))
 	if req.Symbol == "" || req.Side == "" || req.Quantity <= 0 {
 		return httputil.BadRequest(c, "symbol, side and quantity are required")
+	}
+	if !reSymbol.MatchString(req.Symbol) {
+		return httputil.BadRequest(c, "invalid symbol")
+	}
+	// Reject symbols we have no market data for, but only once EOD data exists —
+	// before the first ingest the known-symbol set is empty and we cannot judge.
+	if known, err := h.repo.GetEODSymbols(c.Context()); err == nil && len(known) > 0 {
+		valid := false
+		for _, s := range known {
+			if s == req.Symbol {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			return httputil.BadRequest(c, "unknown symbol — no market data available")
+		}
 	}
 	if req.Side != "buy" && req.Side != "sell" {
 		return httputil.BadRequest(c, "side must be buy or sell")
@@ -714,9 +766,11 @@ func (h *Handler) buildLeaderboard(ctx context.Context, challengeID uuid.UUID, i
 		total := mv + info.row.CashBalance
 		ret := (total - initialCapital) / initialCapital * 100
 
-		displayName := info.row.FirstName + " " + string([]rune(info.row.LastName)[:1]) + "."
-		if anonymize {
-			displayName = displayName // show first name + last initial only
+		// Anonymized student view: "First L." — guard against an empty last
+		// name, which would otherwise panic on the rune slice (INPUT-01).
+		displayName := info.row.FirstName
+		if li := lastInitial(info.row.LastName); li != "" {
+			displayName += " " + li + "."
 		}
 
 		e := leaderboardEntry{

@@ -126,26 +126,25 @@ CREATE TRIGGER users_set_updated_at
 
 -- ── Seed: first admin account ─────────────────────────────────────────────────
 --
--- This creates the initial admin account.
--- IMPORTANT: Change this password immediately after first login.
--- Password here is 'ChangeMe123!' — bcrypt hash generated with cost=12.
+-- This creates the initial admin PLACEHOLDER account, seeded as 'blocked' so
+-- the well-known placeholder password can never be used to log in (INFRA-02 /
+-- DATA-01). entrypoint.sh sets the real password from ADMIN_EMAIL/ADMIN_PASSWORD
+-- and flips the account to 'active' — and refuses to boot in production if those
+-- env vars are unset. The hash below is a deliberately unusable placeholder.
 --
--- To generate your own hash in Go:
---   import "golang.org/x/crypto/bcrypt"
---   hash, _ := bcrypt.GenerateFromPassword([]byte("yourpassword"), 12)
---   fmt.Println(string(hash))
---
--- Or from the command line after running scripts/hash_password.go
+-- To generate a hash manually:
+--   docker run --rm python:3.11-slim python3 -c \
+--     "import bcrypt; print(bcrypt.hashpw(b'yourpassword', bcrypt.gensalt(12)).decode())"
 
 INSERT INTO users (id, email, password_hash, first_name, last_name, role, status)
 VALUES (
     gen_random_uuid(),
     'admin@simtrader.app',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4oE9/gH1Ky',
+    'x',                      -- invalid bcrypt hash: never matches any password
     'System',
     'Admin',
     'admin',
-    'active'
+    'blocked'                 -- inert until entrypoint.sh configures real creds
 )
 ON CONFLICT DO NOTHING;
 

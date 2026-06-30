@@ -12,6 +12,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,6 +21,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/simtrader/backend/internal/httputil"
 	"github.com/simtrader/backend/internal/middleware"
+	"github.com/simtrader/backend/internal/types"
 )
 
 var ErrNotFound = errors.New("portfolio not found")
@@ -228,12 +230,15 @@ func (r *Repository) GetHistory(ctx context.Context, simID, userID uuid.UUID) ([
 	return points, rows.Err()
 }
 
-// GetLeaderboard ranks all students in a simulation by total equity (cash + live positions).
-func (r *Repository) GetLeaderboard(ctx context.Context, simID uuid.UUID) ([]LeaderboardEntry, error) {
+// GetLeaderboard ranks all students in a simulation by total equity (cash + live
+// positions). When anonymize is true the display name is reduced to "First L."
+// so students cannot enumerate classmates' full names (AUTHZ-01).
+func (r *Repository) GetLeaderboard(ctx context.Context, simID uuid.UUID, anonymize bool) ([]LeaderboardEntry, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT
 			u.id,
-			u.first_name || ' ' || u.last_name AS name,
+			u.first_name,
+			u.last_name,
 			port.cash_balance + COALESCE(
 				(SELECT SUM(pos.quantity::float8 * pt.close)
 				 FROM positions pos
@@ -261,9 +266,19 @@ func (r *Repository) GetLeaderboard(ctx context.Context, simID uuid.UUID) ([]Lea
 	rank := 1
 	for rows.Next() {
 		var e LeaderboardEntry
+		var firstName, lastName string
 		e.Rank = rank
-		if err := rows.Scan(&e.UserID, &e.Name, &e.TotalEquity); err != nil {
+		if err := rows.Scan(&e.UserID, &firstName, &lastName, &e.TotalEquity); err != nil {
 			return nil, err
+		}
+		if anonymize {
+			e.Name = firstName
+			for _, r := range strings.TrimSpace(lastName) {
+				e.Name += " " + strings.ToUpper(string(r)) + "."
+				break
+			}
+		} else {
+			e.Name = strings.TrimSpace(firstName + " " + lastName)
 		}
 		entries = append(entries, e)
 		rank++
@@ -357,7 +372,11 @@ func (h *Handler) GetLeaderboard(c *fiber.Ctx) error {
 		return httputil.BadRequest(c, "invalid simulation ID")
 	}
 
-	entries, err := h.repo.GetLeaderboard(c.Context(), simID)
+	// Students see anonymized names ("First L."); admins/instructors see full
+	// names for grading (AUTHZ-01).
+	claims := middleware.GetClaims(c)
+	anonymize := claims == nil || claims.Role != types.RoleAdmin
+	entries, err := h.repo.GetLeaderboard(c.Context(), simID, anonymize)
 	if err != nil {
 		return httputil.InternalError(c)
 	}

@@ -34,7 +34,19 @@
       "Bash(psql *)",
       "Bash(git checkout *)",
       "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader-frontend\\\\src\\\\pages\" -Filter \"*.tsx\")",
-      "Bash(Select-Object Name, FullName)"
+      "Bash(Select-Object Name, FullName)",
+      "Bash(ls simtrader/.env*)",
+      "Bash(ls .env*)",
+      "Bash(ls simtrader-frontend/.env*)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\" -Recurse -Depth 2 -Name)",
+      "PowerShell($root = \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\"; Write-Output \"=== tracked .env files ===\"; git -C $root ls-files | Select-String -Pattern '\\\\.env' ; Write-Output \"=== gitignore content ===\"; if \\(Test-Path \"$root\\\\.gitignore\"\\) { Get-Content \"$root\\\\.gitignore\" } else { Write-Output \"no root gitignore\" }; Write-Output \"=== is psx_data.db tracked? ===\"; git -C $root ls-files | Select-String -Pattern 'psx_data.db'; Write-Output \"=== rar in history? ===\"; git -C $root log --oneline --all -- simtrader-frontend.rar | Select-Object -First 5)",
+      "PowerShell($root = \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\"; git -C $root rm --cached psx_tracker/psx_data.db 2>&1)",
+      "PowerShell($root = \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\"; git -C $root diff --stat HEAD 2>&1; Write-Output \"---\"; git -C $root status --short 2>&1)",
+      "Bash(python -c \"import docx; print\\('python-docx available'\\)\")",
+      "WebSearch",
+      "PowerShell(psql *)",
+      "Bash(sqlite3 *)",
+      "PowerShell(ls \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader\\\\internal\\\\\")"
     ]
   }
 }

@@ -10,12 +10,15 @@ import (
 	"bytes"
 	"context"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/simtrader/backend/internal/httputil"
 )
+
+var reDateYMD = regexp.MustCompile(`^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$`)
 
 type Handler struct {
 	trackerDir string
@@ -79,6 +82,12 @@ func (h *Handler) Backfill(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil || req.From == "" {
 		return httputil.BadRequest(c, "from date required (YYYY-MM-DD)")
 	}
+	if !reDateYMD.MatchString(req.From) {
+		return httputil.BadRequest(c, "from must be YYYY-MM-DD")
+	}
+	if req.To != "" && !reDateYMD.MatchString(req.To) {
+		return httputil.BadRequest(c, "to must be YYYY-MM-DD")
+	}
 	args := []string{"backfill", req.From}
 	if req.To != "" {
 		args = append(args, req.To)
@@ -108,6 +117,9 @@ func (h *Handler) Sync(c *fiber.Ctx) error {
 		From string `json:"from"`
 	}
 	_ = c.BodyParser(&req)
+	if req.From != "" && !reDateYMD.MatchString(req.From) {
+		return httputil.BadRequest(c, "from must be YYYY-MM-DD")
+	}
 	args := []string{}
 	if req.From != "" {
 		args = append(args, req.From)

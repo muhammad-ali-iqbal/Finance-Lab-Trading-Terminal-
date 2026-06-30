@@ -1,5 +1,10 @@
-psx-data-reader
-schedule
-pandas
-beautifulsoup4
-requests
+# Exact-version pinned (DEP-01) so builds are reproducible and a compromised or
+# typosquatted upstream release cannot be silently pulled in. Bump deliberately
+# and re-run pip-audit. For full supply-chain protection, generate a
+# hash-pinned lockfile with `pip-compile --generate-hashes` (see Dockerfile).
+psx-data-reader==0.0.6
+schedule==1.2.2
+pandas==2.2.2
+beautifulsoup4==4.12.3
+requests==2.32.3
+bcrypt==4.1.3

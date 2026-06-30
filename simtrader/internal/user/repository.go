@@ -39,14 +39,14 @@ func (r *Repository) Create(ctx context.Context, u *User) error {
 	query := `
 		INSERT INTO users (
 			id, email, password_hash, first_name, last_name,
-			role, status, invite_token, created_at, updated_at
+			role, status, invite_token, invite_expiry, created_at, updated_at
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW()
 		)`
 
 	_, err := r.db.Exec(ctx, query,
 		u.ID, u.Email, u.PasswordHash, u.FirstName, u.LastName,
-		u.Role, u.Status, u.InviteToken,
+		u.Role, u.Status, u.InviteToken, u.InviteExpiry,
 	)
 	if err != nil {
 		// pgx error codes: 23505 = unique_violation (duplicate email)
@@ -62,7 +62,7 @@ func (r *Repository) Create(ctx context.Context, u *User) error {
 func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, reset_token, reset_expiry,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users WHERE id = $1`
 
@@ -73,7 +73,7 @@ func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
 func (r *Repository) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, reset_token, reset_expiry,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users WHERE LOWER(email) = LOWER($1)`
 
@@ -84,9 +84,11 @@ func (r *Repository) GetByEmail(ctx context.Context, email string) (*User, error
 func (r *Repository) GetByInviteToken(ctx context.Context, token string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, reset_token, reset_expiry,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
-		FROM users WHERE invite_token = $1 AND status = 'pending'`
+		FROM users
+		WHERE invite_token = $1 AND status = 'pending'
+		  AND (invite_expiry IS NULL OR invite_expiry > NOW())`
 
 	return r.scanOne(r.db.QueryRow(ctx, query, token))
 }
@@ -95,7 +97,7 @@ func (r *Repository) GetByInviteToken(ctx context.Context, token string) (*User,
 func (r *Repository) GetByResetToken(ctx context.Context, token string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, reset_token, reset_expiry,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users
 		WHERE reset_token = $1 AND reset_expiry > NOW()`
@@ -120,6 +122,7 @@ func (r *Repository) CompleteRegistration(ctx context.Context, id uuid.UUID, pas
 		    last_name     = $4,
 		    status        = 'active',
 		    invite_token  = NULL,
+		    invite_expiry = NULL,
 		    updated_at    = NOW()
 		WHERE id = $1 AND status = 'pending'`
 
@@ -185,7 +188,7 @@ func (r *Repository) SetAvatarURL(ctx context.Context, id uuid.UUID, avatarURL s
 func (r *Repository) List(ctx context.Context, role *Role) ([]*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, reset_token, reset_expiry,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users`
 
@@ -255,6 +258,54 @@ func (r *Repository) RevokeAllUserTokens(ctx context.Context, userID uuid.UUID) 
 	return err
 }
 
+// Delete permanently removes a user and their refresh tokens.
+func (r *Repository) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := r.db.Exec(ctx, `DELETE FROM users WHERE id = $1`, id)
+	return err
+}
+
+// CleanupExpiredTokens deletes expired/revoked refresh tokens and clears
+// expired password-reset and invite tokens. Run periodically (DATA-04).
+// Returns the number of refresh-token rows deleted.
+func (r *Repository) CleanupExpiredTokens(ctx context.Context) (int64, error) {
+	tag, err := r.db.Exec(ctx, `
+		DELETE FROM refresh_tokens
+		WHERE revoked = true OR expires_at < NOW()`)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup refresh tokens: %w", err)
+	}
+
+	// Clear stale reset tokens so an expired hash cannot linger in the row.
+	if _, err := r.db.Exec(ctx, `
+		UPDATE users SET reset_token = NULL, reset_expiry = NULL
+		WHERE reset_expiry IS NOT NULL AND reset_expiry < NOW()`); err != nil {
+		return tag.RowsAffected(), fmt.Errorf("cleanup reset tokens: %w", err)
+	}
+
+	// Clear lapsed invite tokens for accounts that never registered.
+	if _, err := r.db.Exec(ctx, `
+		UPDATE users SET invite_token = NULL, invite_expiry = NULL
+		WHERE status = 'pending' AND invite_expiry IS NOT NULL AND invite_expiry < NOW()`); err != nil {
+		return tag.RowsAffected(), fmt.Errorf("cleanup invite tokens: %w", err)
+	}
+
+	return tag.RowsAffected(), nil
+}
+
+// GetStatus returns just the account status for a user ID. Used by the auth
+// middleware to enforce blocks within the access-token lifetime (AUTH-04).
+func (r *Repository) GetStatus(ctx context.Context, id uuid.UUID) (Status, error) {
+	var status Status
+	err := r.db.QueryRow(ctx, `SELECT status FROM users WHERE id = $1`, id).Scan(&status)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", ErrNotFound
+		}
+		return "", err
+	}
+	return status, nil
+}
+
 // ── helpers ─────────────────────────────────────────────────────────────────
 
 // scanOne wraps a single row scan, mapping pgx.ErrNoRows to ErrNotFound.
@@ -277,7 +328,7 @@ type scanFn func(dest ...any) error
 func scanUser(scan scanFn, u *User) error {
 	return scan(
 		&u.ID, &u.Email, &u.PasswordHash, &u.FirstName, &u.LastName,
-		&u.Role, &u.Status, &u.AvatarUrl, &u.InviteToken, &u.ResetToken, &u.ResetExpiry,
+		&u.Role, &u.Status, &u.AvatarUrl, &u.InviteToken, &u.InviteExpiry, &u.ResetToken, &u.ResetExpiry,
 		&u.CreatedAt, &u.UpdatedAt,
 	)
 }

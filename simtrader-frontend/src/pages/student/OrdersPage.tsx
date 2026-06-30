@@ -8,6 +8,13 @@ function fmt(n: number) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+function calcFees(tradeValue: number): number {
+  const cdc = Math.min(tradeValue * 0.0001, 10)
+  const nccpl = tradeValue * 0.00017
+  const psx = tradeValue * 0.00003
+  return cdc + nccpl + psx
+}
+
 export function OrdersPage() {
   const qc = useQueryClient()
 
@@ -50,7 +57,7 @@ export function OrdersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary">
-                  {['Time', 'Symbol', 'Side', 'Type', 'Qty', 'Price', 'Filled', 'Fill Price', 'Status', ''].map(h => (
+                  {['Time', 'Symbol', 'Side', 'Type', 'Qty', 'Price', 'Filled', 'Fill Price', 'Fees', 'Status', ''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-ink-tertiary dark:text-dark-ink-tertiary whitespace-nowrap">
                       {h}
                     </th>
@@ -81,6 +88,11 @@ export function OrdersPage() {
                     </td>
                     <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">
                       {order.averageFillPrice != null ? `PKR ${fmt(order.averageFillPrice)}` : '—'}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-ink-secondary dark:text-dark-ink-secondary whitespace-nowrap">
+                      {order.status === 'filled' && order.averageFillPrice != null
+                        ? `PKR ${fmt(calcFees(order.filledQuantity * order.averageFillPrice))}`
+                        : '—'}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={order.status} />

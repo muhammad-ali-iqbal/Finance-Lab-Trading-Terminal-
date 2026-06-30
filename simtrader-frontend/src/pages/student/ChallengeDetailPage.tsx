@@ -16,8 +16,9 @@ import { useTheme } from '@/context/ThemeContext'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
-  CheckCircle2, XCircle, Clock, Activity,
+  CheckCircle2, XCircle, Clock, Activity, Download,
 } from 'lucide-react'
+import { downloadCSV } from '@/utils/csv'
 import EODChartTab from './EODChartTab'
 import clsx from 'clsx'
 
@@ -25,6 +26,13 @@ import clsx from 'clsx'
 
 function fmt(n: number, d = 2) {
   return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
+}
+
+function calcFees(tradeValue: number): number {
+  const cdc = Math.min(tradeValue * 0.0001, 10)
+  const nccpl = tradeValue * 0.00017
+  const psx = tradeValue * 0.00003
+  return cdc + nccpl + psx
 }
 function fmtPKR(n: number) {
   return 'PKR ' + fmt(n, 0)
@@ -272,9 +280,11 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
 
   const qty = parseInt(quantity) || 0
   const lp  = parseFloat(limitPrice) || 0
-  const estimatedValue = orderType === 'limit' ? qty * lp : 0
-  const canAfford = side === 'buy' && orderType === 'limit' && estimatedValue > 0
-    ? (portfolio?.cashBalance ?? 0) >= estimatedValue
+  const estimatedValue = orderType === 'limit' ? qty * lp : qty * (lastPrice ?? 0)
+  const estimatedFees  = estimatedValue > 0 ? calcFees(estimatedValue) : 0
+  const estimatedTotal = estimatedValue + estimatedFees
+  const canAfford = side === 'buy' && estimatedValue > 0
+    ? (portfolio?.cashBalance ?? 0) >= estimatedTotal
     : true
 
   const placeMutation = useMutation({
@@ -415,12 +425,25 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
               />
             )}
 
-            {/* Estimated cost + cash balance */}
-            {qty > 0 && orderType === 'limit' && lp > 0 && (
+            {/* Estimated cost + fees + cash balance */}
+            {qty > 0 && estimatedValue > 0 && (
               <div className="rounded border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary p-3 space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Estimated {side === 'buy' ? 'cost' : 'proceeds'}</span>
+                  <span className="text-ink-tertiary dark:text-dark-ink-tertiary">
+                    Estimated {side === 'buy' ? 'cost' : 'proceeds'}
+                    {orderType === 'market' && <span className="ml-1 opacity-60">(~last close)</span>}
+                  </span>
                   <span className="font-mono font-medium text-ink dark:text-dark-ink">PKR {fmt(estimatedValue)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-ink-tertiary dark:text-dark-ink-tertiary">Brokerage fees</span>
+                  <span className="font-mono text-ink-secondary dark:text-dark-ink-secondary">PKR {fmt(estimatedFees)}</span>
+                </div>
+                <div className="flex justify-between text-xs border-t border-border dark:border-dark-border pt-1.5">
+                  <span className="font-medium text-ink dark:text-dark-ink">
+                    {side === 'buy' ? 'Total debit' : 'Net proceeds'}
+                  </span>
+                  <span className="font-mono font-semibold text-ink dark:text-dark-ink">PKR {fmt(side === 'buy' ? estimatedTotal : estimatedValue - estimatedFees)}</span>
                 </div>
                 {side === 'buy' && portfolio && (
                   <div className="flex justify-between text-xs">
@@ -499,6 +522,11 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
                       filled @ PKR {fmt(o.fillPrice)}
                     </p>
                   )}
+                  {o.status === 'filled' && o.fillPrice != null && (
+                    <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary font-mono">
+                      fees: PKR {fmt(calcFees(o.quantity * o.fillPrice))}
+                    </p>
+                  )}
                   <p className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary">
                     {new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                   </p>
@@ -534,6 +562,20 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
   if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>
 
   const board = data?.leaderboard ?? []
+
+  function handleDownload() {
+    const rows: string[][] = [['Rank', 'Name', 'Portfolio Value (PKR)', 'Return %', 'Gain/Loss (PKR)']]
+    board.forEach((e: LeaderboardEntry) => {
+      rows.push([
+        String(e.rank),
+        e.displayName,
+        fmt(e.portfolioValue),
+        fmt(e.returnPct),
+        fmt(e.portfolioValue - initialCapital),
+      ])
+    })
+    downloadCSV(rows, `leaderboard-${challengeId}.csv`)
+  }
   const top3Colors = ['text-yellow-500', 'text-slate-400', 'text-amber-600']
 
   return (
@@ -544,6 +586,16 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
         <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary ml-auto">
           {board.length} participant{board.length !== 1 ? 's' : ''}
         </span>
+        {board.length > 0 && (
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-1 text-xs text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink transition-colors"
+            title="Download CSV"
+          >
+            <Download className="w-3.5 h-3.5" />
+            CSV
+          </button>
+        )}
       </div>
       {board.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 gap-2">

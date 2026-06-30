@@ -6,7 +6,7 @@ import {
   Card, Button, Input, Badge, Alert, Spinner, EmptyState
 } from '@/components/ui'
 import {
-  Users, UserPlus, X, Shield, ShieldOff, Mail, Clock
+  Users, UserPlus, X, Shield, ShieldOff, Mail, Clock, Trash2
 } from 'lucide-react'
 import type { User } from '@/types'
 
@@ -89,13 +89,72 @@ function InviteModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── Wipe confirmation modal ───────────────────────────────────────────────────
+function WipeModal({ user, onClose, onConfirm, isPending }: {
+  user: User
+  onClose: () => void
+  onConfirm: () => void
+  isPending: boolean
+}) {
+  const [typed, setTyped] = useState('')
+  const ready = typed === 'WIPE'
+  const displayName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.email
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 dark:bg-dark-ink/30 p-4">
+      <div className="bg-surface dark:bg-dark-surface rounded-xl border border-danger/40 shadow-modal w-full max-w-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border">
+          <h2 className="text-sm font-semibold text-danger">Delete student account</h2>
+          <button onClick={onClose} className="text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-4">
+          <p className="text-sm text-ink dark:text-dark-ink">
+            You are about to permanently delete <span className="font-semibold">{displayName}</span> ({user.email}). This cannot be undone.
+          </p>
+          <div>
+            <label className="text-[11px] uppercase tracking-wide text-ink-tertiary dark:text-dark-ink-tertiary block mb-1">
+              Type <span className="font-bold text-danger">WIPE</span> to confirm
+            </label>
+            <input
+              autoFocus
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder="WIPE"
+              className="w-full h-9 px-3 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink focus:outline-none focus:border-danger font-mono"
+            />
+          </div>
+          <div className="flex gap-2 pt-1">
+            <Button type="button" variant="ghost" size="sm" fullWidth onClick={onClose}>Cancel</Button>
+            <Button
+              size="sm"
+              fullWidth
+              disabled={!ready || isPending}
+              loading={isPending}
+              onClick={onConfirm}
+              className="bg-danger hover:bg-danger/90 text-white disabled:opacity-40"
+            >
+              Delete permanently
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── User row ──────────────────────────────────────────────────────────────────
 function UserRow({ user }: { user: User }) {
   const qc = useQueryClient()
   const invalidate = () => qc.invalidateQueries({ queryKey: ['admin', 'users'] })
+  const [showWipe, setShowWipe] = useState(false)
 
   const block   = useMutation({ mutationFn: () => userApi.blockUser(user.id),   onSuccess: invalidate })
   const unblock = useMutation({ mutationFn: () => userApi.unblockUser(user.id), onSuccess: invalidate })
+  const del     = useMutation({ mutationFn: () => userApi.delete(user.id), onSuccess: () => { setShowWipe(false); invalidate() } })
 
   const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || user.email[0].toUpperCase()
   const displayName = user.firstName && user.lastName
@@ -103,6 +162,15 @@ function UserRow({ user }: { user: User }) {
     : user.email
 
   return (
+    <>
+    {showWipe && (
+      <WipeModal
+        user={user}
+        onClose={() => setShowWipe(false)}
+        onConfirm={() => del.mutate()}
+        isPending={del.isPending}
+      />
+    )}
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
       {/* Avatar */}
       <div className="w-8 h-8 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
@@ -166,7 +234,20 @@ function UserRow({ user }: { user: User }) {
       {user.role === 'admin' && (
         <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0">Admin</span>
       )}
+
+      {user.role === 'student' && (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setShowWipe(true)}
+          className="text-danger hover:text-danger flex-shrink-0"
+          title="Delete student"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
+      )}
     </div>
+    </>
   )
 }
 

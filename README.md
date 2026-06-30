@@ -106,7 +106,8 @@ cd simtrader
 
 # Configure
 cp .env.example .env
-# Fill in: DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
+# Fill in: DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, INTERNAL_SECRET
+# (leave ADMIN_*/SMTP_HOST blank in dev — a random admin password is printed on boot)
 
 # Create database
 psql -U postgres -c "CREATE DATABASE simtrader;"
@@ -118,7 +119,9 @@ make migrate
 go run ./cmd/server/main.go
 ```
 
-Server starts at **http://localhost:8080**. Default admin: `admin@simtrader.app` / `ChangeMe123!` — change on first login.
+Server starts at **http://localhost:8080**.
+
+> **Admin account:** there is **no shipped default password**. In production the server refuses to boot unless `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set. In local dev (no `ADMIN_*` set), a **random admin password is generated and printed once to the backend console** on first boot — copy it from the log. See [Configuration](#configuration).
 
 ### Frontend setup
 
@@ -166,8 +169,10 @@ Each student needs a separate browser profile (or incognito window):
 
 1. Open a new Chrome profile
 2. Navigate to `http://localhost:5173/register?token=<TOKEN>`
-3. Fill in First name, Last name, Password (8+ chars, letter + number)
+3. Fill in First name, Last name, Password (**12+ chars**; common passwords are rejected)
 4. Student lands on their dashboard
+
+> Invite links **expire after 7 days**. If a token lapses, re-invite the student to mint a fresh one.
 
 ### 4. Create & start a simulation
 1. Go to **Admin → Simulations**
@@ -254,31 +259,50 @@ Each student needs a separate browser profile (or incognito window):
 
 ## Configuration
 
-### Backend (`.env`)
+For the **docker-compose stack**, copy the root `.env.example` to `.env` and fill it in — `docker compose up` fails fast if any required value is empty. The backend's own `.env` (below) is for running it standalone in dev.
 
 ```env
 PORT=8080
 ENV=development          # development | production
 
-DATABASE_URL=postgresql://user:password@localhost:5432/simtrader
+DATABASE_URL=postgresql://user:password@localhost:5432/simtrader?sslmode=require
 
 # Generate each with: openssl rand -hex 64
 JWT_ACCESS_SECRET=...
 JWT_REFRESH_SECRET=...
 
 JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=168h
+JWT_REFRESH_EXPIRY=168h     # malformed values now fail startup (no silent default)
 
-# Email — blank for dev (tokens print to console)
+# Internal shared secret with psx_tracker (REQUIRED, no default).
+# Generate with: openssl rand -hex 32
+INTERNAL_SECRET=...
+
+# Admin account — REQUIRED in production (server refuses to boot without these).
+# In dev, omit to get a random one-time password printed to the console.
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=...           # 12+ chars, not a common password
+
+# Email — REQUIRED in production. The backend will NOT start in production
+# without SMTP_HOST (otherwise invite/reset tokens would print to logs).
+# In dev, leave SMTP_HOST blank and tokens print to the console.
 SMTP_HOST=smtp.resend.com
 SMTP_PORT=587
 SMTP_USER=resend
 SMTP_PASS=your_resend_api_key
 EMAIL_FROM=noreply@yourdomain.com
 
-# For CORS + email links
+# For CORS + email links (use your HTTPS domain in production)
 FRONTEND_URL=http://localhost:5173
 ```
+
+**Optional / advanced:**
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `CORS_ALLOW_ANY` | `false` | Dev-only: reflect any CORS origin. Ignored in production. |
+| `TRUSTED_PROXIES` | RFC1918 + loopback | CIDRs Fiber trusts for the real client IP behind the proxy (rate limiting). |
+| `DB_REQUIRE_TLS` | `true` (prod) | Set `false` **only** for the internal-network compose Postgres. A managed/remote DB must keep TLS on and use `sslmode=require`. |
 
 ### Frontend (`.env.local`)
 
@@ -294,14 +318,32 @@ FRONTEND_URL=http://localhost:5173
 
 ## Security
 
-- **Short-lived access tokens** — 15-minute expiry
-- **Refresh token rotation** — single-use, replayed tokens rejected
-- **SHA-256 hashed refresh tokens** — raw tokens never stored in DB
-- **bcrypt cost=12** — intentionally slow password hashing
-- **Vague login errors** — doesn't reveal if email exists
-- **Silent password reset** — always returns 200
-- **Instant revocation** — blocking a user kills all their active sessions
-- **Invite-only registration** — no self-signup
+A full code-level audit and remediation pass has been completed — see
+**[SimTrader_Remediation_Report.md](SimTrader_Remediation_Report.md)** for the
+finding-by-finding detail.
+
+**Authentication & sessions**
+- **Short-lived access tokens** (15 min) + **single-use refresh-token rotation**
+- **All sensitive tokens SHA-256 hashed in DB** — refresh, **invite, and reset** tokens; raw values never stored
+- **Invite tokens expire after 7 days**; reset tokens after 1 hour
+- **bcrypt cost=12**; password policy: 12+ chars, common-password denylist, 72-byte cap
+- **Near-instant block enforcement** — a blocked user loses access within ~30s, not just on token expiry
+- **Invite-only registration**, vague login errors, silent password reset (no enumeration)
+- **No default admin** — production requires `ADMIN_EMAIL`/`ADMIN_PASSWORD`; the seed account ships blocked
+
+**Transport & network**
+- **TLS everywhere** via the Caddy reverse proxy (automatic HTTPS + HSTS)
+- **Security headers** — CSP, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy` (helmet + nginx)
+- **Rate limiting** keyed on the real client IP (trusted-proxy aware), including a dedicated limiter on `/refresh`
+- **Internal EOD endpoint** is denied from the public path and rate-limited; secret compared in constant time
+- **Strict CORS** — no wildcard reflection in production; DB connections require TLS in production
+
+**Data integrity & operations**
+- **Transactional, idempotent reconciler** — challenge order fills can't double-charge or leave inconsistent balances
+- **Parameterized SQL throughout** (pgx) — no injection vector
+- **Avatar uploads validated by file signature**, served with `nosniff`
+- **Retention cleanup** of expired/revoked tokens; **hardened migration runner** (single-transaction, advisory-locked, versioned)
+- **Dependency scanning** in CI (govulncheck / npm audit / pip-audit)
 
 ---
 
@@ -389,26 +431,52 @@ python validate_simtrader_csv.py simulation.csv
 
 ---
 
-## Deployment
+### Recommended: full stack via Docker Compose (with TLS)
 
-### Backend (Railway or any server)
-
-1. Set `ENV=production` in environment variables
-2. Set `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`
-3. Set `FRONTEND_URL` to your frontend domain (for CORS)
-4. Run migrations
-5. Build: `go build -o server ./cmd/server/main.go`
-
-### Frontend (Vercel / Netlify / Cloudflare Pages)
+The repo ships a production-ready `docker-compose.yml` that runs the whole
+stack — **Caddy** (TLS termination + automatic HTTPS), the nginx frontend, the
+Go backend, PostgreSQL, and the psx_tracker scheduler — on a single host. This
+is the recommended deployment (it also matches the eventual VPS target, so the
+pen-test surface is identical).
 
 ```bash
-npm run build   # outputs to dist/
+# 1. Configure (compose refuses to start if any required secret is empty)
+cp .env.example .env
+#    Fill in: POSTGRES_PASSWORD, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET,
+#    INTERNAL_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD, SMTP_HOST, DOMAIN, ACME_EMAIL
+#    Generate secrets: openssl rand -hex 64 (JWT) / -hex 32 (INTERNAL/POSTGRES)
+
+# 2. Point DOMAIN at this host's public DNS (or DOMAIN=localhost for local-only).
+#    Caddy obtains/renews Let's Encrypt certs automatically.
+
+# 3. Launch
+docker compose up -d --build
 ```
 
-Set in your hosting environment:
+Caddy publishes **:80 → :443** (HTTP redirects to HTTPS); no other port is
+exposed to the host. Migrations run automatically on backend boot
+(single-transaction, advisory-locked, version-tracked).
+
+> **Managed/remote Postgres** (Render, Railway, Neon, etc.): drop
+> `DB_REQUIRE_TLS=false` from the backend env and use a `DATABASE_URL` with
+> `sslmode=require` — TLS enforcement re-engages automatically.
+
+### Split deployment (static frontend + separate backend)
+
+The frontend can also be hosted on a static CDN (Vercel / Netlify / Cloudflare
+Pages) with the backend on a container host:
+
+```bash
+cd simtrader-frontend && npm run build   # outputs to dist/
+```
+
+Set in the frontend hosting environment, and `FRONTEND_URL` (CORS) on the backend:
 ```
 VITE_WS_URL=wss://your-backend-domain.com
 ```
+
+In all cases set `ENV=production` and the required secrets above; the backend
+fails fast if any are missing or misconfigured.
 
 ---
 

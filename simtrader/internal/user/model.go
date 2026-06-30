@@ -41,8 +41,9 @@ type User struct {
 	Role         Role       `json:"role"`
 	Status       Status     `json:"status"`
 	AvatarUrl    string     `json:"avatarUrl"`
-	InviteToken  *string    `json:"-"`         // Non-nil until registration complete
-	ResetToken   *string    `json:"-"`
+	InviteToken  *string    `json:"-"`         // SHA-256 hash; non-nil until registration complete
+	InviteExpiry *time.Time `json:"-"`         // Invite link expiry (AUTH-02)
+	ResetToken   *string    `json:"-"`         // SHA-256 hash of the reset token
 	ResetExpiry  *time.Time `json:"-"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`

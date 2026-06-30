@@ -8,8 +8,9 @@ import type { ChallengeWithMeta, LeaderboardEntry } from '@/api'
 import { Spinner, Badge, Button } from '@/components/ui'
 import {
   Trophy, Plus, X, Users, Calendar, DollarSign,
-  PlayCircle, CheckCircle, RotateCcw, ChevronDown, ChevronRight,
+  PlayCircle, CheckCircle, RotateCcw, ChevronDown, ChevronRight, Download,
 } from 'lucide-react'
+import { downloadCSV } from '@/utils/csv'
 import clsx from 'clsx'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -147,6 +148,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
 function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
   const qc = useQueryClient()
   const [expanded, setExpanded] = useState(false)
+  const [reconcileDate, setReconcileDate] = useState(() => new Date().toISOString().slice(0, 10))
 
   const activateMut = useMutation({
     mutationFn: () => challengeApi.adminActivate(ch.id),
@@ -164,7 +166,7 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
     },
   })
   const reconcileMut = useMutation({
-    mutationFn: () => challengeApi.adminReconcile(ch.id),
+    mutationFn: () => challengeApi.adminReconcile(ch.id, reconcileDate),
     onSuccess: (data) => alert(`Reconciliation complete — ${data.filled} orders filled for ${data.date}.`),
   })
 
@@ -215,6 +217,12 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
                 <Users className="w-3.5 h-3.5 mr-1" />
                 Enroll All
               </Button>
+              <input
+                type="date"
+                value={reconcileDate}
+                onChange={e => setReconcileDate(e.target.value)}
+                className="h-7 px-2 text-xs rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-ink dark:text-dark-ink focus:outline-none"
+              />
               <Button size="sm" variant="ghost" onClick={() => reconcileMut.mutate()} disabled={reconcileMut.isPending}>
                 <RotateCcw className={clsx('w-3.5 h-3.5 mr-1', reconcileMut.isPending && 'animate-spin')} />
                 Reconcile
@@ -239,6 +247,21 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
             </div>
           ) : (
             <div className="overflow-x-auto">
+              <div className="flex justify-end px-4 py-2 border-b border-border dark:border-dark-border">
+                <button
+                  onClick={() => {
+                    const rows: string[][] = [['Rank', 'Name', 'Email', 'Portfolio Value (PKR)', 'Return %', 'Cash Balance (PKR)']]
+                    leaderboard!.leaderboard.forEach((e: LeaderboardEntry) => {
+                      rows.push([String(e.rank), e.displayName, e.email ?? '', fmt(e.portfolioValue), fmt(e.returnPct), fmt(e.cashBalance)])
+                    })
+                    downloadCSV(rows, `admin-leaderboard-${ch.id}.csv`)
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-ink-secondary dark:text-dark-ink-secondary hover:text-ink dark:hover:text-dark-ink transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Download CSV
+                </button>
+              </div>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border dark:border-dark-border text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide bg-surface-secondary dark:bg-dark-surface-secondary">
