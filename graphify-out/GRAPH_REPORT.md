@@ -1,12 +1,12 @@
-# Graph Report - .  (2026-06-18)
+# Graph Report - .  (2026-06-30)
 
 ## Corpus Check
-- 82 files · ~1,558,916 words
+- 83 files · ~1,560,251 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 634 nodes · 1165 edges · 96 communities detected
-- Extraction: 59% EXTRACTED · 41% INFERRED · 0% AMBIGUOUS · INFERRED: 480 edges (avg confidence: 0.8)
+- 641 nodes · 1175 edges · 97 communities detected
+- Extraction: 59% EXTRACTED · 41% INFERRED · 0% AMBIGUOUS · INFERRED: 482 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -106,13 +106,14 @@
 - [[_COMMUNITY_Community 93|Community 93]]
 - [[_COMMUNITY_Community 94|Community 94]]
 - [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `BadRequest()` - 55 edges
 2. `InternalError()` - 51 edges
 3. `Status` - 43 edges
-4. `Close()` - 36 edges
-5. `main()` - 32 edges
+4. `Close()` - 37 edges
+5. `main()` - 33 edges
 6. `Repository` - 31 edges
 7. `GetClaims()` - 26 edges
 8. `Handler` - 25 edges
@@ -120,10 +121,10 @@
 10. `Handler` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `main()` --calls--> `NewSMTPMailer()`  [INFERRED]
+  simtrader\cmd\server\main.go → simtrader\internal\auth\mailer.go
 - `main()` --calls--> `NewService()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\auth\service.go
-- `main()` --calls--> `NewStatusGuard()`  [INFERRED]
-  simtrader\cmd\server\main.go → simtrader\internal\middleware\auth.go
 - `main()` --calls--> `NewEngine()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\order\engine.go
 - `main()` --calls--> `NewOrderRepository()`  [INFERRED]
@@ -142,31 +143,31 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.09
-Nodes (12): GetClaims(), RequireRole(), Handler, BadRequest(), InternalError(), Handler, Handler, Handler (+4 more)
+Nodes (11): GetClaims(), Handler, BadRequest(), InternalError(), Handler, Handler, Handler, Handler (+3 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (16): SMTPMailer, EODBar, LeaderboardRow, Reconciler, Repository, Close(), lastInitial(), OrderRepository (+8 more)
+Cohesion: 0.06
+Nodes (25): authResponse, forgotPasswordRequest, Handler, loginRequest, logoutRequest, Mailer, NoOpMailer, refreshRequest (+17 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
-Nodes (13): NewClock(), toggle(), startTokenCleanup(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry (+5 more)
+Nodes (13): NewClock(), toggle(), NewRepository(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry (+5 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
-Nodes (18): Handler, Mailer, NoOpMailer, Service, TokenPair, mapAuthError(), scanUser(), generateSecureToken() (+10 more)
+Nodes (46): db(), get_known_tickers(), init_db(), last_fetch_date(), log_fetch(), rows: list of dicts with keys symbol, date, open, high, low, close, volume, Return ticker symbols. By default only active series (status=1) are returned., Mark `active_symbols` with status=1 and every other known ticker with status=0. (+38 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.07
-Nodes (47): db(), get_connection(), get_known_tickers(), init_db(), last_fetch_date(), log_fetch(), rows: list of dicts with keys symbol, date, open, high, low, close, volume, Return ticker symbols. By default only active series (status=1) are returned. (+39 more)
+Nodes (12): EODBar, LeaderboardRow, Reconciler, Repository, Close(), OrderRepository, lockedHeldQty(), NewReconciler() (+4 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.09
-Nodes (19): Config, getEnv(), Load(), parseDuration(), requireEnv(), Connect(), requireTLS(), respond() (+11 more)
+Cohesion: 0.08
+Nodes (26): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+18 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.06
-Nodes (28): authResponse, forgotPasswordRequest, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest, Challenge (+20 more)
+Cohesion: 0.08
+Nodes (22): Challenge, ChallengeOrder, ChallengePosition, EODPrice, leaderboardEntry, Participant, Snapshot, hasImageSignature() (+14 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.1
@@ -181,48 +182,48 @@ Cohesion: 0.18
 Nodes (18): detect_columns(), expand_daily_to_minutes(), forward_fill_gaps(), _in_session(), main(), parse_daily_file(), parse_datetime(), parse_intraday_file() (+10 more)
 
 ### Community 10 - "Community 10"
+Cohesion: 0.12
+Nodes (8): fmt(), fmtPKR(), handleDownload(), pct(), PerformanceChart(), downloadCSV(), useTheme(), ThemeToggle()
+
+### Community 11 - "Community 11"
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
-### Community 11 - "Community 11"
-Cohesion: 0.16
-Nodes (6): fmt(), fmtPKR(), pct(), PerformanceChart(), useTheme(), ThemeToggle()
-
 ### Community 12 - "Community 12"
+Cohesion: 0.14
+Nodes (6): HistoryPoint, LeaderboardEntry, Portfolio, Position, Repository, SimRepo
+
+### Community 13 - "Community 13"
+Cohesion: 0.42
+Nodes (2): respond(), Handler
+
+### Community 14 - "Community 14"
 Cohesion: 0.36
 Nodes (9): forward_fill(), in_session(), main(), parse_file(), parse_row_date(), pf(), pkt_to_utc(), PSO.PK.txt  →  PSO   (strips exchange suffix like .PK, .KAR) (+1 more)
 
-### Community 13 - "Community 13"
-Cohesion: 0.28
-Nodes (6): extractBearerToken(), NewStatusGuard(), RequireAuth(), statusEntry, StatusGuard, TokenParser
-
-### Community 14 - "Community 14"
-Cohesion: 0.25
-Nodes (5): HistoryPoint, LeaderboardEntry, Portfolio, Position, SimRepo
-
 ### Community 15 - "Community 15"
-Cohesion: 0.43
-Nodes (2): NewEngine(), Engine
+Cohesion: 0.39
+Nodes (3): calcFees(), NewEngine(), Engine
 
 ### Community 16 - "Community 16"
+Cohesion: 0.43
+Nodes (2): SMTPMailer, NewSMTPMailer()
+
+### Community 17 - "Community 17"
 Cohesion: 0.47
 Nodes (3): handleFileUpload(), handleReupload(), invalidate()
 
-### Community 17 - "Community 17"
+### Community 18 - "Community 18"
 Cohesion: 0.4
 Nodes (2): calcEMA(), calcMACD()
 
-### Community 18 - "Community 18"
+### Community 19 - "Community 19"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 19 - "Community 19"
-Cohesion: 0.5
-Nodes (3): Simulation, Status, TickBroadcast
-
 ### Community 20 - "Community 20"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (3): Simulation, Status, TickBroadcast
 
 ### Community 21 - "Community 21"
 Cohesion: 0.5
@@ -241,28 +242,28 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 25 - "Community 25"
+Cohesion: 0.5
+Nodes (0): 
+
+### Community 26 - "Community 26"
 Cohesion: 0.83
 Nodes (3): fmt(), fmtPct(), fmtPKR()
 
-### Community 26 - "Community 26"
+### Community 27 - "Community 27"
 Cohesion: 0.67
 Nodes (1): End-to-end test suite for psx_tracker. Tests: DB schema, ticker loading, single-
 
-### Community 27 - "Community 27"
+### Community 28 - "Community 28"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 28 - "Community 28"
-Cohesion: 1.0
-Nodes (2): fmt(), fmtCurrency()
-
 ### Community 29 - "Community 29"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 30 - "Community 30"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): fmt(), fmtCurrency()
 
 ### Community 31 - "Community 31"
 Cohesion: 1.0
@@ -282,11 +283,11 @@ Nodes (0):
 
 ### Community 35 - "Community 35"
 Cohesion: 1.0
-Nodes (2): AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01), Bloomberg â†’ SimTrader CSV Workflow
+Nodes (0): 
 
 ### Community 36 - "Community 36"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01), Bloomberg â†’ SimTrader CSV Workflow
 
 ### Community 37 - "Community 37"
 Cohesion: 1.0
@@ -378,299 +379,301 @@ Nodes (0):
 
 ### Community 59 - "Community 59"
 Cohesion: 1.0
-Nodes (1): Scrape PSX /market-watch for the set of currently quoted (active) series.     Th
+Nodes (0): 
 
 ### Community 60 - "Community 60"
 Cohesion: 1.0
-Nodes (1): Pull the full ticker list from PSX and persist any new ones.     Does NOT touch
+Nodes (1): Scrape PSX /market-watch for the set of currently quoted (active) series.     Th
 
 ### Community 61 - "Community 61"
 Cohesion: 1.0
-Nodes (1): Sync active/inactive status from PSX market-watch.     Only call this on confirm
+Nodes (1): Pull the full ticker list from PSX and persist any new ones.     Does NOT touch
 
 ### Community 62 - "Community 62"
 Cohesion: 1.0
-Nodes (1): Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.
+Nodes (1): Sync active/inactive status from PSX market-watch.     Only call this on confirm
 
 ### Community 63 - "Community 63"
 Cohesion: 1.0
-Nodes (1): Fetch all months covering from_date..to_date for a single symbol.
+Nodes (1): Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.
 
 ### Community 64 - "Community 64"
 Cohesion: 1.0
-Nodes (1): Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday
+Nodes (1): Fetch all months covering from_date..to_date for a single symbol.
 
 ### Community 65 - "Community 65"
 Cohesion: 1.0
-Nodes (1): Push today's EOD prices to the SimTrader backend so the challenge     reconciler
+Nodes (1): Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday
 
 ### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
+Nodes (1): Push today's EOD prices to the SimTrader backend so the challenge     reconciler
 
 ### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (1): If the process was offline, backfill missing trading days.
+Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
 
 ### Community 68 - "Community 68"
 Cohesion: 1.0
-Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
+Nodes (1): If the process was offline, backfill missing trading days.
 
 ### Community 69 - "Community 69"
 Cohesion: 1.0
-Nodes (1): rows: list of dicts with keys symbol, date, open, high, low, close, volume
+Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
-Nodes (1): Pull the full ticker list from PSX and persist any new ones.
+Nodes (1): rows: list of dicts with keys symbol, date, open, high, low, close, volume
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
-Nodes (1): Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.
+Nodes (1): Pull the full ticker list from PSX and persist any new ones.
 
 ### Community 72 - "Community 72"
 Cohesion: 1.0
-Nodes (1): Fetch all months covering from_date..to_date for a single symbol.
+Nodes (1): Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.
 
 ### Community 73 - "Community 73"
 Cohesion: 1.0
-Nodes (1): Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday
+Nodes (1): Fetch all months covering from_date..to_date for a single symbol.
 
 ### Community 74 - "Community 74"
 Cohesion: 1.0
-Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
+Nodes (1): Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday
 
 ### Community 75 - "Community 75"
 Cohesion: 1.0
-Nodes (1): If the process was offline, backfill missing trading days.
+Nodes (1): Fetch all trading days between from_date and to_date (inclusive).
 
 ### Community 76 - "Community 76"
 Cohesion: 1.0
-Nodes (1): Portfolio Management System (Auto P&L)
+Nodes (1): If the process was offline, backfill missing trading days.
 
 ### Community 77 - "Community 77"
 Cohesion: 1.0
-Nodes (1): Order Management System
+Nodes (1): Portfolio Management System (Auto P&L)
 
 ### Community 78 - "Community 78"
 Cohesion: 1.0
-Nodes (1): Admin Dashboard & Simulation Controls
+Nodes (1): Order Management System
 
 ### Community 79 - "Community 79"
 Cohesion: 1.0
-Nodes (1): Real-Time WebSocket Integration
+Nodes (1): Admin Dashboard & Simulation Controls
 
 ### Community 80 - "Community 80"
 Cohesion: 1.0
-Nodes (1): SimulationTimer Component
+Nodes (1): Real-Time WebSocket Integration
 
 ### Community 81 - "Community 81"
 Cohesion: 1.0
-Nodes (1): Frontend Infrastructure (React+TS+Vite+Tailwind)
+Nodes (1): SimulationTimer Component
 
 ### Community 82 - "Community 82"
 Cohesion: 1.0
-Nodes (1): Authentication & User Management (Invite Flow)
+Nodes (1): Frontend Infrastructure (React+TS+Vite+Tailwind)
 
 ### Community 83 - "Community 83"
 Cohesion: 1.0
-Nodes (1): QWEN.md â€” SimTrader Context for Qwen Code
+Nodes (1): Authentication & User Management (Invite Flow)
 
 ### Community 84 - "Community 84"
 Cohesion: 1.0
-Nodes (1): SimTrader Monorepo (3-component structure)
+Nodes (1): QWEN.md â€” SimTrader Context for Qwen Code
 
 ### Community 85 - "Community 85"
 Cohesion: 1.0
-Nodes (1): Security Feature Set (short-lived tokens, rotation, bcrypt)
+Nodes (1): SimTrader Monorepo (3-component structure)
 
 ### Community 86 - "Community 86"
 Cohesion: 1.0
-Nodes (1): Frontend Design System (Button, Card, Badge, StatCard)
+Nodes (1): Security Feature Set (short-lived tokens, rotation, bcrypt)
 
 ### Community 87 - "Community 87"
 Cohesion: 1.0
-Nodes (1): Admin+Student Session Workflow
+Nodes (1): Frontend Design System (Button, Card, Badge, StatCard)
 
 ### Community 88 - "Community 88"
 Cohesion: 1.0
-Nodes (1): Railway Deployment (Backend)
+Nodes (1): Admin+Student Session Workflow
 
 ### Community 89 - "Community 89"
 Cohesion: 1.0
-Nodes (1): Role-Based Access Control (Admin/Student)
+Nodes (1): Railway Deployment (Backend)
 
 ### Community 90 - "Community 90"
 Cohesion: 1.0
-Nodes (1): Module Pattern (modelâ†’repositoryâ†’serviceâ†’handler)
+Nodes (1): Role-Based Access Control (Admin/Student)
 
 ### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (1): Mailer (SMTP + NoOp Dev Mode)
+Nodes (1): Module Pattern (modelâ†’repositoryâ†’serviceâ†’handler)
 
 ### Community 92 - "Community 92"
 Cohesion: 1.0
-Nodes (1): Database Migrations (SQL schema + seed admin)
+Nodes (1): Mailer (SMTP + NoOp Dev Mode)
 
 ### Community 93 - "Community 93"
 Cohesion: 1.0
-Nodes (1): PSX Session Details (09:30-15:30 PKT, 360 bars)
+Nodes (1): Database Migrations (SQL schema + seed admin)
 
 ### Community 94 - "Community 94"
 Cohesion: 1.0
-Nodes (1): PSX Stock Teaching Categories (Large/Mid/Volatile/Defensive)
+Nodes (1): PSX Session Details (09:30-15:30 PKT, 360 bars)
 
 ### Community 95 - "Community 95"
+Cohesion: 1.0
+Nodes (1): PSX Stock Teaching Categories (Large/Mid/Volatile/Defensive)
+
+### Community 96 - "Community 96"
 Cohesion: 1.0
 Nodes (1): Light/Dark Mode Toggle UI Component
 
 ## Knowledge Gaps
 - **131 isolated node(s):** `rows: list of dicts with keys symbol, date, open, high, low, close, volume`, `Return ticker symbols. By default only active series (status=1) are returned.`, `Mark `active_symbols` with status=1 and every other known ticker with status=0.`, `Direct PSX scraper — hits dps.psx.com.pk without relying on the psx package's br`, `Raised when the PSX page shape is unrecognised (likely a site redesign),     so` (+126 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 29`** (2 nodes): `processPending()`, `client.ts`
+- **Thin community `Community 31`** (2 nodes): `processPending()`, `client.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `clsx()`, `DashboardLayout.tsx`
+- **Thin community `Community 32`** (2 nodes): `clsx()`, `DashboardLayout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (2 nodes): `handleSubmit()`, `AdminSettingsPage.tsx`
+- **Thin community `Community 33`** (2 nodes): `handleSubmit()`, `AdminSettingsPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (2 nodes): `fmt()`, `ChartPageold.tsx`
+- **Thin community `Community 34`** (2 nodes): `fmt()`, `ChartPageold.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
+- **Thin community `Community 35`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (2 nodes): `fmt()`, `OrdersPage.tsx`
+- **Thin community `Community 36`** (2 nodes): `AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01)`, `Bloomberg â†’ SimTrader CSV Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (2 nodes): `AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01)`, `Bloomberg â†’ SimTrader CSV Workflow`
+- **Thin community `Community 37`** (1 nodes): `gemma.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (1 nodes): `gemma.py`
+- **Thin community `Community 38`** (1 nodes): `config.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (1 nodes): `config.py`
+- **Thin community `Community 39`** (1 nodes): `adapter.go`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (1 nodes): `adapter.go`
+- **Thin community `Community 40`** (1 nodes): `postcss.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (1 nodes): `postcss.config.js`
+- **Thin community `Community 41`** (1 nodes): `tailwind.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (1 nodes): `tailwind.config.js`
+- **Thin community `Community 42`** (1 nodes): `vite.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (1 nodes): `vite.config.ts`
+- **Thin community `Community 43`** (1 nodes): `App.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (1 nodes): `App.tsx`
+- **Thin community `Community 44`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (1 nodes): `main.tsx`
+- **Thin community `Community 45`** (1 nodes): `vite-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (1 nodes): `vite-env.d.ts`
+- **Thin community `Community 46`** (1 nodes): `auth.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (1 nodes): `auth.ts`
+- **Thin community `Community 47`** (1 nodes): `challenge.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (1 nodes): `challenge.ts`
+- **Thin community `Community 48`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (1 nodes): `index.ts`
+- **Thin community `Community 49`** (1 nodes): `order.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (1 nodes): `order.ts`
+- **Thin community `Community 50`** (1 nodes): `portfolio.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (1 nodes): `portfolio.ts`
+- **Thin community `Community 51`** (1 nodes): `psx.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (1 nodes): `psx.ts`
+- **Thin community `Community 52`** (1 nodes): `simulation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (1 nodes): `simulation.ts`
+- **Thin community `Community 53`** (1 nodes): `user.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (1 nodes): `user.ts`
+- **Thin community `Community 54`** (1 nodes): `index.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (1 nodes): `index.tsx`
+- **Thin community `Community 55`** (1 nodes): `AdminLayout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (1 nodes): `AdminLayout.tsx`
+- **Thin community `Community 56`** (1 nodes): `AdminOverviewPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (1 nodes): `AdminOverviewPage.tsx`
+- **Thin community `Community 57`** (1 nodes): `ProfilePage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (1 nodes): `ProfilePage.tsx`
+- **Thin community `Community 58`** (1 nodes): `auth.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (1 nodes): `auth.ts`
+- **Thin community `Community 59`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (1 nodes): `index.ts`
+- **Thin community `Community 60`** (1 nodes): `Scrape PSX /market-watch for the set of currently quoted (active) series.     Th`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (1 nodes): `Scrape PSX /market-watch for the set of currently quoted (active) series.     Th`
+- **Thin community `Community 61`** (1 nodes): `Pull the full ticker list from PSX and persist any new ones.     Does NOT touch`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (1 nodes): `Pull the full ticker list from PSX and persist any new ones.     Does NOT touch`
+- **Thin community `Community 62`** (1 nodes): `Sync active/inactive status from PSX market-watch.     Only call this on confirm`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (1 nodes): `Sync active/inactive status from PSX market-watch.     Only call this on confirm`
+- **Thin community `Community 63`** (1 nodes): `Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (1 nodes): `Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.`
+- **Thin community `Community 64`** (1 nodes): `Fetch all months covering from_date..to_date for a single symbol.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (1 nodes): `Fetch all months covering from_date..to_date for a single symbol.`
+- **Thin community `Community 65`** (1 nodes): `Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (1 nodes): `Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday`
+- **Thin community `Community 66`** (1 nodes): `Push today's EOD prices to the SimTrader backend so the challenge     reconciler`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (1 nodes): `Push today's EOD prices to the SimTrader backend so the challenge     reconciler`
+- **Thin community `Community 67`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
+- **Thin community `Community 68`** (1 nodes): `If the process was offline, backfill missing trading days.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (1 nodes): `If the process was offline, backfill missing trading days.`
+- **Thin community `Community 69`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
+- **Thin community `Community 70`** (1 nodes): `rows: list of dicts with keys symbol, date, open, high, low, close, volume`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `rows: list of dicts with keys symbol, date, open, high, low, close, volume`
+- **Thin community `Community 71`** (1 nodes): `Pull the full ticker list from PSX and persist any new ones.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (1 nodes): `Pull the full ticker list from PSX and persist any new ones.`
+- **Thin community `Community 72`** (1 nodes): `Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (1 nodes): `Fetch one month of OHLCV for a single symbol via PSX HTML endpoint.`
+- **Thin community `Community 73`** (1 nodes): `Fetch all months covering from_date..to_date for a single symbol.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 72`** (1 nodes): `Fetch all months covering from_date..to_date for a single symbol.`
+- **Thin community `Community 74`** (1 nodes): `Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (1 nodes): `Fetch EOD OHLCV for all known tickers on target_date.     Defaults to yesterday`
+- **Thin community `Community 75`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 74`** (1 nodes): `Fetch all trading days between from_date and to_date (inclusive).`
+- **Thin community `Community 76`** (1 nodes): `If the process was offline, backfill missing trading days.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (1 nodes): `If the process was offline, backfill missing trading days.`
+- **Thin community `Community 77`** (1 nodes): `Portfolio Management System (Auto P&L)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 76`** (1 nodes): `Portfolio Management System (Auto P&L)`
+- **Thin community `Community 78`** (1 nodes): `Order Management System`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (1 nodes): `Order Management System`
+- **Thin community `Community 79`** (1 nodes): `Admin Dashboard & Simulation Controls`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (1 nodes): `Admin Dashboard & Simulation Controls`
+- **Thin community `Community 80`** (1 nodes): `Real-Time WebSocket Integration`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (1 nodes): `Real-Time WebSocket Integration`
+- **Thin community `Community 81`** (1 nodes): `SimulationTimer Component`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `SimulationTimer Component`
+- **Thin community `Community 82`** (1 nodes): `Frontend Infrastructure (React+TS+Vite+Tailwind)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `Frontend Infrastructure (React+TS+Vite+Tailwind)`
+- **Thin community `Community 83`** (1 nodes): `Authentication & User Management (Invite Flow)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `Authentication & User Management (Invite Flow)`
+- **Thin community `Community 84`** (1 nodes): `QWEN.md â€” SimTrader Context for Qwen Code`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (1 nodes): `QWEN.md â€” SimTrader Context for Qwen Code`
+- **Thin community `Community 85`** (1 nodes): `SimTrader Monorepo (3-component structure)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (1 nodes): `SimTrader Monorepo (3-component structure)`
+- **Thin community `Community 86`** (1 nodes): `Security Feature Set (short-lived tokens, rotation, bcrypt)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (1 nodes): `Security Feature Set (short-lived tokens, rotation, bcrypt)`
+- **Thin community `Community 87`** (1 nodes): `Frontend Design System (Button, Card, Badge, StatCard)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (1 nodes): `Frontend Design System (Button, Card, Badge, StatCard)`
+- **Thin community `Community 88`** (1 nodes): `Admin+Student Session Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (1 nodes): `Admin+Student Session Workflow`
+- **Thin community `Community 89`** (1 nodes): `Railway Deployment (Backend)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (1 nodes): `Railway Deployment (Backend)`
+- **Thin community `Community 90`** (1 nodes): `Role-Based Access Control (Admin/Student)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (1 nodes): `Role-Based Access Control (Admin/Student)`
+- **Thin community `Community 91`** (1 nodes): `Module Pattern (modelâ†’repositoryâ†’serviceâ†’handler)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (1 nodes): `Module Pattern (modelâ†’repositoryâ†’serviceâ†’handler)`
+- **Thin community `Community 92`** (1 nodes): `Mailer (SMTP + NoOp Dev Mode)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (1 nodes): `Mailer (SMTP + NoOp Dev Mode)`
+- **Thin community `Community 93`** (1 nodes): `Database Migrations (SQL schema + seed admin)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (1 nodes): `Database Migrations (SQL schema + seed admin)`
+- **Thin community `Community 94`** (1 nodes): `PSX Session Details (09:30-15:30 PKT, 360 bars)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (1 nodes): `PSX Session Details (09:30-15:30 PKT, 360 bars)`
+- **Thin community `Community 95`** (1 nodes): `PSX Stock Teaching Categories (Large/Mid/Volatile/Defensive)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (1 nodes): `PSX Stock Teaching Categories (Large/Mid/Volatile/Defensive)`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (1 nodes): `Light/Dark Mode Toggle UI Component`
+- **Thin community `Community 96`** (1 nodes): `Light/Dark Mode Toggle UI Component`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 13`, `Community 15`?**
-  _High betweenness centrality (0.182) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 15`?**
-  _High betweenness centrality (0.101) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Community 2`, `Community 13`, `Community 3`, `Community 5`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
+- **Why does `main()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 13`, `Community 15`, `Community 16`?**
+  _High betweenness centrality (0.181) - this node is a cross-community bridge._
+- **Why does `Close()` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 12`, `Community 15`, `Community 16`?**
+  _High betweenness centrality (0.100) - this node is a cross-community bridge._
+- **Why does `Status` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`?**
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **Are the 54 inferred relationships involving `BadRequest()` (e.g. with `.Login()` and `.CompleteRegistration()`) actually correct?**
   _`BadRequest()` has 54 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 50 inferred relationships involving `InternalError()` (e.g. with `.IngestEODPrices()` and `.AdminCreate()`) actually correct?**
