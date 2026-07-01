@@ -155,7 +155,7 @@ func (m *SMTPMailer) deliver(to string, msg []byte) error {
 	}
 
 	if m.cfg.SMTPUser != "" {
-		if err := client.Auth(smtp.PlainAuth("", m.cfg.SMTPUser, m.cfg.SMTPPass, m.cfg.SMTPHost)); err != nil {
+		if err := client.Auth(newLoginAuth(m.cfg.SMTPUser, m.cfg.SMTPPass)); err != nil {
 			return fmt.Errorf("smtp auth: %w", err)
 		}
 	}
@@ -176,6 +176,32 @@ func (m *SMTPMailer) deliver(to string, msg []byte) error {
 		return fmt.Errorf("smtp close: %w", err)
 	}
 	return client.Quit()
+}
+
+// loginAuth implements smtp.Auth for the LOGIN mechanism required by Office 365.
+// Go's built-in smtp.PlainAuth uses PLAIN, which Office 365 rejects (504 5.7.4).
+type loginAuth struct{ username, password string }
+
+func newLoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(_ *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", nil, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, fmt.Errorf("smtp login: unexpected challenge: %s", fromServer)
+		}
+	}
+	return nil, nil
 }
 
 // NoOpMailer is used in development when you don't want to send real emails.
