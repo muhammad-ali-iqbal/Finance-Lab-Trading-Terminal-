@@ -240,10 +240,19 @@ const inviteHTMLTemplate = `<!DOCTYPE html>
 <style>
 body { margin: 0; padding: 0; background-color: #F4F1EC; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media only screen and (max-width: 600px) {
+  .em-outer       { padding: 24px 12px !important; }
+  .em-iba-title   { letter-spacing: 1px !important; }
+  .em-header-band { padding: 18px 24px 16px !important; }
+  .em-body        { padding: 28px 20px 28px !important; }
+  .em-h1          { font-size: 22px !important; }
+  .em-body-p      { font-size: 15px !important; }
+  .em-btn         { display: block !important; padding: 14px 20px !important; text-align: center !important; box-sizing: border-box !important; width: 100%% !important; }
+}
 </style>
 </head>
 <body>
-<div style="min-height: 100vh; background-color: #F4F1EC; padding: 48px 16px; font-family: 'EB Garamond', Georgia, serif; animation: fadeIn 0.6s ease both;">
+<div class="em-outer" style="min-height: 100vh; background-color: #F4F1EC; padding: 48px 16px; font-family: 'EB Garamond', Georgia, serif; animation: fadeIn 0.6s ease both;">
   <div style="max-width: 580px; margin: 0 auto;">
 
     <!-- IBA header -->
@@ -260,7 +269,7 @@ body { margin: 0; padding: 0; background-color: #F4F1EC; }
         </svg>
         <div style="flex: 1; height: 1px; background: linear-gradient(to left, transparent, #8B1A2A);"></div>
       </div>
-      <div style="font-size: 11px; font-family: 'EB Garamond', Georgia, serif; letter-spacing: 3px; color: #8B1A2A; text-transform: uppercase; font-weight: 500; margin-bottom: 6px;">
+      <div class="em-iba-title" style="font-size: 11px; font-family: 'EB Garamond', Georgia, serif; letter-spacing: 3px; color: #8B1A2A; text-transform: uppercase; font-weight: 500; margin-bottom: 6px;">
         Institute of Business Administration
       </div>
       <div style="font-size: 11px; font-family: 'EB Garamond', Georgia, serif; letter-spacing: 2px; color: #9A7B4A; text-transform: uppercase;">
@@ -272,7 +281,7 @@ body { margin: 0; padding: 0; background-color: #F4F1EC; }
     <div style="background-color: #FFFFFF; border-top: 3px solid #8B1A2A; box-shadow: 0 2px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(139,26,42,0.06);">
 
       <!-- Maroon header band -->
-      <div style="background-color: #8B1A2A; padding: 28px 48px 24px; text-align: center;">
+      <div class="em-header-band" style="background-color: #8B1A2A; padding: 28px 48px 24px; text-align: center;">
         <div style="font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 600; color: #F4F1EC; letter-spacing: 1px; font-style: italic; margin-bottom: 4px;">
           SimTrader
         </div>
@@ -285,33 +294,33 @@ body { margin: 0; padding: 0; background-color: #F4F1EC; }
       <div style="height: 2px; background: linear-gradient(to right, #8B1A2A, #C9A84C, #8B1A2A);"></div>
 
       <!-- Body -->
-      <div style="padding: 44px 52px 40px;">
+      <div class="em-body" style="padding: 44px 52px 40px;">
 
         <p style="margin: 0 0 6px 0; font-size: 13px; letter-spacing: 2.5px; color: #9A7B4A; text-transform: uppercase; font-family: 'EB Garamond', Georgia, serif;">
           Formal Invitation
         </p>
 
-        <h1 style="margin: 0 0 20px 0; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-size: 30px; font-weight: 600; color: #1A0A0E; letter-spacing: -0.3px; line-height: 1.2;">
+        <h1 class="em-h1" style="margin: 0 0 20px 0; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-size: 30px; font-weight: 600; color: #1A0A0E; letter-spacing: -0.3px; line-height: 1.2;">
           You Have Been Invited<br>to Join SimTrader
         </h1>
 
         <div style="width: 48px; height: 1px; background-color: #C9A84C; margin-bottom: 24px;"></div>
 
-        <p style="margin: 0 0 18px 0; font-size: 17px; color: #2A1A1E; line-height: 1.75;">
+        <p class="em-body-p" style="margin: 0 0 18px 0; font-size: 17px; color: #2A1A1E; line-height: 1.75;">
           On behalf of the <strong style="font-weight: 600; color: #8B1A2A;">IBA Finance Laboratory</strong>, we are pleased to extend this invitation for you to participate in <em>SimTrader</em> &mdash; the Institute's designated stock market simulation platform.
         </p>
 
-        <p style="margin: 0 0 18px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
+        <p class="em-body-p" style="margin: 0 0 18px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
           SimTrader is deployed as part of the IBA's commitment to applied financial education, enabling students and faculty to engage with live market conditions, construct and manage portfolios, and develop rigorous analytical judgment in a consequence-free environment.
         </p>
 
-        <p style="margin: 0 0 32px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
+        <p class="em-body-p" style="margin: 0 0 32px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
           You are cordially invited to complete your registration and commence participation at your earliest convenience.
         </p>
 
         <!-- CTA button -->
         <div style="text-align: center; margin: 0 0 32px 0;">
-          <a href="%s" style="display: inline-block; padding: 14px 36px; background-color: #8B1A2A; border-bottom: 2px solid #5E1020; font-family: 'EB Garamond', Georgia, serif; font-size: 15px; font-weight: 600; color: #F4F1EC; text-decoration: none; letter-spacing: 2px; text-transform: uppercase;">
+          <a class="em-btn" href="%s" style="display: inline-block; padding: 14px 36px; background-color: #8B1A2A; border-bottom: 2px solid #5E1020; font-family: 'EB Garamond', Georgia, serif; font-size: 15px; font-weight: 600; color: #F4F1EC; text-decoration: none; letter-spacing: 2px; text-transform: uppercase;">
             Establish Your Account
           </a>
         </div>
