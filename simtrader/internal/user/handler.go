@@ -8,6 +8,7 @@ package user
 import (
 	"context"
 	"errors"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -218,6 +219,7 @@ func (h *Handler) InviteStudent(c *fiber.Ctx) error {
 		}
 		// Email send failure — user was created but email failed.
 		// Return 207 Multi-Status so the frontend can warn the admin.
+		log.Printf("[invite] email failed for %s: %v", req.Email, err)
 		return c.Status(fiber.StatusMultiStatus).JSON(fiber.Map{
 			"warning": "Student account created but invite email failed to send. Share the invite link manually.",
 			"user":    u.ToPublicProfile(),
