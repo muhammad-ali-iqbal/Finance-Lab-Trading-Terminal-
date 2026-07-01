@@ -48,7 +48,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
               </div>
               <p className="text-sm font-medium text-ink dark:text-dark-ink">Invite sent!</p>
               <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">
-                {email} will receive a registration link. In dev mode, check the server console for the token.
+                {email} will receive a registration link via email.
               </p>
               <div className="pt-2 flex gap-2">
                 <Button size="sm" variant="secondary" fullWidth onClick={() => { setEmail(''); setSuccess(false) }}>
