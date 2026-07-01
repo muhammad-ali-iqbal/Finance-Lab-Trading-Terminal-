@@ -49,9 +49,7 @@ import bcrypt, os
 print(bcrypt.hashpw(os.environ['ADMIN_PW'].encode(), bcrypt.gensalt(12)).decode())
 ")
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q \
-    -v admin_email="$email" \
-    -v admin_hash="$hash" \
-    -c "UPDATE users SET email = :'admin_email', password_hash = :'admin_hash', status = 'active' WHERE role = 'admin'"
+    -c "UPDATE users SET email = '$email', password_hash = '$hash', status = 'active' WHERE role = 'admin'"
 }
 
 if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
