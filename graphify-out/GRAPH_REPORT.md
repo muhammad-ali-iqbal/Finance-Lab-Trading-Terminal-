@@ -1,12 +1,12 @@
 # Graph Report - .  (2026-07-01)
 
 ## Corpus Check
-- 83 files · ~1,560,256 words
+- 83 files · ~1,544,436 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 641 nodes · 1175 edges · 97 communities detected
-- Extraction: 59% EXTRACTED · 41% INFERRED · 0% AMBIGUOUS · INFERRED: 482 edges (avg confidence: 0.8)
+- 645 nodes · 1209 edges · 97 communities detected
+- Extraction: 58% EXTRACTED · 42% INFERRED · 0% AMBIGUOUS · INFERRED: 511 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -113,7 +113,7 @@
 2. `InternalError()` - 51 edges
 3. `Status` - 43 edges
 4. `Close()` - 37 edges
-5. `main()` - 33 edges
+5. `main()` - 34 edges
 6. `Repository` - 31 edges
 7. `GetClaims()` - 26 edges
 8. `Handler` - 25 edges
@@ -143,59 +143,59 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.09
-Nodes (11): GetClaims(), Handler, BadRequest(), InternalError(), Handler, Handler, Handler, Handler (+3 more)
+Nodes (12): GetClaims(), Handler, BadRequest(), InternalError(), mapAuthError(), Handler, Handler, Handler (+4 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (25): authResponse, forgotPasswordRequest, Handler, loginRequest, logoutRequest, Mailer, NoOpMailer, refreshRequest (+17 more)
+Cohesion: 0.05
+Nodes (19): EODBar, LeaderboardRow, Reconciler, Repository, Close(), Connect(), Migrate(), requireTLS() (+11 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
-Nodes (13): NewClock(), toggle(), NewRepository(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry (+5 more)
+Nodes (21): Handler, Mailer, NoOpMailer, Service, TokenPair, handler(), contains(), containsRune() (+13 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.07
-Nodes (46): db(), get_known_tickers(), init_db(), last_fetch_date(), log_fetch(), rows: list of dicts with keys symbol, date, open, high, low, close, volume, Return ticker symbols. By default only active series (status=1) are returned., Mark `active_symbols` with status=1 and every other known ticker with status=0. (+38 more)
+Cohesion: 0.06
+Nodes (14): NewClock(), toggle(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry, Repository (+6 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.07
-Nodes (12): EODBar, LeaderboardRow, Reconciler, Repository, Close(), OrderRepository, lockedHeldQty(), NewReconciler() (+4 more)
+Nodes (47): db(), get_connection(), get_known_tickers(), init_db(), last_fetch_date(), log_fetch(), rows: list of dicts with keys symbol, date, open, high, low, close, volume, Return ticker symbols. By default only active series (status=1) are returned. (+39 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.08
-Nodes (26): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+18 more)
+Cohesion: 0.06
+Nodes (29): authResponse, forgotPasswordRequest, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest, Challenge (+21 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (22): Challenge, ChallengeOrder, ChallengePosition, EODPrice, leaderboardEntry, Participant, Snapshot, hasImageSignature() (+14 more)
+Cohesion: 0.11
+Nodes (20): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+12 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.1
 Nodes (24): Admin Route Prefix Convention, Go Backend Architecture, Bloomberg to SimTrader CSV Conversion Tool, Directory Structure and Project Layout, React Frontend Architecture, Go 1.22+ with Fiber v2, Insufficient Resources WebSocket Issue, Invite-Only Registration Pattern (+16 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.1
-Nodes (9): handler(), onClickOutside(), td(), toDateStr(), contains(), containsRune(), isDuplicateError(), onClickOutside() (+1 more)
-
-### Community 9 - "Community 9"
 Cohesion: 0.18
 Nodes (18): detect_columns(), expand_daily_to_minutes(), forward_fill_gaps(), _in_session(), main(), parse_daily_file(), parse_datetime(), parse_intraday_file() (+10 more)
 
-### Community 10 - "Community 10"
+### Community 9 - "Community 9"
 Cohesion: 0.12
 Nodes (8): fmt(), fmtPKR(), handleDownload(), pct(), PerformanceChart(), downloadCSV(), useTheme(), ThemeToggle()
 
-### Community 11 - "Community 11"
+### Community 10 - "Community 10"
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
-### Community 12 - "Community 12"
-Cohesion: 0.14
-Nodes (6): HistoryPoint, LeaderboardEntry, Portfolio, Position, Repository, SimRepo
+### Community 11 - "Community 11"
+Cohesion: 0.29
+Nodes (4): loginAuth, SMTPMailer, newLoginAuth(), NewSMTPMailer()
 
-### Community 13 - "Community 13"
+### Community 12 - "Community 12"
 Cohesion: 0.42
 Nodes (2): respond(), Handler
+
+### Community 13 - "Community 13"
+Cohesion: 0.22
+Nodes (3): onClickOutside(), td(), toDateStr()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.36
@@ -206,8 +206,8 @@ Cohesion: 0.39
 Nodes (3): calcFees(), NewEngine(), Engine
 
 ### Community 16 - "Community 16"
-Cohesion: 0.43
-Nodes (2): SMTPMailer, NewSMTPMailer()
+Cohesion: 0.25
+Nodes (5): HistoryPoint, LeaderboardEntry, Portfolio, Position, SimRepo
 
 ### Community 17 - "Community 17"
 Cohesion: 0.47
@@ -668,12 +668,12 @@ Nodes (1): Light/Dark Mode Toggle UI Component
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 13`, `Community 15`, `Community 16`?**
-  _High betweenness centrality (0.181) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 12`, `Community 15`, `Community 16`?**
-  _High betweenness centrality (0.100) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+- **Why does `main()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 11`, `Community 12`, `Community 15`?**
+  _High betweenness centrality (0.165) - this node is a cross-community bridge._
+- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 11`, `Community 15`?**
+  _High betweenness centrality (0.074) - this node is a cross-community bridge._
+- **Why does `Status` connect `Community 0` to `Community 3`, `Community 6`?**
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **Are the 54 inferred relationships involving `BadRequest()` (e.g. with `.Login()` and `.CompleteRegistration()`) actually correct?**
   _`BadRequest()` has 54 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 50 inferred relationships involving `InternalError()` (e.g. with `.IngestEODPrices()` and `.AdminCreate()`) actually correct?**

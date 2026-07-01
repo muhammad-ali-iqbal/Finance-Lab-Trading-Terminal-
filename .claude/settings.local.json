@@ -46,7 +46,10 @@
       "WebSearch",
       "PowerShell(psql *)",
       "Bash(sqlite3 *)",
-      "PowerShell(ls \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader\\\\internal\\\\\")"
+      "PowerShell(ls \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader\\\\internal\\\\\")",
+      "Skill(artifact-design)",
+      "Artifact",
+      "Bash(python3 *)"
     ]
   }
 }

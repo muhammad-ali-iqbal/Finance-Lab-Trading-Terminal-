@@ -45,7 +45,8 @@ If you didn't expect this invitation, you can ignore this email.
 
 © SimTrader — IBA Finance Lab`, registrationURL)
 
-	html := fmt.Sprintf(inviteHTMLTemplate, registrationURL)
+	// Three %s: button href, fallback <a> href, fallback display text.
+	html := fmt.Sprintf(inviteHTMLTemplate, registrationURL, registrationURL, registrationURL)
 
 	return m.send(toEmail, subject, plain, html)
 }
@@ -223,8 +224,10 @@ func (n *NoOpMailer) SendPasswordReset(toEmail, firstName, resetToken string) er
 }
 
 // ---------------------------------------------------------------------------
-// HTML templates (inline, email-client-safe: table layout, inline styles)
-// %s is replaced with the CTA URL via fmt.Sprintf before sending.
+// HTML templates (IBA-branded, inline styles for email client compatibility)
+// inviteHTMLTemplate: three %s — (1) button href, (2) fallback <a> href,
+//                                 (3) fallback link display text.
+// resetHTMLTemplate:  one %s  — CTA href.
 // ---------------------------------------------------------------------------
 
 const inviteHTMLTemplate = `<!DOCTYPE html>
@@ -233,67 +236,123 @@ const inviteHTMLTemplate = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>You've been invited to SimTrader</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+body { margin: 0; padding: 0; background-color: #F4F1EC; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
-<body style="margin:0;padding:0;background-color:#F8F8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F8F7;">
-    <tr>
-      <td align="center" style="padding:48px 16px;">
-        <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%%;">
+<body>
+<div style="min-height: 100vh; background-color: #F4F1EC; padding: 48px 16px; font-family: 'EB Garamond', Georgia, serif; animation: fadeIn 0.6s ease both;">
+  <div style="max-width: 580px; margin: 0 auto;">
 
-          <!-- Logo / brand -->
-          <tr>
-            <td align="center" style="padding-bottom:32px;">
-              <span style="font-size:22px;font-weight:700;color:#0F0F0E;letter-spacing:-0.5px;">SimTrader</span>
-            </td>
-          </tr>
+    <!-- IBA header -->
+    <div style="text-align: center; padding-bottom: 36px;">
+      <div style="display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 20px;">
+        <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, #8B1A2A);"></div>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="8" y="0" width="2" height="18" fill="#8B1A2A" opacity="0.5"/>
+          <rect x="0" y="8" width="18" height="2" fill="#8B1A2A" opacity="0.5"/>
+          <rect x="3" y="3" width="2" height="2" fill="#C9A84C"/>
+          <rect x="13" y="3" width="2" height="2" fill="#C9A84C"/>
+          <rect x="3" y="13" width="2" height="2" fill="#C9A84C"/>
+          <rect x="13" y="13" width="2" height="2" fill="#C9A84C"/>
+        </svg>
+        <div style="flex: 1; height: 1px; background: linear-gradient(to left, transparent, #8B1A2A);"></div>
+      </div>
+      <div style="font-size: 11px; font-family: 'EB Garamond', Georgia, serif; letter-spacing: 3px; color: #8B1A2A; text-transform: uppercase; font-weight: 500; margin-bottom: 6px;">
+        Institute of Business Administration
+      </div>
+      <div style="font-size: 11px; font-family: 'EB Garamond', Georgia, serif; letter-spacing: 2px; color: #9A7B4A; text-transform: uppercase;">
+        Finance Laboratory &mdash; Karachi
+      </div>
+    </div>
 
-          <!-- Card -->
-          <tr>
-            <td style="background-color:#FFFFFF;border-radius:8px;padding:40px 48px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <!-- Main card -->
+    <div style="background-color: #FFFFFF; border-top: 3px solid #8B1A2A; box-shadow: 0 2px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(139,26,42,0.06);">
 
-              <h1 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#0F0F0E;letter-spacing:-0.3px;">
-                You've been invited
-              </h1>
-              <p style="margin:0 0 24px 0;font-size:15px;color:#6B6B6B;line-height:1.5;">
-                Learn markets by participating in them.
-              </p>
+      <!-- Maroon header band -->
+      <div style="background-color: #8B1A2A; padding: 28px 48px 24px; text-align: center;">
+        <div style="font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 600; color: #F4F1EC; letter-spacing: 1px; font-style: italic; margin-bottom: 4px;">
+          SimTrader
+        </div>
+        <div style="font-size: 10px; letter-spacing: 4px; color: #C9A84C; text-transform: uppercase; font-family: 'EB Garamond', Georgia, serif;">
+          Market Simulation Platform
+        </div>
+      </div>
 
-              <p style="margin:0 0 28px 0;font-size:15px;color:#3A3A3A;line-height:1.6;">
-                You've been invited to join <strong>SimTrader</strong>, a stock market simulation platform used at the IBA Finance Lab. Click the button below to create your account and start trading.
-              </p>
+      <!-- Gold rule -->
+      <div style="height: 2px; background: linear-gradient(to right, #8B1A2A, #C9A84C, #8B1A2A);"></div>
 
-              <!-- CTA button -->
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;">
-                <tr>
-                  <td style="border-radius:6px;background-color:#0F0F0E;">
-                    <a href="%s"
-                       style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#F2F1EF;text-decoration:none;border-radius:6px;letter-spacing:0.1px;">
-                      Set Up Your Account
-                    </a>
-                  </td>
-                </tr>
-              </table>
+      <!-- Body -->
+      <div style="padding: 44px 52px 40px;">
 
-              <p style="margin:0;font-size:13px;color:#9A9A9A;line-height:1.5;">
-                This invitation link expires in 7 days. If you didn't expect this email, you can safely ignore it.
-              </p>
+        <p style="margin: 0 0 6px 0; font-size: 13px; letter-spacing: 2.5px; color: #9A7B4A; text-transform: uppercase; font-family: 'EB Garamond', Georgia, serif;">
+          Formal Invitation
+        </p>
 
-            </td>
-          </tr>
+        <h1 style="margin: 0 0 20px 0; font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif; font-size: 30px; font-weight: 600; color: #1A0A0E; letter-spacing: -0.3px; line-height: 1.2;">
+          You Have Been Invited<br>to Join SimTrader
+        </h1>
 
-          <!-- Footer -->
-          <tr>
-            <td align="center" style="padding-top:28px;">
-              <p style="margin:0;font-size:12px;color:#ACACAC;">
-                &copy; SimTrader &mdash; IBA Finance Lab
-              </p>
-            </td>
-          </tr>
+        <div style="width: 48px; height: 1px; background-color: #C9A84C; margin-bottom: 24px;"></div>
 
-        </table>
-      </td>
-    </tr>
-  </table>
+        <p style="margin: 0 0 18px 0; font-size: 17px; color: #2A1A1E; line-height: 1.75;">
+          On behalf of the <strong style="font-weight: 600; color: #8B1A2A;">IBA Finance Laboratory</strong>, we are pleased to extend this invitation for you to participate in <em>SimTrader</em> &mdash; the Institute's designated stock market simulation platform.
+        </p>
+
+        <p style="margin: 0 0 18px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
+          SimTrader is deployed as part of the IBA's commitment to applied financial education, enabling students and faculty to engage with live market conditions, construct and manage portfolios, and develop rigorous analytical judgment in a consequence-free environment.
+        </p>
+
+        <p style="margin: 0 0 32px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">
+          You are cordially invited to complete your registration and commence participation at your earliest convenience.
+        </p>
+
+        <!-- CTA button -->
+        <div style="text-align: center; margin: 0 0 32px 0;">
+          <a href="%s" style="display: inline-block; padding: 14px 36px; background-color: #8B1A2A; border-bottom: 2px solid #5E1020; font-family: 'EB Garamond', Georgia, serif; font-size: 15px; font-weight: 600; color: #F4F1EC; text-decoration: none; letter-spacing: 2px; text-transform: uppercase;">
+            Establish Your Account
+          </a>
+        </div>
+
+        <!-- Fallback link for clients where the button does not render/respond -->
+        <p style="margin: 0 0 28px 0; font-size: 14px; color: #7A6A6E; line-height: 1.6; font-style: italic;">
+          Should the button above fail to respond, kindly copy and paste the following link into your browser:
+          <a href="%s" style="color: #8B1A2A; word-break: break-all; text-decoration: underline; font-style: normal;">%s</a>
+        </p>
+
+        <!-- Expiry / disregard notice -->
+        <div style="border-top: 1px solid #E8E0D4; padding-top: 24px;">
+          <p style="margin: 0; font-size: 14px; color: #9A8A8E; line-height: 1.7; font-style: italic;">
+            This invitation is valid for <strong style="font-weight: 600; color: #6A5A5E;">72 hours</strong> from the time of issuance. If you did not anticipate this communication, no further action is required and this message may be disregarded without consequence.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding: 28px 0 0; text-align: center;">
+      <div style="display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 18px;">
+        <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.33));"></div>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <rect x="4" y="0" width="2" height="10" fill="#C9A84C" opacity="0.4"/>
+          <rect x="0" y="4" width="10" height="2" fill="#C9A84C" opacity="0.4"/>
+        </svg>
+        <div style="flex: 1; height: 1px; background: linear-gradient(to left, transparent, rgba(201,168,76,0.33));"></div>
+      </div>
+      <p style="margin: 0 0 4px 0; font-size: 12px; letter-spacing: 1.5px; color: #8B1A2A; text-transform: uppercase; font-family: 'EB Garamond', Georgia, serif;">
+        SimTrader &mdash; IBA Finance Laboratory
+      </p>
+      <p style="margin: 0; font-size: 12px; color: #A89A8E; letter-spacing: 0.5px; line-height: 1.6;">
+        University Road, Karachi 75270 &mdash; Pakistan<br>
+        &copy; 2026 Institute of Business Administration. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>`
 
