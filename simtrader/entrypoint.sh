@@ -16,12 +16,12 @@ echo "[simtrader] Running database migrations..."
 MIGRATION_LOCK_KEY=872461
 
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -c \
-  "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW());"
+  "CREATE TABLE IF NOT EXISTS schema_migrations (filename TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW());"
 
 for f in $(ls /app/migrations/*.sql | sort); do
   version=$(basename "$f")
   applied=$(psql "$DATABASE_URL" -tA -c \
-    "SELECT 1 FROM schema_migrations WHERE version = '$version';")
+    "SELECT 1 FROM schema_migrations WHERE filename = '$version';")
   if [ "$applied" = "1" ]; then
     echo "  • $version (already applied, skipping)"
     continue
@@ -32,7 +32,7 @@ for f in $(ls /app/migrations/*.sql | sort); do
   psql "$DATABASE_URL" --single-transaction -v ON_ERROR_STOP=1 -q \
     -c "SELECT pg_advisory_xact_lock($MIGRATION_LOCK_KEY);" \
     -f "$f" \
-    -c "INSERT INTO schema_migrations (version) VALUES ('$version') ON CONFLICT DO NOTHING;"
+    -c "INSERT INTO schema_migrations (filename) VALUES ('$version') ON CONFLICT DO NOTHING;"
 done
 echo "[simtrader] Migrations complete."
 
