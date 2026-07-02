@@ -29,6 +29,7 @@ import AdminSimulationsPage from '@/pages/admin/AdminSimulationsPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage'
 import AdminChallengePage from '@/pages/admin/AdminChallengePage'
+import AdminAnnouncementsPage from '@/pages/admin/AdminAnnouncementsPage'
 import AdminPSXPage from '@/pages/admin/AdminPSXPage'
 
 // Guards
@@ -93,6 +94,7 @@ export default function App() {
             <Route index                element={<AdminOverviewPage />} />
             <Route path="simulations"  element={<AdminSimulationsPage />} />
             <Route path="challenges"   element={<AdminChallengePage />} />
+            <Route path="announcements" element={<AdminAnnouncementsPage />} />
             <Route path="psx"          element={<AdminPSXPage />} />
             <Route path="users"        element={<AdminUsersPage />} />
             <Route path="settings"     element={<AdminSettingsPage />} />

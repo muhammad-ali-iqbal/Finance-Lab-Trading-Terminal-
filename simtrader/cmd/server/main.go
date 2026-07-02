@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/simtrader/backend/internal/announcement"
 	"github.com/simtrader/backend/internal/auth"
 	"github.com/simtrader/backend/internal/challenge"
 	"github.com/simtrader/backend/internal/config"
@@ -103,6 +104,11 @@ func main() {
 
 	// Periodic retention cleanup of expired/revoked tokens (DATA-04).
 	go startTokenCleanup(ctx, userRepo)
+
+	// Announcements
+	announcementRepo := announcement.NewRepository(db.Pool)
+	announcementService := announcement.NewService(announcementRepo, userRepo, mailer)
+	announcementHandler := announcement.NewHandler(announcementService)
 
 	// PSX Tracker admin panel
 	psxHandler := psxtracker.NewHandler(cfg.PSXTrackerDir, cfg.PythonCmd)
@@ -215,6 +221,7 @@ func main() {
 	orderHandler.RegisterRoutes(app, authMW)
 	portfolioHandler.RegisterRoutes(app, authMW)
 	challengeHandler.RegisterRoutes(app, authMW, adminMW, internalLimiter)
+	announcementHandler.RegisterRoutes(app, authMW, adminMW)
 	psxHandler.RegisterRoutes(app, authMW, adminMW)
 
 	// 404

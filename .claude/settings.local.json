@@ -49,7 +49,9 @@
       "PowerShell(ls \"C:\\\\Users\\\\maiqbal\\\\OneDrive - Institute of Business Administration\\\\Desktop\\\\Finance-Lab-Trading-Terminal-\\\\simtrader\\\\internal\\\\\")",
       "Skill(artifact-design)",
       "Artifact",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(go run *)",
+      "Read(//c/Users/maiqbal/.ssh/**)"
     ]
   }
 }

@@ -75,6 +75,15 @@ Your password will not change.
 	return m.send(toEmail, subject, plain, html)
 }
 
+// SendAnnouncement sends a pre-rendered branded announcement email to one
+// recipient. Exported (unlike send/deliver) so the announcement package can
+// reuse the existing SMTP delivery plumbing without duplicating MIME/TLS/LOGIN
+// auth code. The caller is responsible for escaping any admin-supplied text
+// baked into htmlBody.
+func (m *SMTPMailer) SendAnnouncement(toEmail, subject, htmlBody, plainBody string) error {
+	return m.send(toEmail, subject, plainBody, htmlBody)
+}
+
 // send builds a multipart/alternative MIME message and delivers it via SMTP.
 func (m *SMTPMailer) send(to, subject, plainText, htmlText string) error {
 	var buf bytes.Buffer
@@ -220,6 +229,11 @@ func (n *NoOpMailer) SendInvite(toEmail, firstName, inviteToken string) error {
 
 func (n *NoOpMailer) SendPasswordReset(toEmail, firstName, resetToken string) error {
 	fmt.Printf("[DEV EMAIL] Password reset for %s → token: %s\n", toEmail, resetToken)
+	return nil
+}
+
+func (n *NoOpMailer) SendAnnouncement(toEmail, subject, htmlBody, plainBody string) error {
+	fmt.Printf("[DEV EMAIL] Announcement to %s: %s\n", toEmail, subject)
 	return nil
 }
 

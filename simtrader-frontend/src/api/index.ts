@@ -225,6 +225,31 @@ export interface CreateChallengeInput {
   initialCapital: number
 }
 
+// ── Announcement types ─────────────────────────────────────────────────────
+
+export type AnnouncementStatus = 'pending' | 'sending' | 'completed' | 'failed'
+
+export interface Announcement {
+  id: string
+  subject: string
+  heading: string
+  body: string
+  createdBy: string
+  status: AnnouncementStatus
+  recipientCount: number
+  sentCount: number
+  failedCount: number
+  createdAt: string
+  completedAt: string | null
+}
+
+export interface CreateAnnouncementInput {
+  subject: string
+  heading: string
+  body: string
+  excludeUserIds?: string[]
+}
+
 // API error shape from the Go backend
 export interface ApiError {
   error: string
@@ -248,6 +273,7 @@ export { portfolioApi } from './portfolio'
 export { userApi } from './user'
 export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
 export { challengeApi } from './challenge'
+export { announcementApi } from './announcement'
 export { psxApi } from './psx'
 export type { PSXResult } from './psx'
 export { client } from './client'

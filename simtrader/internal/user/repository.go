@@ -216,6 +216,34 @@ func (r *Repository) List(ctx context.Context, role *Role) ([]*User, error) {
 	return users, rows.Err()
 }
 
+// ListActiveByRole returns active (non-blocked, non-pending) users of a given
+// role. Used to build the recipient list for admin broadcast announcements.
+func (r *Repository) ListActiveByRole(ctx context.Context, role Role) ([]*User, error) {
+	query := `
+		SELECT id, email, password_hash, first_name, last_name,
+		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       created_at, updated_at
+		FROM users
+		WHERE role = $1 AND status = 'active'
+		ORDER BY created_at DESC`
+
+	rows, err := r.db.Query(ctx, query, role)
+	if err != nil {
+		return nil, fmt.Errorf("list active users by role: %w", err)
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		u := &User{}
+		if err := scanUser(rows.Scan, u); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, rows.Err()
+}
+
 // StoreRefreshToken saves a refresh token hash for a user session.
 // We store the hash, never the raw token — same principle as passwords.
 func (r *Repository) StoreRefreshToken(ctx context.Context, userID uuid.UUID, tokenHash string, expiry time.Time) error {

@@ -7,16 +7,17 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   LayoutDashboard, Users, PlayCircle,
-  LogOut, ChevronRight, Settings, Trophy, Database
+  LogOut, ChevronRight, Settings, Trophy, Database, Megaphone
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/admin',             icon: LayoutDashboard, label: 'Overview',    end: true },
-  { to: '/admin/simulations', icon: PlayCircle,      label: 'Simulations'       },
-  { to: '/admin/challenges',  icon: Trophy,          label: 'Challenges'        },
-  { to: '/admin/psx',         icon: Database,        label: 'PSX Data'          },
-  { to: '/admin/users',       icon: Users,           label: 'Students'          },
-  { to: '/admin/settings',    icon: Settings,        label: 'Settings'          },
+  { to: '/admin',              icon: LayoutDashboard, label: 'Overview',      end: true },
+  { to: '/admin/simulations',  icon: PlayCircle,      label: 'Simulations'         },
+  { to: '/admin/challenges',   icon: Trophy,          label: 'Challenges'          },
+  { to: '/admin/announcements', icon: Megaphone,      label: 'Announcements'       },
+  { to: '/admin/psx',          icon: Database,        label: 'PSX Data'            },
+  { to: '/admin/users',        icon: Users,           label: 'Students'            },
+  { to: '/admin/settings',     icon: Settings,        label: 'Settings'            },
 ]
 
 export default function AdminLayout() {

@@ -53,6 +53,7 @@ type Service struct {
 type Mailer interface {
 	SendInvite(toEmail, firstName, inviteToken string) error
 	SendPasswordReset(toEmail, firstName, resetToken string) error
+	SendAnnouncement(toEmail, subject, htmlBody, plainBody string) error
 }
 
 func NewService(users *user.Repository, cfg *config.Config, mailer Mailer) *Service {
