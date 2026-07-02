@@ -1,16 +1,16 @@
 // src/components/layout/DashboardLayout.tsx
 import { useState, useEffect, useRef } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
-import { authApi, simulationApi } from '@/api'
+import { authApi, simulationApi, challengeApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
 import { SimulationTimer } from '@/components/simulation/SimulationTimer'
 import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
-  User, LogOut, Menu, X, ChevronRight, Activity, Briefcase, Trophy
+  User, LogOut, Menu, X, ChevronRight, ChevronDown, Activity, Briefcase, Trophy, ListOrdered, Medal, History
 } from 'lucide-react'
 
 // Compact sidebar widget — reads active sim from shared React Query cache
@@ -49,15 +49,27 @@ function SimulationSidebarWidget() {
   )
 }
 
-const navItems = [
-  { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview'    },
-  { to: '/dashboard/portfolio',    icon: Briefcase,       label: 'Portfolio'   },
-  { to: '/dashboard/trade',        icon: TrendingUp,      label: 'Order Entry' },
-  { to: '/dashboard/chart',        icon: BarChart3,       label: 'Charts'      },
-  { to: '/dashboard/book',         icon: BookOpen,        label: 'Order Book'  },
-  { to: '/dashboard/orders',       icon: Activity,        label: 'My Orders'   },
-  { to: '/dashboard/challenges',   icon: Trophy,          label: 'Challenges'  },
-  { to: '/dashboard/profile',      icon: User,            label: 'Profile'     },
+// Shortcuts into the student's current active challenge — this is the live
+// feature, so its Portfolio/Orders/Leaderboard/Charts tabs are surfaced as
+// top-level nav items rather than requiring a click into "Challenges" first.
+const challengeTabItems: { tab: 'portfolio' | 'orders' | 'leaderboard' | 'charts'; icon: typeof Briefcase; label: string }[] = [
+  { tab: 'portfolio',   icon: Briefcase,   label: 'Portfolio'   },
+  { tab: 'orders',      icon: ListOrdered, label: 'Trade'       },
+  { tab: 'leaderboard', icon: Medal,       label: 'Leaderboard' },
+  { tab: 'charts',      icon: BarChart3,   label: 'Charts'      },
+]
+
+// The old historical-replay-simulation pages. Grouped and collapsed by
+// default now that Challenges (live PSX paper-trading) is the active feature
+// — an empty/unstarted historical simulation shouldn't be the first thing
+// students see.
+const historicNavItems = [
+  { to: '/dashboard',           icon: LayoutDashboard, label: 'Overview'    },
+  { to: '/dashboard/portfolio', icon: Briefcase,       label: 'Portfolio'   },
+  { to: '/dashboard/trade',     icon: TrendingUp,      label: 'Order Entry' },
+  { to: '/dashboard/chart',     icon: BarChart3,       label: 'Charts'      },
+  { to: '/dashboard/book',      icon: BookOpen,        label: 'Order Book'  },
+  { to: '/dashboard/orders',    icon: Activity,        label: 'My Orders'   },
 ]
 
 // Detects simulation restarts (simulationTime jumping backwards) and flushes
@@ -88,7 +100,9 @@ function useRestartDetector(simulationId: string | null) {
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [historicOpen, setHistoricOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuthStore(s => ({
     user: s.user, logout: s.logout
   }))
@@ -101,6 +115,22 @@ export default function DashboardLayout() {
   })
   useRestartDetector(sim?.id ?? null)
 
+  // The single challenge the student is currently enrolled in — challenge
+  // tab shortcuts route here directly instead of requiring a click through
+  // the "Challenges" list first.
+  const { data: challengesData } = useQuery({
+    queryKey: ['challenges'],
+    queryFn: challengeApi.list,
+    staleTime: 30_000,
+  })
+  const currentChallenge = challengesData?.challenges.find(c => c.joined && c.status === 'active')
+
+  const searchParams = new URLSearchParams(location.search)
+  const isChallengeTabActive = (tab: string) =>
+    !!currentChallenge &&
+    location.pathname === `/dashboard/challenges/${currentChallenge.id}` &&
+    (searchParams.get('tab') ?? 'portfolio') === tab
+
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logout(),
     onSettled: () => {
@@ -108,6 +138,13 @@ export default function DashboardLayout() {
       navigate('/login')
     },
   })
+
+  const navLinkClass = (isActive: boolean) => clsx(
+    'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group border-l-2',
+    isActive
+      ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface border-iba dark:border-dark-iba'
+      : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink border-transparent',
+  )
 
   return (
     <div className="flex h-screen ambient-bg overflow-hidden">
@@ -136,29 +173,78 @@ export default function DashboardLayout() {
           </div>
         </div>
 
-        {/* Live simulation timer */}
-        <SimulationSidebarWidget />
-
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-2 px-2">
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/dashboard'}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => clsx(
-                'flex items-center gap-2.5 px-3 py-2 rounded text-sm font-medium transition-colors mb-0.5 group border-l-2',
-                isActive
-                  ? 'bg-ink text-surface dark:bg-dark-ink dark:text-dark-surface border-iba dark:border-dark-iba'
-                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary hover:text-ink dark:hover:text-dark-ink border-transparent',
-              )}
+          {/* Challenges — the active feature */}
+          <NavLink
+            to="/dashboard/challenges"
+            end
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) => navLinkClass(isActive)}
+          >
+            <Trophy className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
+            <span className="flex-1">Challenges</span>
+            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+          </NavLink>
+
+          {challengeTabItems.map(({ tab, icon: Icon, label }) => {
+            const active = isChallengeTabActive(tab)
+            return (
+              <button
+                key={tab}
+                onClick={() => {
+                  setSidebarOpen(false)
+                  navigate(currentChallenge ? `/dashboard/challenges/${currentChallenge.id}?tab=${tab}` : '/dashboard/challenges')
+                }}
+                className={clsx(navLinkClass(active), 'w-full text-left')}
+              >
+                <Icon className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
+                <span className="flex-1">{label}</span>
+                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+              </button>
+            )
+          })}
+
+          <NavLink
+            to="/dashboard/profile"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) => navLinkClass(isActive)}
+          >
+            <User className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
+            <span className="flex-1">Profile</span>
+            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+          </NavLink>
+
+          {/* Historic Simulation — legacy replay feature, collapsed by default */}
+          <div className="mt-3 pt-3 border-t border-border dark:border-dark-border">
+            <button
+              onClick={() => setHistoricOpen(o => !o)}
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded text-xs font-semibold uppercase tracking-wide text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink transition-colors"
             >
-              <Icon className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
-              <span className="flex-1">{label}</span>
-              <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
-            </NavLink>
-          ))}
+              <History className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="flex-1 text-left">Historic Simulation</span>
+              {historicOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            </button>
+
+            {historicOpen && (
+              <div className="mt-1 space-y-0.5">
+                <SimulationSidebarWidget />
+                {historicNavItems.map(({ to, icon: Icon, label }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === '/dashboard'}
+                    onClick={() => setSidebarOpen(false)}
+                    className={({ isActive }) => navLinkClass(isActive)}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
+                    <span className="flex-1">{label}</span>
+                    <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* User footer */}

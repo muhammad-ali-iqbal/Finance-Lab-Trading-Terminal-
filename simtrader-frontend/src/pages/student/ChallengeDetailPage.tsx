@@ -2,7 +2,7 @@
 // Per-challenge view with tabs: Portfolio · Orders · Leaderboard
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createChart, type IChartApi, type ISeriesApi,
@@ -646,10 +646,20 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
 
 type Tab = 'portfolio' | 'orders' | 'leaderboard' | 'charts'
 
+const VALID_TABS: Tab[] = ['portfolio', 'orders', 'leaderboard', 'charts']
+
 export default function ChallengeDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [tab, setTab] = useState<Tab>('portfolio')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const tabParam = searchParams.get('tab')
+  const tab: Tab = VALID_TABS.includes(tabParam as Tab) ? (tabParam as Tab) : 'portfolio'
+  const setTab = (next: Tab) => setSearchParams(prev => {
+    const params = new URLSearchParams(prev)
+    params.set('tab', next)
+    return params
+  }, { replace: true })
 
   const { data, isLoading } = useQuery({
     queryKey: ['challenge', id],

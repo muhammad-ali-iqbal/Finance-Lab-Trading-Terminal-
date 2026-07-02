@@ -51,7 +51,8 @@
       "Artifact",
       "Bash(python3 *)",
       "Bash(go run *)",
-      "Read(//c/Users/maiqbal/.ssh/**)"
+      "Read(//c/Users/maiqbal/.ssh/**)",
+      "Bash(graphify update *)"
     ]
   }
 }
