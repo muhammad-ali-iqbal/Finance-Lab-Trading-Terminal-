@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ui'
 import clsx from 'clsx'
 import {
   TrendingUp, LayoutDashboard, BookOpen, BarChart3,
-  User, LogOut, Menu, X, ChevronRight, ChevronDown, Activity, Briefcase, Trophy, ListOrdered, Medal, History
+  User, LogOut, Menu, X, ChevronRight, ChevronDown, Activity, Briefcase, Trophy, ListOrdered, Medal, History, Banknote
 } from 'lucide-react'
 
 // Compact sidebar widget — reads active sim from shared React Query cache
@@ -64,7 +64,7 @@ const challengeTabItems: { tab: 'portfolio' | 'orders' | 'leaderboard' | 'charts
 // — an empty/unstarted historical simulation shouldn't be the first thing
 // students see.
 const historicNavItems = [
-  { to: '/dashboard',           icon: LayoutDashboard, label: 'Overview'    },
+  { to: '/dashboard/overview',  icon: LayoutDashboard, label: 'Overview'    },
   { to: '/dashboard/portfolio', icon: Briefcase,       label: 'Portfolio'   },
   { to: '/dashboard/trade',     icon: TrendingUp,      label: 'Order Entry' },
   { to: '/dashboard/chart',     icon: BarChart3,       label: 'Charts'      },
@@ -206,6 +206,16 @@ export default function DashboardLayout() {
           })}
 
           <NavLink
+            to="/dashboard/dividends"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) => navLinkClass(isActive)}
+          >
+            <Banknote className="w-4 h-4 flex-shrink-0 text-ink-secondary dark:text-dark-ink-secondary group-[.active]:text-surface dark:group-[.active]:text-dark-surface" />
+            <span className="flex-1">Dividends</span>
+            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+          </NavLink>
+
+          <NavLink
             to="/dashboard/profile"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) => navLinkClass(isActive)}
@@ -233,7 +243,6 @@ export default function DashboardLayout() {
                   <NavLink
                     key={to}
                     to={to}
-                    end={to === '/dashboard'}
                     onClick={() => setSidebarOpen(false)}
                     className={({ isActive }) => navLinkClass(isActive)}
                   >

@@ -258,6 +258,25 @@ export interface CreateAnnouncementInput {
   excludeUserIds?: string[]
 }
 
+// ── Dividend announcement types (proxied from the PSX data portal) ─────────
+
+export interface DividendPayout {
+  symbol: string
+  company: string
+  sector: string
+  announcement: string // e.g. "60%(i) (D)", "10% (B)"
+  announcedAt: string  // as published by PSX, e.g. "April 17, 2026 5:10 PM"
+  bookClosure: string  // e.g. "29/04/2026 - 30/04/2026"
+}
+
+// One entry of the PSX listed-securities directory (search suggestions)
+export interface PSXSymbol {
+  symbol: string
+  name: string
+  sectorName: string
+  isDebt: boolean
+}
+
 // API error shape from the Go backend
 export interface ApiError {
   error: string
@@ -282,6 +301,8 @@ export { userApi } from './user'
 export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
 export { challengeApi } from './challenge'
 export { announcementApi } from './announcement'
+export { dividendApi } from './dividend'
+export type { DividendsResponse } from './dividend'
 export { securitiesApi } from './securities'
 export { psxApi } from './psx'
 export type { PSXResult } from './psx'

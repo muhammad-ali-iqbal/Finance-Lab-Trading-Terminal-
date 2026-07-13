@@ -22,6 +22,7 @@ import { OrdersPage } from '@/pages/student/OrdersPage'
 import { ProfilePage } from '@/pages/student/ProfilePage'
 import ChallengePage from '@/pages/student/ChallengePage'
 import ChallengeDetailPage from '@/pages/student/ChallengeDetailPage'
+import DividendsPage from '@/pages/student/DividendsPage'
 
 // Admin pages
 import AdminOverviewPage from '@/pages/admin/AdminOverviewPage'
@@ -71,7 +72,10 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route index               element={<OverviewPage />} />
+            {/* Challenges (live PSX paper-trading) is the active feature, so
+                it's the default landing page after login. */}
+            <Route index               element={<Navigate to="challenges" replace />} />
+            <Route path="overview"     element={<OverviewPage />} />
             <Route path="portfolio"    element={<PortfolioPage />} />
             <Route path="trade"        element={<OrderEntryPage />} />
             <Route path="chart"   element={<ChartPage />} />
@@ -79,6 +83,7 @@ export default function App() {
             <Route path="orders"       element={<OrdersPage />} />
             <Route path="challenges"   element={<ChallengePage />} />
             <Route path="challenges/:id" element={<ChallengeDetailPage />} />
+            <Route path="dividends"    element={<DividendsPage />} />
             <Route path="profile"      element={<ProfilePage />} />
           </Route>
 

@@ -25,6 +25,7 @@ import (
 	"github.com/simtrader/backend/internal/challenge"
 	"github.com/simtrader/backend/internal/config"
 	"github.com/simtrader/backend/internal/db"
+	"github.com/simtrader/backend/internal/dividend"
 	"github.com/simtrader/backend/internal/middleware"
 	"github.com/simtrader/backend/internal/order"
 	"github.com/simtrader/backend/internal/portfolio"
@@ -112,6 +113,9 @@ func main() {
 
 	// PSX Tracker admin panel
 	psxHandler := psxtracker.NewHandler(cfg.PSXTrackerDir, cfg.PythonCmd)
+
+	// Dividend announcements (proxied from the PSX data portal)
+	dividendHandler := dividend.NewHandler(dividend.NewService())
 
 	// ── 4. HTTP server ─────────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
@@ -223,6 +227,7 @@ func main() {
 	challengeHandler.RegisterRoutes(app, authMW, adminMW, internalLimiter)
 	announcementHandler.RegisterRoutes(app, authMW, adminMW)
 	psxHandler.RegisterRoutes(app, authMW, adminMW)
+	dividendHandler.RegisterRoutes(app, authMW)
 
 	// 404
 	app.Use(func(c *fiber.Ctx) error {
