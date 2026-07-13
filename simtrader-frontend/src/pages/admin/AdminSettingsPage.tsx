@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { userApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
 import { Button, Input, Card, Alert } from '@/components/ui'
+import { PASSWORD_MIN_LENGTH, isPasswordValid } from '@/utils/password'
 
 export default function AdminSettingsPage() {
   const user = useAuthStore(s => s.user)
@@ -23,7 +24,7 @@ export default function AdminSettingsPage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (newPw !== confirmPw || newPw.length < 8) return
+    if (newPw !== confirmPw || !isPasswordValid(newPw)) return
     changePw.mutate()
   }
 
@@ -82,7 +83,7 @@ export default function AdminSettingsPage() {
             value={newPw}
             onChange={e => setNewPw(e.target.value)}
             autoComplete="new-password"
-            hint="Minimum 8 characters"
+            hint={`Minimum ${PASSWORD_MIN_LENGTH} characters`}
             required
           />
           <Input
@@ -99,7 +100,7 @@ export default function AdminSettingsPage() {
               type="submit"
               size="sm"
               loading={changePw.isPending}
-              disabled={newPw !== confirmPw || newPw.length < 8 || !currentPw}
+              disabled={newPw !== confirmPw || !isPasswordValid(newPw) || !currentPw}
             >
               Update password
             </Button>

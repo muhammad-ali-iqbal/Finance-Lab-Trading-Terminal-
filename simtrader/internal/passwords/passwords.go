@@ -5,7 +5,23 @@
 
 package passwords
 
-import "strings"
+import (
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+// BcryptCost is the shared hashing cost factor — 12 is the minimum
+// recommended for production. Every code path that persists a password
+// (registration, reset, authenticated change) must hash through Hash so a
+// mistaken direct write can never store plaintext in password_hash.
+const BcryptCost = 12
+
+// Hash bcrypt-hashes a plaintext password. Intentionally slow.
+func Hash(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), BcryptCost)
+	return string(bytes), err
+}
 
 // MinLength is the minimum acceptable password length.
 const MinLength = 12

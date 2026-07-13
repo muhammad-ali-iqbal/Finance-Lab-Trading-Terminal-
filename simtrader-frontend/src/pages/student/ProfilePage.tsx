@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth'
 import { Button, Input, Card, Alert, Divider } from '@/components/ui'
 import { Upload, Check } from 'lucide-react'
 import clsx from 'clsx'
+import { PASSWORD_MIN_LENGTH, isPasswordValid } from '@/utils/password'
 
 const PRESETS = [
   'avatar-01', 'avatar-02', 'avatar-03', 'avatar-04',
@@ -256,7 +257,7 @@ export function ProfilePage() {
         <form
           onSubmit={(e: FormEvent) => {
             e.preventDefault()
-            if (newPw !== confirmPw || newPw.length < 8) return
+            if (newPw !== confirmPw || !isPasswordValid(newPw)) return
             changePw.mutate()
           }}
           className="space-y-4"
@@ -283,7 +284,7 @@ export function ProfilePage() {
             value={newPw}
             onChange={e => setNewPw(e.target.value)}
             autoComplete="new-password"
-            hint="Minimum 8 characters"
+            hint={`Minimum ${PASSWORD_MIN_LENGTH} characters`}
             required
           />
           <Input
@@ -301,7 +302,7 @@ export function ProfilePage() {
               type="submit"
               size="sm"
               loading={changePw.isPending}
-              disabled={newPw !== confirmPw || newPw.length < 8}
+              disabled={newPw !== confirmPw || !isPasswordValid(newPw)}
             >
               Update password
             </Button>

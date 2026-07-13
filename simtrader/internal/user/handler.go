@@ -169,8 +169,15 @@ func (h *Handler) ChangeMyPassword(c *fiber.Ctx) error {
 		})
 	}
 
-	// Direct update for authenticated password change (not reset flow)
-	if err := h.repo.ResetPassword(c.Context(), uid, req.NewPassword); err != nil {
+	// Direct update for authenticated password change (not reset flow).
+	// ResetPassword persists whatever string it's given verbatim into
+	// password_hash, so the new password must be bcrypt-hashed here first —
+	// passing plaintext would silently break subsequent bcrypt logins.
+	hash, err := passwords.Hash(req.NewPassword)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if err := h.repo.ResetPassword(c.Context(), uid, hash); err != nil {
 		return httputil.InternalError(c)
 	}
 

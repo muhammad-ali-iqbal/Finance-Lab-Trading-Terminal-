@@ -6,12 +6,7 @@ import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
 import { Button, Input, Alert, ThemeToggle } from '@/components/ui'
 import { Eye, EyeOff, TrendingUp, CheckCircle2 } from 'lucide-react'
-
-const requirements = [
-  { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
-  { label: 'Contains a number', test: (p: string) => /\d/.test(p) },
-  { label: 'Contains a letter', test: (p: string) => /[a-zA-Z]/.test(p) },
-]
+import { passwordRequirements as requirements, isPasswordValid } from '@/utils/password'
 
 export default function RegisterPage() {
   const [params] = useSearchParams()
@@ -26,7 +21,7 @@ export default function RegisterPage() {
     setForm(f => ({ ...f, [k]: e.target.value }))
 
   const passwordsMatch = form.password === form.confirm
-  const allReqsMet = requirements.every(r => r.test(form.password))
+  const allReqsMet = isPasswordValid(form.password)
 
   const register = useMutation({
     mutationFn: () =>

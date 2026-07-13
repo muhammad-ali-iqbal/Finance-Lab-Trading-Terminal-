@@ -90,6 +90,7 @@ export function ForgotPasswordPage() {
 
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import { PASSWORD_MIN_LENGTH, isPasswordValid } from '@/utils/password'
 
 export function ResetPasswordPage() {
   const [params] = useSearchParams()
@@ -109,7 +110,7 @@ export function ResetPasswordPage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (password !== confirm || password.length < 8) return
+    if (password !== confirm || !isPasswordValid(password)) return
     reset.mutate()
   }
 
@@ -170,11 +171,11 @@ export function ResetPasswordPage() {
               <Input
                 label="New password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="At least 8 characters"
+                placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                hint="Minimum 8 characters"
+                hint={`Minimum ${PASSWORD_MIN_LENGTH} characters`}
                 rightIcon={
                   <button type="button" onClick={() => setShowPassword(s => !s)} tabIndex={-1}>
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -197,7 +198,7 @@ export function ResetPasswordPage() {
                 fullWidth
                 size="lg"
                 loading={reset.isPending}
-                disabled={password !== confirm || password.length < 8}
+                disabled={password !== confirm || !isPasswordValid(password)}
               >
                 Update password
               </Button>

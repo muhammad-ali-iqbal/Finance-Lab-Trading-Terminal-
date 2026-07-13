@@ -19,6 +19,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/simtrader/backend/internal/config"
+	"github.com/simtrader/backend/internal/passwords"
 	"github.com/simtrader/backend/internal/types"
 	"github.com/simtrader/backend/internal/user"
 	"golang.org/x/crypto/bcrypt"
@@ -31,11 +32,6 @@ var (
 	ErrAccountNotActive   = errors.New("account is not active")
 	ErrAccountBlocked     = errors.New("account has been blocked")
 )
-
-// bcrypt cost factor — 12 is the minimum recommended for production.
-// Higher = slower to hash (good for security), slower for tests (annoying).
-// Do not lower below 12 in production.
-const bcryptCost = 12
 
 // TokenPair is what we return after a successful login or token refresh.
 type TokenPair struct {
@@ -327,10 +323,11 @@ func (s *Service) ParseAccessToken(tokenString string) (*types.Claims, error) {
 
 // ── Crypto helpers ───────────────────────────────────────────────────────────
 
-// hashPassword uses bcrypt. This is intentionally slow.
+// hashPassword bcrypt-hashes via the shared passwords package, so every
+// password-persisting code path (register, reset, authenticated change)
+// uses one hashing implementation and cost factor.
 func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
-	return string(bytes), err
+	return passwords.Hash(password)
 }
 
 // generateSecureToken creates a cryptographically random 32-byte hex string.

@@ -28,8 +28,8 @@ func main() {
 	}
 
 	password := os.Args[1]
-	if len(password) < 8 {
-		fmt.Fprintln(os.Stderr, "Error: password must be at least 8 characters")
+	if len(password) < 12 {
+		fmt.Fprintln(os.Stderr, "Error: password must be at least 12 characters")
 		os.Exit(1)
 	}
 
