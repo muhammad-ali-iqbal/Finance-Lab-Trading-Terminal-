@@ -21,7 +21,9 @@ from config import BATCH_SIZE, BATCH_DELAY, SIMTRADER_URL, INTERNAL_SECRET
 from database import (
     upsert_ohlcv,
     upsert_tickers,
+    upsert_ticker_names,
     get_known_tickers,
+    get_ticker_names,
     log_fetch,
     set_active_tickers,
 )
@@ -29,6 +31,7 @@ from database import (
 
 _HISTORICAL_URL = "https://dps.psx.com.pk/historical"
 _MARKET_WATCH_URL = "https://dps.psx.com.pk/market-watch"
+_SYMBOLS_URL = "https://dps.psx.com.pk/symbols"
 _SESSION = requests.Session()
 _SESSION.headers.update({"User-Agent": "Mozilla/5.0 (psx-tracker)"})
 
@@ -77,10 +80,40 @@ def _fetch_active_symbols() -> set[str]:
     return active
 
 
+def _fetch_symbol_directory() -> list[dict]:
+    """Scrape PSX's own symbols directory directly (same endpoint psx.tickers()
+    wraps) so we get symbol + full company name + sector in one call, instead
+    of just the bare symbol list."""
+    try:
+        resp = _SESSION.get(_SYMBOLS_URL, timeout=15)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        print(f"[Fetcher] ERROR fetching symbol directory: {e}")
+        return []
+
+
 def refresh_tickers():
-    """Pull the full ticker list from PSX and persist any new ones.
-    Does NOT touch active/inactive flags — call sync_active_flags() for that."""
+    """Pull the full ticker list (with company names) from PSX and persist
+    any new ones. Does NOT touch active/inactive flags — call
+    sync_active_flags() for that."""
     print("[Fetcher] Refreshing ticker list ...")
+
+    directory = _fetch_symbol_directory()
+    if directory:
+        all_symbols = [d["symbol"].strip() for d in directory if d.get("symbol")]
+        upsert_tickers(all_symbols)
+        securities = [
+            {"symbol": d["symbol"].strip(), "name": d.get("name", "").strip(), "sector": d.get("sectorName")}
+            for d in directory
+            if d.get("symbol") and d.get("name")
+        ]
+        upsert_ticker_names(securities)
+        print(f"[Fetcher] {len(all_symbols)} tickers in registry ({len(securities)} with names).")
+        _push_securities_to_simtrader(get_ticker_names())
+        return all_symbols
+
+    # Fall back to the (name-less) psx.tickers() helper if the direct scrape fails.
     try:
         df = _psx.tickers()
         all_symbols = df["symbol"].dropna().str.strip().tolist()
@@ -88,7 +121,7 @@ def refresh_tickers():
         print(f"[Fetcher] ERROR fetching tickers: {e}")
         return []
     upsert_tickers(all_symbols)
-    print(f"[Fetcher] {len(all_symbols)} tickers in registry.")
+    print(f"[Fetcher] {len(all_symbols)} tickers in registry (fallback, no names).")
     return all_symbols
 
 
@@ -329,6 +362,30 @@ def _push_to_simtrader(target_date: date, rows: list[dict]):
         raise
     except Exception as e:
         print(f"[Fetcher] WARN: failed to push prices to SimTrader ({url}): {e}", file=sys.stderr)
+
+
+def _push_securities_to_simtrader(securities: list[dict]):
+    """Push the ticker -> company name lookup to SimTrader so the frontend's
+    'company name' display preference has real data instead of a guess."""
+    if not securities:
+        return
+    payload = {"securities": securities}
+    url = f"{SIMTRADER_URL}/api/internal/securities"
+    try:
+        resp = _SESSION.post(
+            url,
+            json=payload,
+            headers={"X-Internal-Secret": INTERNAL_SECRET},
+            timeout=30,
+        )
+        if resp.status_code == 401:
+            _alert(f"backend rejected securities push with 401 — INTERNAL_SECRET mismatch.")
+            return
+        resp.raise_for_status()
+        data = resp.json()
+        print(f"[Fetcher] SimTrader notified: {data.get('ingested', '?')} securities ingested.")
+    except Exception as e:
+        print(f"[Fetcher] WARN: failed to push securities to SimTrader ({url}): {e}", file=sys.stderr)
 
 
 def backfill(from_date: date, to_date: date | None = None):

@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { orderApi, simulationApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import { Spinner, EmptyState } from '@/components/ui'
 import clsx from 'clsx'
 import { BookOpen, LayoutGrid } from 'lucide-react'
@@ -16,6 +17,7 @@ function fmt(n: number, d = 2) {
 const ROWS = 15
 
 export default function OrderBookPage() {
+  const { formatSymbol } = useSymbolDisplay()
   const { data: simulation } = useQuery({
     queryKey: ['simulation', 'active'],
     queryFn: simulationApi.getActive,
@@ -111,7 +113,7 @@ export default function OrderBookPage() {
                   : 'border-border dark:border-dark-border text-ink-secondary dark:text-dark-ink-secondary hover:border-border-strong dark:hover:border-dark-border-strong hover:text-ink dark:hover:text-dark-ink'
               )}
             >
-              {s}
+              {formatSymbol(s)}
             </button>
           ))}
         </div>
@@ -121,7 +123,7 @@ export default function OrderBookPage() {
         allBooksLoading ? (
           <div className="flex justify-center py-16"><Spinner size="lg" /></div>
         ) : (
-          <AllBooksView symbols={symbols} bookResults={allBookResults} onSelect={s => setSelectedSymbol(s)} />
+          <AllBooksView symbols={symbols} bookResults={allBookResults} onSelect={s => setSelectedSymbol(s)} formatSymbol={formatSymbol} />
         )
       ) : isLoading ? (
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
@@ -248,10 +250,12 @@ function AllBooksView({
   symbols,
   bookResults,
   onSelect,
+  formatSymbol,
 }: {
   symbols: string[]
   bookResults: { data?: BookData; isLoading: boolean }[]
   onSelect: (s: string) => void
+  formatSymbol: (s: string) => string
 }) {
   if (symbols.length === 0) {
     return (
@@ -289,7 +293,7 @@ function AllBooksView({
               className="w-full grid grid-cols-[1fr_auto_auto_auto_auto_auto] px-4 py-3 border-t border-border/40 dark:border-dark-border/40 first:border-t-0 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors text-left group"
             >
               <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink group-hover:underline underline-offset-2">
-                {s}
+                {formatSymbol(s)}
               </span>
               {result?.isLoading ? (
                 <span className="col-span-5 text-xs text-ink-tertiary dark:text-dark-ink-tertiary text-right">Loading&hellip;</span>

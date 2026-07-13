@@ -4,6 +4,7 @@
 // Types (mirror Go backend models)
 export type Role = 'admin' | 'student'
 export type UserStatus = 'pending' | 'active' | 'blocked'
+export type SymbolDisplay = 'ticker' | 'name'
 export type OrderSide = 'buy' | 'sell'
 export type OrderType = 'market' | 'limit' | 'stop'
 export type OrderStatus = 'pending' | 'filled' | 'partially_filled' | 'cancelled' | 'rejected'
@@ -17,6 +18,7 @@ export interface User {
   role: Role
   status: UserStatus
   avatarUrl: string
+  symbolDisplay: SymbolDisplay
   createdAt: string
 }
 
@@ -208,6 +210,12 @@ export interface LeaderboardEntry {
   returnPct: number
 }
 
+export interface Security {
+  symbol: string
+  name: string
+  sector?: string
+}
+
 export interface EODBar {
   time: string   // 'YYYY-MM-DD'
   open: number
@@ -274,6 +282,7 @@ export { userApi } from './user'
 export type { UpdateUserInput, InviteUserInput, UsersListResponse } from './user'
 export { challengeApi } from './challenge'
 export { announcementApi } from './announcement'
+export { securitiesApi } from './securities'
 export { psxApi } from './psx'
 export type { PSXResult } from './psx'
 export { client } from './client'

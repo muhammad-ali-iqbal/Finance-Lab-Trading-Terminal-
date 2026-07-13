@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { userApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
 import { Button, Input, Card, Alert, Divider } from '@/components/ui'
-import { Upload } from 'lucide-react'
+import { Upload, Check } from 'lucide-react'
 import clsx from 'clsx'
 
 const PRESETS = [
@@ -96,6 +96,14 @@ export function ProfilePage() {
   })
 
   const avatarLoading = uploadAvatar.isPending || setPreset.isPending || removeAvatar.isPending
+
+  const updateDisplay = useMutation({
+    mutationFn: (symbolDisplay: 'ticker' | 'name') => userApi.updateDisplayPreference(symbolDisplay),
+    onSuccess: (updated) => {
+      setUser(updated)
+      qc.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
 
   return (
     <div className="p-6 max-w-xl space-y-6">
@@ -203,6 +211,44 @@ export function ProfilePage() {
       </Card>
 
       <Divider />
+
+      {/* Display preferences */}
+      <Card>
+        <h2 className="text-sm font-semibold text-ink dark:text-dark-ink mb-1">Display</h2>
+        <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mb-4">
+          Choose how stock symbols are shown across the app.
+        </p>
+
+        {updateDisplay.isError && <Alert variant="error" message="Failed to update display preference." />}
+
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { value: 'ticker' as const, label: 'Ticker', example: 'MEBL' },
+            { value: 'name' as const,   label: 'Company name', example: 'Meezan Bank Limited' },
+          ]).map(opt => {
+            const selected = (user?.symbolDisplay ?? 'ticker') === opt.value
+            return (
+              <button
+                key={opt.value}
+                disabled={updateDisplay.isPending}
+                onClick={() => updateDisplay.mutate(opt.value)}
+                className={clsx(
+                  'relative text-left rounded-lg border p-3 transition-colors',
+                  selected
+                    ? 'border-iba dark:border-dark-iba bg-iba/5 dark:bg-dark-iba/10'
+                    : 'border-border dark:border-dark-border hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
+                )}
+              >
+                {selected && (
+                  <Check className="w-3.5 h-3.5 text-iba dark:text-dark-iba absolute top-2.5 right-2.5" />
+                )}
+                <p className="text-xs font-medium text-ink dark:text-dark-ink">{opt.label}</p>
+                <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5 font-mono">{opt.example}</p>
+              </button>
+            )
+          })}
+        </div>
+      </Card>
 
       {/* Change password */}
       <Card>

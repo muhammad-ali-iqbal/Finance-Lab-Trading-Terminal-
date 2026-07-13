@@ -3,21 +3,25 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { Search, BarChart3, ChevronDown, X } from 'lucide-react'
 import clsx from 'clsx'
 
-export function SymbolPicker({ symbols, value, onChange, placeholder = 'Select symbol' }: {
+export function SymbolPicker({ symbols, value, onChange, placeholder = 'Select symbol', getLabel }: {
   symbols: string[]
   value: string
   onChange: (s: string) => void
   placeholder?: string
+  getLabel?: (symbol: string) => string
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const ref = useRef<HTMLDivElement>(null)
+  const label = getLabel ?? ((s: string) => s)
 
   const filtered = useMemo(() =>
     query.trim() === ''
       ? symbols
-      : symbols.filter(s => s.toLowerCase().includes(query.toLowerCase())),
-    [symbols, query],
+      : symbols.filter(s =>
+          s.toLowerCase().includes(query.toLowerCase()) ||
+          label(s).toLowerCase().includes(query.toLowerCase())),
+    [symbols, query, label],
   )
 
   useEffect(() => {
@@ -36,7 +40,7 @@ export function SymbolPicker({ symbols, value, onChange, placeholder = 'Select s
         className="flex items-center gap-2 px-3 py-1.5 rounded border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-sm font-medium text-ink dark:text-dark-ink hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors min-w-[140px] w-full"
       >
         <BarChart3 className="w-3.5 h-3.5 text-ink-secondary dark:text-dark-ink-secondary flex-shrink-0" />
-        <span className="flex-1 text-left truncate font-mono">{value || placeholder}</span>
+        <span className="flex-1 text-left truncate font-mono">{value ? label(value) : placeholder}</span>
         <ChevronDown className="w-3.5 h-3.5 text-ink-secondary dark:text-dark-ink-secondary flex-shrink-0" />
       </button>
 
@@ -74,7 +78,7 @@ export function SymbolPicker({ symbols, value, onChange, placeholder = 'Select s
                     : 'text-ink dark:text-dark-ink hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
                 )}
               >
-                {s}
+                {label(s)}
               </button>
             ))}
           </div>

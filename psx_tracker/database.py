@@ -34,6 +34,12 @@ def init_db():
             )
         """)
         cols = {r["name"] for r in conn.execute("PRAGMA table_info(tickers)").fetchall()}
+        if "name" not in cols:
+            conn.execute("ALTER TABLE tickers ADD COLUMN name TEXT")
+            print("[DB] Migrated: added tickers.name column.")
+        if "sector" not in cols:
+            conn.execute("ALTER TABLE tickers ADD COLUMN sector TEXT")
+            print("[DB] Migrated: added tickers.sector column.")
         if "status" not in cols:
             if "is_active" in cols:
                 # Earlier schema used is_active — rename so old data carries over.
@@ -96,6 +102,32 @@ def upsert_tickers(symbols: list[str]):
             [(s,) for s in symbols],
         )
     print(f"[DB] Tickers stored: {len(symbols)}")
+
+
+def upsert_ticker_names(securities: list[dict]):
+    """securities: list of dicts with keys symbol, name, sector.
+    Backfills name/sector on existing ticker rows and inserts any new ones."""
+    if not securities:
+        return
+    with db() as conn:
+        conn.executemany(
+            """
+            INSERT INTO tickers(symbol, name, sector) VALUES (:symbol, :name, :sector)
+            ON CONFLICT(symbol) DO UPDATE SET name=excluded.name, sector=excluded.sector
+            """,
+            securities,
+        )
+    print(f"[DB] Ticker names stored: {len(securities)}")
+
+
+def get_ticker_names() -> list[dict]:
+    """Return symbol/name/sector for every ticker that has a name on file —
+    used to push the lookup to SimTrader."""
+    with db() as conn:
+        rows = conn.execute(
+            "SELECT symbol, name, sector FROM tickers WHERE name IS NOT NULL"
+        ).fetchall()
+    return [{"symbol": r["symbol"], "name": r["name"], "sector": r["sector"]} for r in rows]
 
 
 def upsert_ohlcv(rows: list[dict]):

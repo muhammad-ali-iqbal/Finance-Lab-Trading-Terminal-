@@ -22,6 +22,7 @@ import {
 } from 'lightweight-charts'
 import { simulationApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import { useTheme } from '@/context/ThemeContext'
 import { Spinner, Badge } from '@/components/ui'
 import {
@@ -313,6 +314,7 @@ export default function ChartPage() {
   })
 
   const { theme } = useTheme()
+  const { formatSymbol } = useSymbolDisplay()
   const [chartType, setChartType] = useState<ChartType>('candlestick')
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null)
   const [lastTick, setLastTick] = useState<PriceTick | null>(null)
@@ -897,7 +899,7 @@ export default function ChartPage() {
     { value: 'line',        label: 'Line Chart',  icon: <TrendingUp className="w-3.5 h-3.5" /> },
   ]
 
-  const symbolOptions = symbols.map(s => ({ value: s, label: s, icon: undefined }))
+  const symbolOptions = symbols.map(s => ({ value: s, label: formatSymbol(s), icon: undefined }))
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -994,7 +996,7 @@ export default function ChartPage() {
               className="text-xs font-semibold tracking-widest uppercase font-mono"
               style={{ color: t.textSecondary }}
             >
-              {selectedSymbol}
+              {formatSymbol(selectedSymbol)}
             </span>
 
             {/* Price */}

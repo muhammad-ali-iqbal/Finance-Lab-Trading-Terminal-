@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderApi, simulationApi } from '@/api'
 import { Badge, Card, Button, EmptyState, Spinner } from '@/components/ui'
 import { Activity, X } from 'lucide-react'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 
 function fmt(n: number) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -17,6 +18,7 @@ function calcFees(tradeValue: number): number {
 
 export function OrdersPage() {
   const qc = useQueryClient()
+  const { formatSymbol } = useSymbolDisplay()
 
   const { data: simulation } = useQuery({
     queryKey: ['simulation', 'active'],
@@ -70,7 +72,7 @@ export function OrdersPage() {
                     <td className="px-4 py-3 text-xs text-ink-tertiary dark:text-dark-ink-tertiary font-mono whitespace-nowrap">
                       {new Date(order.createdAt).toLocaleTimeString()}
                     </td>
-                    <td className="px-4 py-3 font-mono font-semibold text-ink dark:text-dark-ink">{order.symbol}</td>
+                    <td className="px-4 py-3 font-mono font-semibold text-ink dark:text-dark-ink">{formatSymbol(order.symbol)}</td>
                     <td className="px-4 py-3">
                       <Badge variant={order.side === 'buy' ? 'success' : 'danger'}>
                         {order.side.toUpperCase()}

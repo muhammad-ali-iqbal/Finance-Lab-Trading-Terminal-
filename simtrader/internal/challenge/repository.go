@@ -375,6 +375,49 @@ func (r *Repository) UpsertEODPrices(ctx context.Context, date string, prices []
 	return nil
 }
 
+// UpsertSecurities stores/updates ticker -> company name mappings pushed by
+// psx_tracker after each ticker refresh.
+func (r *Repository) UpsertSecurities(ctx context.Context, securities []Security) error {
+	for _, s := range securities {
+		if _, err := r.db.Exec(ctx, `
+			INSERT INTO securities (symbol, name, sector)
+			VALUES ($1,$2,$3)
+			ON CONFLICT (symbol) DO UPDATE
+			  SET name=$2, sector=$3, updated_at=NOW()`,
+			s.Symbol, s.Name, nullIfEmpty(s.Sector),
+		); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ListSecurities returns the full ticker -> company name lookup.
+func (r *Repository) ListSecurities(ctx context.Context) ([]Security, error) {
+	rows, err := r.db.Query(ctx, `SELECT symbol, name, COALESCE(sector, '') FROM securities ORDER BY symbol`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []Security
+	for rows.Next() {
+		var s Security
+		if err := rows.Scan(&s.Symbol, &s.Name, &s.Sector); err != nil {
+			return nil, err
+		}
+		out = append(out, s)
+	}
+	return out, rows.Err()
+}
+
+func nullIfEmpty(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
+}
+
 func (r *Repository) GetLatestPrices(ctx context.Context, symbols []string) (map[string]float64, error) {
 	if len(symbols) == 0 {
 		return map[string]float64{}, nil

@@ -65,6 +65,11 @@ export const userApi = {
     return data
   },
 
+  updateDisplayPreference: async (symbolDisplay: 'ticker' | 'name') => {
+    const { data } = await client.put<User>('/me/display-preference', { symbolDisplay })
+    return data
+  },
+
   changePassword: async (currentPassword: string, newPassword: string) => {
     const { data } = await client.put('/me/password', { currentPassword, newPassword })
     return data

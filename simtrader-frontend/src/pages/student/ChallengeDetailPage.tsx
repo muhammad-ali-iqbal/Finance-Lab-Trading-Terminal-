@@ -13,6 +13,7 @@ import type { ChallengeOrder, ChallengePosition, LeaderboardEntry } from '@/api'
 import { Spinner, Badge, Button, Input, Alert, Card, EmptyState } from '@/components/ui'
 import { SymbolPicker } from '@/components/ui/SymbolPicker'
 import { useTheme } from '@/context/ThemeContext'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
@@ -136,6 +137,7 @@ function PerformanceChart({ challengeId, initialCapital }: { challengeId: string
 // ── Portfolio tab ─────────────────────────────────────────────────────────────
 
 function PortfolioTab({ challengeId }: { challengeId: string }) {
+  const { formatSymbol } = useSymbolDisplay()
   const { data, isLoading } = useQuery({
     queryKey: ['challenge-portfolio', challengeId],
     queryFn: () => challengeApi.getPortfolio(challengeId),
@@ -193,7 +195,7 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
                   const up = p.unrealizedPnL >= 0
                   return (
                     <tr key={p.symbol} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
-                      <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{p.symbol}</td>
+                      <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{formatSymbol(p.symbol)}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{p.quantity.toLocaleString()}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink-secondary dark:text-dark-ink-secondary">{fmt(p.avgCost)}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{fmt(p.currentPrice)}</td>
@@ -242,6 +244,7 @@ function ChallengeOrderStatusBadge({ status }: { status: string }) {
 
 function OrdersTab({ challengeId }: { challengeId: string }) {
   const qc = useQueryClient()
+  const { formatSymbol } = useSymbolDisplay()
   const [symbol, setSymbol] = useState('')
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
@@ -360,6 +363,7 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
                 value={symbol}
                 onChange={setSymbol}
                 placeholder={eodSymbols?.symbols?.length ? 'Select a symbol' : 'Loading symbols…'}
+                getLabel={formatSymbol}
               />
               {symbol && lastPrice !== undefined && (
                 <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
@@ -504,7 +508,7 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
               <div key={o.id} className="px-4 py-3 flex items-center gap-4 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{o.symbol}</span>
+                    <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{formatSymbol(o.symbol)}</span>
                     <Badge variant={o.side === 'buy' ? 'success' : 'danger'} size="sm">
                       {o.side.toUpperCase()}
                     </Badge>

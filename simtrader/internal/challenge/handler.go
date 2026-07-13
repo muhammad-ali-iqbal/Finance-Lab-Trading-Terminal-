@@ -104,6 +104,14 @@ type EODPrice struct {
 	Volume int64   `json:"volume"`
 }
 
+// Security is a ticker -> company name mapping, scraped from PSX's own
+// symbols directory by psx_tracker.
+type Security struct {
+	Symbol string `json:"symbol"`
+	Name   string `json:"name"`
+	Sector string `json:"sector,omitempty"`
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 
 type Handler struct {
@@ -120,11 +128,15 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW, internalLimite
 	// Internal — psx_tracker webhook (no JWT, shared secret header).
 	// Rate-limited because it is reachable through the public nginx proxy (NET-01).
 	app.Post("/api/internal/eod-prices", internalLimiter, h.IngestEODPrices)
+	app.Post("/api/internal/securities", internalLimiter, h.IngestSecurities)
 
 	// EOD chart data — auth required, not challenge-specific
 	eod := app.Group("/api/eod", authMW)
 	eod.Get("/symbols",  h.EODSymbols)
 	eod.Get("/:symbol",  h.EODHistory)
+
+	// Ticker -> company name lookup — auth required, not challenge-specific
+	app.Get("/api/securities", authMW, h.ListSecurities)
 
 	// Admin routes
 	adm := app.Group("/api/admin/challenges", authMW, adminMW)
@@ -183,6 +195,47 @@ func (h *Handler) IngestEODPrices(c *fiber.Ctx) error {
 	go h.reconciler.RunForDate(req.Date)
 
 	return c.JSON(fiber.Map{"ingested": len(req.Prices), "date": req.Date})
+}
+
+// IngestSecurities godoc
+// POST /api/internal/securities
+// Body: { securities: [{symbol, name, sector}] }
+// Called by psx_tracker after each ticker refresh — same shared-secret auth
+// as the EOD price ingest above.
+func (h *Handler) IngestSecurities(c *fiber.Ctx) error {
+	if subtle.ConstantTimeCompare([]byte(c.Get("X-Internal-Secret")), []byte(h.internalKey)) != 1 {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
+	var req struct {
+		Securities []Security `json:"securities"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return httputil.BadRequest(c, "invalid body")
+	}
+	if len(req.Securities) == 0 {
+		return httputil.BadRequest(c, "securities required")
+	}
+
+	if err := h.repo.UpsertSecurities(c.Context(), req.Securities); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	return c.JSON(fiber.Map{"ingested": len(req.Securities)})
+}
+
+// ListSecurities godoc
+// GET /api/securities
+// Ticker -> company name lookup, used by the frontend's display preference.
+func (h *Handler) ListSecurities(c *fiber.Ctx) error {
+	securities, err := h.repo.ListSecurities(c.Context())
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if securities == nil {
+		securities = []Security{}
+	}
+	return c.JSON(fiber.Map{"securities": securities})
 }
 
 // ── Admin handlers ────────────────────────────────────────────────────────────

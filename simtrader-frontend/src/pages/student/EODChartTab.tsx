@@ -14,6 +14,7 @@ import { Spinner } from '@/components/ui'
 import { useTheme } from '@/context/ThemeContext'
 import { ChevronDown } from 'lucide-react'
 import { SymbolPicker } from '@/components/ui/SymbolPicker'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   calcSMA, calcEMA, calcBollingerBands, calcRSI, calcMACD,
   type OHLCBar,
@@ -165,6 +166,7 @@ function ChartTypePicker({ value, onChange }: { value: ChartType; onChange: (t: 
 
 export default function EODChartTab() {
   const { theme } = useTheme()
+  const { formatSymbol } = useSymbolDisplay()
   const isDark = theme === 'dark'
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef     = useRef<IChartApi | null>(null)
@@ -475,7 +477,7 @@ export default function EODChartTab() {
     <div className="flex flex-col gap-3">
       {/* Toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
-        <SymbolPicker symbols={symbols} value={symbol} onChange={setSymbol} />
+        <SymbolPicker symbols={symbols} value={symbol} onChange={setSymbol} getLabel={formatSymbol} />
 
         {/* Chart type toggle */}
         <ChartTypePicker value={chartType} onChange={setChartType} />
@@ -514,7 +516,7 @@ export default function EODChartTab() {
       {/* Price ticker */}
       {lastBar && (
         <div className="flex items-center gap-4 text-xs font-mono text-ink-secondary dark:text-dark-ink-secondary">
-          <span className="font-semibold text-ink dark:text-dark-ink">{symbol}</span>
+          <span className="font-semibold text-ink dark:text-dark-ink">{formatSymbol(symbol)}</span>
           <span>O <span className="text-ink dark:text-dark-ink">{lastBar.open.toFixed(2)}</span></span>
           <span>H <span className="text-ink dark:text-dark-ink">{lastBar.high.toFixed(2)}</span></span>
           <span>L <span className="text-ink dark:text-dark-ink">{lastBar.low.toFixed(2)}</span></span>
@@ -540,7 +542,7 @@ export default function EODChartTab() {
         )}
         {symbol && bars.length === 0 && !isFetching && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">No data available for {symbol}</p>
+            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">No data available for {formatSymbol(symbol)}</p>
           </div>
         )}
         <div ref={containerRef} className="w-full h-full" />

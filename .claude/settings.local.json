@@ -52,7 +52,12 @@
       "Bash(python3 *)",
       "Bash(go run *)",
       "Read(//c/Users/maiqbal/.ssh/**)",
-      "Bash(graphify update *)"
+      "Bash(graphify update *)",
+      "Bash(gofmt -l .)",
+      "Bash(pip show *)",
+      "Bash(pip3 show *)",
+      "Read(//c//**)",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(psx-tracker\\)\" \"https://dps.psx.com.pk/symbols\")"
     ]
   }
 }

@@ -62,7 +62,7 @@ func (r *Repository) Create(ctx context.Context, u *User) error {
 func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users WHERE id = $1`
 
@@ -73,7 +73,7 @@ func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*User, error) {
 func (r *Repository) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users WHERE LOWER(email) = LOWER($1)`
 
@@ -84,7 +84,7 @@ func (r *Repository) GetByEmail(ctx context.Context, email string) (*User, error
 func (r *Repository) GetByInviteToken(ctx context.Context, token string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users
 		WHERE invite_token = $1 AND status = 'pending'
@@ -97,7 +97,7 @@ func (r *Repository) GetByInviteToken(ctx context.Context, token string) (*User,
 func (r *Repository) GetByResetToken(ctx context.Context, token string) (*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users
 		WHERE reset_token = $1 AND reset_expiry > NOW()`
@@ -188,7 +188,7 @@ func (r *Repository) SetAvatarURL(ctx context.Context, id uuid.UUID, avatarURL s
 func (r *Repository) List(ctx context.Context, role *Role) ([]*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users`
 
@@ -221,7 +221,7 @@ func (r *Repository) List(ctx context.Context, role *Role) ([]*User, error) {
 func (r *Repository) ListActiveByRole(ctx context.Context, role Role) ([]*User, error) {
 	query := `
 		SELECT id, email, password_hash, first_name, last_name,
-		       role, status, avatar_url, invite_token, invite_expiry, reset_token, reset_expiry,
+		       role, status, avatar_url, symbol_display, invite_token, invite_expiry, reset_token, reset_expiry,
 		       created_at, updated_at
 		FROM users
 		WHERE role = $1 AND status = 'active'
@@ -356,9 +356,15 @@ type scanFn func(dest ...any) error
 func scanUser(scan scanFn, u *User) error {
 	return scan(
 		&u.ID, &u.Email, &u.PasswordHash, &u.FirstName, &u.LastName,
-		&u.Role, &u.Status, &u.AvatarUrl, &u.InviteToken, &u.InviteExpiry, &u.ResetToken, &u.ResetExpiry,
+		&u.Role, &u.Status, &u.AvatarUrl, &u.SymbolDisplay, &u.InviteToken, &u.InviteExpiry, &u.ResetToken, &u.ResetExpiry,
 		&u.CreatedAt, &u.UpdatedAt,
 	)
+}
+
+// SetSymbolDisplay updates the student's ticker/company-name display preference.
+func (r *Repository) SetSymbolDisplay(ctx context.Context, id uuid.UUID, pref SymbolDisplay) error {
+	_, err := r.db.Exec(ctx, `UPDATE users SET symbol_display=$2, updated_at=NOW() WHERE id=$1`, id, pref)
+	return err
 }
 
 func isDuplicateError(err error) bool {

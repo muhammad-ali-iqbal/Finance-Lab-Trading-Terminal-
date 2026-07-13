@@ -31,6 +31,15 @@ const (
 	StatusBlocked  Status = "blocked"  // Admin has blocked this account
 )
 
+// SymbolDisplay controls whether stock symbols render as raw tickers
+// (e.g. MEBL) or full company names (e.g. Meezan Bank Limited).
+type SymbolDisplay string
+
+const (
+	SymbolDisplayTicker SymbolDisplay = "ticker"
+	SymbolDisplayName   SymbolDisplay = "name"
+)
+
 // User is the core domain entity.
 type User struct {
 	ID           uuid.UUID  `json:"id"`
@@ -41,6 +50,7 @@ type User struct {
 	Role         Role       `json:"role"`
 	Status       Status     `json:"status"`
 	AvatarUrl    string     `json:"avatarUrl"`
+	SymbolDisplay SymbolDisplay `json:"symbolDisplay"`
 	InviteToken  *string    `json:"-"`         // SHA-256 hash; non-nil until registration complete
 	InviteExpiry *time.Time `json:"-"`         // Invite link expiry (AUTH-02)
 	ResetToken   *string    `json:"-"`         // SHA-256 hash of the reset token
@@ -51,25 +61,27 @@ type User struct {
 
 // PublicProfile is what the API returns — strips sensitive fields.
 type PublicProfile struct {
-	ID        uuid.UUID `json:"id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Role      Role      `json:"role"`
-	Status    Status    `json:"status"`
-	AvatarUrl string    `json:"avatarUrl"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID            uuid.UUID     `json:"id"`
+	Email         string        `json:"email"`
+	FirstName     string        `json:"firstName"`
+	LastName      string        `json:"lastName"`
+	Role          Role          `json:"role"`
+	Status        Status        `json:"status"`
+	AvatarUrl     string        `json:"avatarUrl"`
+	SymbolDisplay SymbolDisplay `json:"symbolDisplay"`
+	CreatedAt     time.Time     `json:"createdAt"`
 }
 
 func (u *User) ToPublicProfile() PublicProfile {
 	return PublicProfile{
-		ID:        u.ID,
-		Email:     u.Email,
-		FirstName: u.FirstName,
-		LastName:  u.LastName,
-		Role:      u.Role,
-		Status:    u.Status,
-		AvatarUrl: u.AvatarUrl,
-		CreatedAt: u.CreatedAt,
+		ID:            u.ID,
+		Email:         u.Email,
+		FirstName:     u.FirstName,
+		LastName:      u.LastName,
+		Role:          u.Role,
+		Status:        u.Status,
+		AvatarUrl:     u.AvatarUrl,
+		SymbolDisplay: u.SymbolDisplay,
+		CreatedAt:     u.CreatedAt,
 	}
 }

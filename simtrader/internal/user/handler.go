@@ -49,6 +49,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	me.Get("/", h.GetMyProfile)
 	me.Put("/", h.UpdateMyProfile)
 	me.Put("/password", h.ChangeMyPassword)
+	me.Put("/display-preference", h.UpdateDisplayPreference)
 	me.Post("/avatar", h.UploadAvatar)
 	me.Put("/avatar/preset", h.SetPresetAvatar)
 	me.Delete("/avatar", h.RemoveAvatar)
@@ -77,6 +78,10 @@ type updateProfileRequest struct {
 type changePasswordRequest struct {
 	CurrentPassword string `json:"currentPassword"`
 	NewPassword     string `json:"newPassword"`
+}
+
+type updateDisplayPreferenceRequest struct {
+	SymbolDisplay string `json:"symbolDisplay"`
 }
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
@@ -173,6 +178,34 @@ func (h *Handler) ChangeMyPassword(c *fiber.Ctx) error {
 	_ = h.repo.RevokeAllUserTokens(c.Context(), uid)
 
 	return c.JSON(fiber.Map{"message": "Password updated. Please log in again on other devices."})
+}
+
+// UpdateDisplayPreference godoc
+// PUT /api/me/display-preference
+// Body: { symbolDisplay: "ticker" | "name" }
+func (h *Handler) UpdateDisplayPreference(c *fiber.Ctx) error {
+	claims := middleware.GetClaims(c)
+	uid, _ := uuid.Parse(claims.UserID)
+
+	var req updateDisplayPreferenceRequest
+	if err := c.BodyParser(&req); err != nil {
+		return httputil.BadRequest(c, "invalid request body")
+	}
+
+	pref := SymbolDisplay(req.SymbolDisplay)
+	if pref != SymbolDisplayTicker && pref != SymbolDisplayName {
+		return httputil.BadRequest(c, "symbolDisplay must be 'ticker' or 'name'")
+	}
+
+	if err := h.repo.SetSymbolDisplay(c.Context(), uid, pref); err != nil {
+		return httputil.InternalError(c)
+	}
+
+	u, err := h.repo.GetByID(c.Context(), uid)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(u.ToPublicProfile())
 }
 
 // ListUsers godoc

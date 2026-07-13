@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderApi, simulationApi, portfolioApi } from '@/api'
 import { Button, Input, Card, Badge, Alert, Spinner, EmptyState } from '@/components/ui'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import type { OrderSide, OrderType } from '@/types'
 import clsx from 'clsx'
 import { CheckCircle2, XCircle, Clock, Activity } from 'lucide-react'
@@ -20,6 +21,7 @@ const ORDER_TYPES: { value: OrderType; label: string; description: string }[] = 
 
 export default function OrderEntryPage() {
   const qc = useQueryClient()
+  const { formatSymbol } = useSymbolDisplay()
 
   const { data: simulation } = useQuery({
     queryKey: ['simulation', 'active'],
@@ -157,7 +159,7 @@ export default function OrderEntryPage() {
                     {symbols.length === 0 ? 'Waiting for simulation data…' : 'Select a symbol'}
                   </option>
                   {symbols.map(s => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>{formatSymbol(s)}</option>
                   ))}
                 </select>
                 {symbol && currentPrice !== undefined && (
@@ -307,7 +309,7 @@ export default function OrderEntryPage() {
                 <div key={order.id} className="px-4 py-3 flex items-center gap-4 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{order.symbol}</span>
+                      <span className="font-mono font-semibold text-sm text-ink dark:text-dark-ink">{formatSymbol(order.symbol)}</span>
                       <Badge variant={order.side === 'buy' ? 'success' : 'danger'}>
                         {order.side.toUpperCase()}
                       </Badge>

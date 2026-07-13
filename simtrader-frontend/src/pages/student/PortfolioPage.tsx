@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { portfolioApi, simulationApi } from '@/api'
 import { useSimulationSocket } from '@/hooks/useSimulationSocket'
+import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import { StatCard, Card, Badge, EmptyState, Spinner } from '@/components/ui'
 import { TrendingUp, TrendingDown, Briefcase } from 'lucide-react'
 import clsx from 'clsx'
@@ -49,6 +50,7 @@ function NoSimulationGraphic() {
 }
 
 export default function PortfolioPage() {
+  const { formatSymbol } = useSymbolDisplay()
   const { data: simulation, isLoading: simLoading } = useQuery({
     queryKey: ['simulation', 'active'],
     queryFn: simulationApi.getActive,
@@ -186,7 +188,7 @@ export default function PortfolioPage() {
                   return (
                     <tr key={pos.symbol} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
                       <td className="px-4 py-3">
-                        <span className="font-semibold text-ink dark:text-dark-ink font-mono">{pos.symbol}</span>
+                        <span className="font-semibold text-ink dark:text-dark-ink font-mono">{formatSymbol(pos.symbol)}</span>
                       </td>
                       <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{pos.quantity.toLocaleString()}</td>
                       <td className="px-4 py-3 font-mono text-ink dark:text-dark-ink">{fmtCurrency(pos.averageCost)}</td>
