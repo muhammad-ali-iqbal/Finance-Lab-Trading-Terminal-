@@ -161,6 +161,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW, internalLimite
 	stu.Get("/:id/orders",               h.StudentListOrders)
 	stu.Post("/:id/orders/:oid/cancel",  h.StudentCancelOrder)
 	stu.Get("/:id/leaderboard",          h.StudentLeaderboard)
+	stu.Get("/:id/dividends",            h.StudentDividends)
 }
 
 // ── Internal ──────────────────────────────────────────────────────────────────
@@ -400,11 +401,11 @@ func (h *Handler) AdminReconcile(c *fiber.Ctx) error {
 		return httputil.BadRequest(c, "invalid id")
 	}
 	date := c.Query("date", time.Now().Format("2006-01-02"))
-	n, err := h.reconciler.RunForChallenge(c.Context(), id, date)
+	filled, payouts, err := h.reconciler.RunForChallenge(c.Context(), id, date)
 	if err != nil {
 		return httputil.InternalError(c)
 	}
-	return c.JSON(fiber.Map{"filled": n, "date": date})
+	return c.JSON(fiber.Map{"filled": filled, "payoutsApplied": payouts, "date": date})
 }
 
 func (h *Handler) AdminLeaderboard(c *fiber.Ctx) error {
@@ -739,6 +740,30 @@ func (h *Handler) StudentCancelOrder(c *fiber.Ctx) error {
 		return httputil.InternalError(c)
 	}
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// StudentDividends godoc
+// GET /api/challenges/:id/dividends
+// The participant's applied dividend/bonus payouts, newest first.
+func (h *Handler) StudentDividends(c *fiber.Ctx) error {
+	claims := middleware.GetClaims(c)
+	userID, _ := uuid.Parse(claims.UserID)
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid id")
+	}
+	p, err := h.repo.GetParticipant(c.Context(), id, userID)
+	if err != nil || p == nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	}
+	dividends, err := h.repo.ListDividends(c.Context(), p.ID)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if dividends == nil {
+		dividends = []DividendRecord{}
+	}
+	return c.JSON(fiber.Map{"dividends": dividends})
 }
 
 func (h *Handler) StudentLeaderboard(c *fiber.Ctx) error {

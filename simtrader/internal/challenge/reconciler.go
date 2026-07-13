@@ -27,6 +27,11 @@ type Reconciler struct {
 	repo *Repository
 	db   *pgxpool.Pool
 
+	// payouts provides PSX dividend/bonus announcements for the corporate-
+	// action pass (dividends.go). Nil-safe: without a source that pass is
+	// skipped and order fills proceed normally.
+	payouts PayoutSource
+
 	// mu serialises reconciliation runs. Three sources can trigger a run (the
 	// nightly goroutine, the EOD-prices webhook, and admin reconcile); without
 	// this they could fill the same pending order twice (AVAIL-02). Combined
@@ -34,8 +39,8 @@ type Reconciler struct {
 	mu sync.Mutex
 }
 
-func NewReconciler(repo *Repository, db *pgxpool.Pool) *Reconciler {
-	return &Reconciler{repo: repo, db: db}
+func NewReconciler(repo *Repository, db *pgxpool.Pool, payouts PayoutSource) *Reconciler {
+	return &Reconciler{repo: repo, db: db, payouts: payouts}
 }
 
 // Start launches the nightly goroutine. It runs once at 16:35 PKT each day.
@@ -82,32 +87,40 @@ func (r *Reconciler) RunForDate(date string) {
 		if ch.Status != "active" {
 			continue
 		}
-		n, err := r.RunForChallenge(ctx, ch.ID, date)
+		filled, payouts, err := r.RunForChallenge(ctx, ch.ID, date)
 		if err != nil {
 			log.Printf("[challenge] reconcile challenge %s error: %v", ch.ID, err)
 			continue
 		}
-		log.Printf("[challenge] %s (%s): filled %d orders, snapshots taken", ch.Name, date, n)
+		log.Printf("[challenge] %s (%s): filled %d orders, applied %d payouts, snapshots taken", ch.Name, date, filled, payouts)
 	}
 }
 
-// RunForChallenge processes all pending orders for one challenge on a given date
-// and records daily snapshots. Returns the number of orders filled.
-func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID, date string) (int, error) {
+// RunForChallenge runs the corporate-action pass (dividends/bonus shares),
+// processes all pending orders for one challenge on a given date, and records
+// daily snapshots. Returns the number of orders filled and payouts applied.
+func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID, date string) (int, int, error) {
 	// Serialise all reconciliation so concurrent triggers cannot double-fill.
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	// Corporate actions first, using pre-fill holdings — shares bought today
+	// are not entitled to a payout whose book closure starts today.
+	payoutsApplied := 0
+	if ch, err := r.repo.GetByID(ctx, challengeID); err == nil && ch != nil {
+		payoutsApplied = r.applyDividends(ctx, ch, date)
+	}
+
 	orders, err := r.repo.ListPendingOrders(ctx, challengeID)
 	if err != nil {
-		return 0, err
+		return 0, payoutsApplied, err
 	}
 	if len(orders) == 0 {
 		// Still take snapshots even if no orders pending
 		if err := r.takeSnapshots(ctx, challengeID, date); err != nil {
-			return 0, err
+			return 0, payoutsApplied, err
 		}
-		return 0, nil
+		return 0, payoutsApplied, nil
 	}
 
 	// Collect distinct symbols
@@ -122,7 +135,7 @@ func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID,
 
 	prices, err := r.repo.GetPricesForDate(ctx, syms, date)
 	if err != nil {
-		return 0, err
+		return 0, payoutsApplied, err
 	}
 
 	filled := 0
@@ -177,7 +190,7 @@ func (r *Reconciler) RunForChallenge(ctx context.Context, challengeID uuid.UUID,
 		log.Printf("[challenge] snapshot error: %v", err)
 	}
 
-	return filled, nil
+	return filled, payoutsApplied, nil
 }
 
 // fillOrder fills a single pending order inside one database transaction.

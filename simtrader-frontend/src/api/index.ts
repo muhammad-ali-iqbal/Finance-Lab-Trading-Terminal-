@@ -225,6 +225,23 @@ export interface EODBar {
   volume: number
 }
 
+// One corporate-action payout applied to a challenge participant —
+// cash dividend credited to balance, or bonus shares added to a position.
+export interface ChallengeDividend {
+  id: string
+  challengeId: string
+  participantId: string
+  symbol: string
+  kind: 'dividend' | 'bonus'
+  announcement: string     // raw PSX text, e.g. "60%(i) (D)"
+  percent: number
+  bookClosureStart: string // YYYY-MM-DD
+  quantityHeld: number
+  cashCredited: number
+  sharesCredited: number
+  appliedAt: string
+}
+
 export interface CreateChallengeInput {
   name: string
   description: string

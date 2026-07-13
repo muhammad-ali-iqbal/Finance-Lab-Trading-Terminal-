@@ -20,6 +20,8 @@ Students can:
 - Analyze candlestick charts driven by real historical data
 - View live order book depth (bids/asks)
 - Compete via a real-time leaderboard
+- Join semester-long **Challenges** on live PSX EOD data (orders fill nightly at market close)
+- Browse live **PSX dividend announcements** and automatically receive **dividend cash / bonus shares** on stocks held in a challenge
 
 ---
 
@@ -78,7 +80,7 @@ React SPA with dark/light mode and IBA branding.
 | lightweight-charts v4 | Candlestick + line charts |
 | React Router v6 | Client-side routing |
 
-**Student pages:** Overview · Portfolio · Trade · Chart · Order Book · Orders · Profile
+**Student pages:** Challenges (default) · Dividends · Profile · Historic simulation (Overview · Portfolio · Trade · Chart · Order Book · Orders)
 
 **Admin pages:** Overview · Simulations · Students · Settings
 
@@ -243,6 +245,14 @@ Each student needs a separate browser profile (or incognito window):
 | GET | `/api/simulations/:id/progress` | Timer / progress data |
 | GET | `/api/simulations/:id/ticks/:symbol` | Historical OHLCV |
 | GET | `/api/simulations/:id/ws?token=...` | WebSocket (live ticks) |
+
+### Student — Dividends & Market Data
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/dividends` | Latest PSX dividend/bonus/right announcements (cached proxy of dps.psx.com.pk) |
+| GET | `/api/dividends?symbol=HBL` | Same, filtered by ticker |
+| GET | `/api/dividends/symbols` | PSX securities directory (powers search suggestions) |
+| GET | `/api/challenges/:id/dividends` | Payouts credited to the student in a challenge |
 
 ### Student — Trading
 | Method | Path | Description |
@@ -503,6 +513,34 @@ python validate_simtrader_csv.py simulation.csv
 | Market selloff | All stocks fall | Portfolio risk |
 | High volatility (KSE-100 >1% swing) | Sharp moves | Stop-loss lessons |
 | Low volatility | Flat price action | Limit order patience |
+
+---
+
+## Changelog
+
+### 2026-07-13
+
+**Dividend Announcements section (student dashboard)**
+- New **Dividends** page (`/dashboard/dividends`) showing live PSX dividend, bonus and right share announcements, proxied from the PSX Data Portal payouts feed (`dps.psx.com.pk/payouts`) and cached server-side for 30 minutes — no manual refresh needed
+- Typeahead search over the full PSX securities directory: type a ticker **or** a company name ("habib bank" resolves to HBL); suggestions are ranked and keyboard-navigable
+- Each symbol links to its company page on the PSX data portal
+- Announcement types decoded into badges: **(D)** cash dividend · **(B)** bonus shares · **(R)** right shares; **(F)** final / **(i)** interim shown in the payout column
+
+**Dividends now pay out in Challenges**
+- The nightly reconciler (16:35 PKT) credits payouts for stocks participants hold, before that day's order fills:
+  - **Cash dividends** — percent of the standard PKR 10 face value (e.g. "60% (D)" = PKR 6.00/share) added to cash balance
+  - **Bonus shares** — added to the position (floored), with average cost diluted so cost basis is preserved
+  - **Right issues** — not auto-applied (require subscription)
+- Entitlement follows the book-closure start date and is bounded to the challenge period; a `challenge_dividends` ledger with a uniqueness constraint guarantees each payout is credited exactly once (migration `011`)
+- Portfolio tab shows a **Dividends & Payouts** history card; admin reconcile responses report `payoutsApplied`
+
+**Login / signup consistency & security**
+- Frontend password rules now match the backend policy everywhere (register, reset, student & admin change-password): **12–72 characters**, single shared validator (`src/utils/password.ts`) — previously forms showed an 8-character rule the server would reject
+- **Fixed a security bug**: authenticated password change (`PUT /api/me/password`) stored the new password in **plaintext** instead of bcrypt-hashing it, silently breaking subsequent logins; all password-persisting paths now hash through one shared `internal/passwords.Hash` (bcrypt cost 12)
+- Token expiry audited end-to-end (JWT access/refresh, invite, reset): all comparisons correct and UTC-safe — no changes required
+
+**Navigation**
+- Students now land on **Challenges** after login; the historic-simulation Overview moved to `/dashboard/overview` under the collapsed "Historic Simulation" nav group
 
 ---
 

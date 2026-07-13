@@ -289,6 +289,57 @@ func (r *Repository) GetPositions(ctx context.Context, participantID uuid.UUID) 
 	return out, rows.Err()
 }
 
+// ListHeldPositionsByChallenge returns every position with shares held across
+// all participants of a challenge — the working set for the reconciler's
+// corporate-action (dividend/bonus) pass.
+func (r *Repository) ListHeldPositionsByChallenge(ctx context.Context, challengeID uuid.UUID) ([]ChallengePosition, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, challenge_id, participant_id, symbol, quantity, avg_cost
+		FROM challenge_positions
+		WHERE challenge_id=$1 AND quantity > 0`,
+		challengeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []ChallengePosition
+	for rows.Next() {
+		var p ChallengePosition
+		if err := rows.Scan(&p.ID, &p.ChallengeID, &p.ParticipantID, &p.Symbol, &p.Quantity, &p.AvgCost); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
+// ListDividends returns the payouts applied to one participant, newest first.
+func (r *Repository) ListDividends(ctx context.Context, participantID uuid.UUID) ([]DividendRecord, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, challenge_id, participant_id, symbol, kind, announcement, percent,
+		       to_char(book_closure_start, 'YYYY-MM-DD'), quantity_held,
+		       cash_credited, shares_credited, applied_at
+		FROM challenge_dividends
+		WHERE participant_id=$1
+		ORDER BY applied_at DESC`,
+		participantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []DividendRecord
+	for rows.Next() {
+		var d DividendRecord
+		if err := rows.Scan(&d.ID, &d.ChallengeID, &d.ParticipantID, &d.Symbol, &d.Kind,
+			&d.Announcement, &d.Percent, &d.BookClosureStart, &d.QuantityHeld,
+			&d.CashCredited, &d.SharesCredited, &d.AppliedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, d)
+	}
+	return out, rows.Err()
+}
+
 func (r *Repository) UpsertPosition(ctx context.Context, p *ChallengePosition) error {
 	_, err := r.db.Exec(ctx, `
 		INSERT INTO challenge_positions (id, challenge_id, participant_id, symbol, quantity, avg_cost)

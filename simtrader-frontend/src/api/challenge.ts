@@ -3,7 +3,7 @@
 import { client } from './client'
 import type {
   Challenge, ChallengeWithMeta, ChallengeOrder, ChallengePortfolio,
-  ChallengeSnapshot, LeaderboardEntry, CreateChallengeInput, EODBar,
+  ChallengeSnapshot, ChallengeDividend, LeaderboardEntry, CreateChallengeInput, EODBar,
 } from './index'
 
 export const challengeApi = {
@@ -52,6 +52,12 @@ export const challengeApi = {
 
   cancelOrder: async (id: string, orderId: string): Promise<void> => {
     await client.post(`/challenges/${id}/orders/${orderId}/cancel`)
+  },
+
+  // Dividend/bonus payouts credited to the student by the nightly reconciler
+  getDividends: async (id: string): Promise<{ dividends: ChallengeDividend[] }> => {
+    const { data } = await client.get(`/challenges/${id}/dividends`)
+    return data
   },
 
   getLeaderboard: async (id: string): Promise<{ leaderboard: LeaderboardEntry[] }> => {

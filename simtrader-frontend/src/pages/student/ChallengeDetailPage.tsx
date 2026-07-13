@@ -9,7 +9,7 @@ import {
   ColorType, LineStyle, CrosshairMode,
 } from 'lightweight-charts'
 import { challengeApi } from '@/api'
-import type { ChallengeOrder, ChallengePosition, LeaderboardEntry } from '@/api'
+import type { ChallengeOrder, ChallengePosition, ChallengeDividend, LeaderboardEntry } from '@/api'
 import { Spinner, Badge, Button, Input, Alert, Card, EmptyState } from '@/components/ui'
 import { SymbolPicker } from '@/components/ui/SymbolPicker'
 import { useTheme } from '@/context/ThemeContext'
@@ -17,7 +17,7 @@ import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
-  CheckCircle2, XCircle, Clock, Activity, Download,
+  CheckCircle2, XCircle, Clock, Activity, Download, Banknote,
 } from 'lucide-react'
 import { downloadCSV } from '@/utils/csv'
 import EODChartTab from './EODChartTab'
@@ -214,6 +214,81 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
           </div>
         )}
       </div>
+
+      {/* Dividends & payouts */}
+      <DividendsSection challengeId={challengeId} />
+    </div>
+  )
+}
+
+// ── Dividends & payouts (Portfolio tab section) ───────────────────────────────
+
+function DividendsSection({ challengeId }: { challengeId: string }) {
+  const { formatSymbol } = useSymbolDisplay()
+  const { data } = useQuery({
+    queryKey: ['challenge-dividends', challengeId],
+    queryFn: () => challengeApi.getDividends(challengeId),
+    staleTime: 5 * 60_000,
+  })
+
+  const dividends = data?.dividends ?? []
+
+  return (
+    <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg overflow-hidden">
+      <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center gap-2">
+        <Banknote className="w-4 h-4 text-ink dark:text-dark-ink" />
+        <p className="text-sm font-medium text-ink dark:text-dark-ink">Dividends &amp; Payouts</p>
+        <span className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary ml-auto">
+          Credited automatically when stocks you hold pay out
+        </span>
+      </div>
+      {dividends.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 gap-1.5 text-center px-4">
+          <Banknote className="w-6 h-6 text-ink-disabled dark:text-dark-ink-disabled" />
+          <p className="text-sm text-ink-tertiary dark:text-dark-ink-tertiary">No payouts yet</p>
+          <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary max-w-sm">
+            When a company you hold announces a dividend or bonus issue, cash or shares are
+            credited to your portfolio on its book-closure date.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border dark:border-dark-border text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide">
+                <th className="text-left px-4 py-2">Symbol</th>
+                <th className="text-left px-4 py-2">Type</th>
+                <th className="text-left px-4 py-2">Announcement</th>
+                <th className="text-right px-4 py-2">Shares Held</th>
+                <th className="text-right px-4 py-2">Credited</th>
+                <th className="text-right px-4 py-2">Book Closure</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border dark:divide-dark-border">
+              {dividends.map((d: ChallengeDividend) => (
+                <tr key={d.id} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
+                  <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{formatSymbol(d.symbol)}</td>
+                  <td className="px-4 py-2.5">
+                    <Badge variant={d.kind === 'dividend' ? 'success' : 'accent'} size="sm">
+                      {d.kind === 'dividend' ? 'Dividend' : 'Bonus'}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-2.5 text-ink-secondary dark:text-dark-ink-secondary font-mono text-xs">{d.announcement}</td>
+                  <td className="px-4 py-2.5 text-right font-mono text-ink-secondary dark:text-dark-ink-secondary">{d.quantityHeld.toLocaleString()}</td>
+                  <td className="px-4 py-2.5 text-right font-mono font-semibold text-success dark:text-dark-success">
+                    {d.kind === 'dividend'
+                      ? `+PKR ${fmt(d.cashCredited)}`
+                      : `+${d.sharesCredited.toLocaleString()} shares`}
+                  </td>
+                  <td className="px-4 py-2.5 text-right text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
+                    {new Date(d.bookClosureStart + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

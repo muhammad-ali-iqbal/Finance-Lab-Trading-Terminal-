@@ -96,9 +96,14 @@ func main() {
 	portfolioRepo := portfolio.NewRepository(db.Pool)
 	portfolioHandler := portfolio.NewHandler(portfolioRepo, simRepo)
 
+	// Dividend announcements (proxied from the PSX data portal). Created
+	// before the challenge reconciler, which uses it as its payout source.
+	dividendService := dividend.NewService()
+	dividendHandler := dividend.NewHandler(dividendService)
+
 	// Challenge
 	challengeRepo := challenge.NewRepository(db.Pool)
-	challengeReconciler := challenge.NewReconciler(challengeRepo, db.Pool)
+	challengeReconciler := challenge.NewReconciler(challengeRepo, db.Pool, dividendService)
 	challengeHandler := challenge.NewHandler(challengeRepo, challengeReconciler, cfg.InternalSecret)
 	ctx, cancelReconciler := context.WithCancel(context.Background())
 	go challengeReconciler.Start(ctx)
@@ -113,9 +118,6 @@ func main() {
 
 	// PSX Tracker admin panel
 	psxHandler := psxtracker.NewHandler(cfg.PSXTrackerDir, cfg.PythonCmd)
-
-	// Dividend announcements (proxied from the PSX data portal)
-	dividendHandler := dividend.NewHandler(dividend.NewService())
 
 	// ── 4. HTTP server ─────────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
