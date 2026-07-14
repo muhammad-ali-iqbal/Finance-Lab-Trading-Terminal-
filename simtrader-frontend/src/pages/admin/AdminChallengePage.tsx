@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { challengeApi } from '@/api'
 import type { ChallengeWithMeta, LeaderboardEntry } from '@/api'
 import { Spinner, Badge, Button } from '@/components/ui'
+import { DecisionTimeline } from '@/components/challenge/DecisionTimeline'
 import {
   Trophy, Plus, X, Users, Calendar, DollarSign,
   PlayCircle, CheckCircle, RotateCcw, ChevronDown, ChevronRight, Download,
@@ -143,12 +144,58 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
   )
 }
 
+// ── Participant decisions modal ───────────────────────────────────────────────
+// Admin drill-down into one enrolled student's own timestamped order/decision
+// ledger — the name/email are passed in from the leaderboard row that was
+// clicked, so no extra identity lookup is needed here.
+
+function ParticipantDecisionsModal({
+  challengeId, participantId, displayName, email, onClose,
+}: {
+  challengeId: string
+  participantId: string
+  displayName: string
+  email?: string
+  onClose: () => void
+}) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-participant-orders', challengeId, participantId],
+    queryFn: () => challengeApi.adminParticipantOrders(challengeId, participantId),
+  })
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-ink/30 dark:bg-dark-ink/30" onClick={onClose} />
+      <div className="relative w-full max-w-2xl max-h-[80vh] flex flex-col bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-xl shadow-xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border flex-shrink-0">
+          <div>
+            <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">{displayName} — Decisions</h2>
+            {email && <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary">{email}</p>}
+          </div>
+          <button onClick={onClose} className="p-1 text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="overflow-y-auto">
+          <DecisionTimeline
+            orders={data?.orders ?? []}
+            isLoading={isLoading}
+            emptyTitle="No decisions yet"
+            emptyDescription="This student hasn't placed any orders in this challenge yet."
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Expandable challenge row ──────────────────────────────────────────────────
 
 function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
   const qc = useQueryClient()
   const [expanded, setExpanded] = useState(false)
   const [reconcileDate, setReconcileDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null)
 
   const activateMut = useMutation({
     mutationFn: () => challengeApi.adminActivate(ch.id),
@@ -277,7 +324,12 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
                   {leaderboard.leaderboard.map((e: LeaderboardEntry) => {
                     const up = e.returnPct >= 0
                     return (
-                      <tr key={e.participantId} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
+                      <tr
+                        key={e.participantId}
+                        onClick={() => setSelectedEntry(e)}
+                        className="cursor-pointer hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary"
+                        title="View this student's decisions"
+                      >
                         <td className="px-4 py-2.5 text-sm font-bold text-ink-tertiary dark:text-dark-ink-tertiary">
                           {e.rank <= 3 ? ['🥇', '🥈', '🥉'][e.rank - 1] : `#${e.rank}`}
                         </td>
@@ -296,6 +348,16 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
             </div>
           )}
         </div>
+      )}
+
+      {selectedEntry && (
+        <ParticipantDecisionsModal
+          challengeId={ch.id}
+          participantId={selectedEntry.participantId}
+          displayName={selectedEntry.displayName}
+          email={selectedEntry.email}
+          onClose={() => setSelectedEntry(null)}
+        />
       )}
     </div>
   )

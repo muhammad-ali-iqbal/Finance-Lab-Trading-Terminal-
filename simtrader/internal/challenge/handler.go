@@ -149,6 +149,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW, internalLimite
 	adm.Post("/:id/enroll-all",         h.AdminEnrollAll)
 	adm.Post("/:id/reconcile",          h.AdminReconcile)
 	adm.Get("/:id/leaderboard",         h.AdminLeaderboard)
+	adm.Get("/:id/participants/:pid/orders", h.AdminParticipantOrders)
 
 	// Student routes
 	stu := app.Group("/api/challenges", authMW)
@@ -422,6 +423,33 @@ func (h *Handler) AdminLeaderboard(c *fiber.Ctx) error {
 		return httputil.InternalError(c)
 	}
 	return c.JSON(fiber.Map{"leaderboard": board})
+}
+
+// AdminParticipantOrders lets an admin drill into a single enrolled student's
+// own order/decision ledger for a challenge — the admin equivalent of
+// StudentListOrders, but keyed by an arbitrary participant ID instead of the
+// caller's own JWT identity.
+func (h *Handler) AdminParticipantOrders(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid id")
+	}
+	pid, err := uuid.Parse(c.Params("pid"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid participant id")
+	}
+	p, err := h.repo.GetParticipantByID(c.Context(), pid)
+	if err != nil || p == nil || p.ChallengeID != id {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "participant not found"})
+	}
+	orders, err := h.repo.ListOrders(c.Context(), pid)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if orders == nil {
+		orders = []ChallengeOrder{}
+	}
+	return c.JSON(fiber.Map{"orders": orders})
 }
 
 // ── Student handlers ──────────────────────────────────────────────────────────

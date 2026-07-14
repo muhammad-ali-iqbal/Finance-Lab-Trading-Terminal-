@@ -12,10 +12,18 @@ Usage:
 """
 
 import sys
+import time
 import sqlite3
 import requests
 from collections import defaultdict
 from config import DB_PATH, SIMTRADER_URL, INTERNAL_SECRET
+
+# The internal ingest endpoint is capped at 20 req/min per IP (it's reachable
+# through the public proxy, so this stops secret-spraying — see
+# simtrader/cmd/server/main.go's internalLimiter). Pace requests comfortably
+# under that, and back off + retry on a 429 rather than counting it as failed.
+REQUEST_DELAY_SEC = 3.5
+RATE_LIMIT_BACKOFF_SEC = 65
 
 
 def main():
@@ -60,22 +68,30 @@ def main():
     failed = 0
     for i, date in enumerate(dates, 1):
         prices = by_date[date]
-        try:
-            resp = requests.post(
-                f"{SIMTRADER_URL}/api/internal/eod-prices",
-                json={"date": date, "prices": prices},
-                headers={"X-Internal-Secret": INTERNAL_SECRET},
-                timeout=30,
-            )
-            if resp.ok:
-                ok += 1
-                print(f"  [{i:>3}/{total_dates}] {date}  {len(prices):>4} symbols  ✓")
-            else:
+        while True:
+            try:
+                resp = requests.post(
+                    f"{SIMTRADER_URL}/api/internal/eod-prices",
+                    json={"date": date, "prices": prices},
+                    headers={"X-Internal-Secret": INTERNAL_SECRET},
+                    timeout=30,
+                )
+                if resp.status_code == 429:
+                    print(f"  [{i:>3}/{total_dates}] {date}  429 rate-limited, "
+                          f"waiting {RATE_LIMIT_BACKOFF_SEC}s ...")
+                    time.sleep(RATE_LIMIT_BACKOFF_SEC)
+                    continue
+                if resp.ok:
+                    ok += 1
+                    print(f"  [{i:>3}/{total_dates}] {date}  {len(prices):>4} symbols  ✓")
+                else:
+                    failed += 1
+                    print(f"  [{i:>3}/{total_dates}] {date}  HTTP {resp.status_code}: {resp.text[:80]}")
+            except Exception as e:
                 failed += 1
-                print(f"  [{i:>3}/{total_dates}] {date}  HTTP {resp.status_code}: {resp.text[:80]}")
-        except Exception as e:
-            failed += 1
-            print(f"  [{i:>3}/{total_dates}] {date}  ERROR: {e}")
+                print(f"  [{i:>3}/{total_dates}] {date}  ERROR: {e}")
+            break
+        time.sleep(REQUEST_DELAY_SEC)
 
     print(f"\nDone. {ok} dates pushed, {failed} failed.")
 

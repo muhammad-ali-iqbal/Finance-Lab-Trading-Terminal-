@@ -12,12 +12,13 @@ import { challengeApi } from '@/api'
 import type { ChallengeOrder, ChallengePosition, ChallengeDividend, LeaderboardEntry } from '@/api'
 import { Spinner, Badge, Button, Input, Alert, Card, EmptyState } from '@/components/ui'
 import { SymbolPicker } from '@/components/ui/SymbolPicker'
+import { ChallengeOrderStatusBadge } from '@/components/challenge/DecisionTimeline'
 import { useTheme } from '@/context/ThemeContext'
 import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
-  CheckCircle2, XCircle, Clock, Activity, Download, Banknote,
+  Activity, Download, Banknote,
 } from 'lucide-react'
 import { downloadCSV } from '@/utils/csv'
 import EODChartTab from './EODChartTab'
@@ -299,23 +300,6 @@ const CHALLENGE_ORDER_TYPES: { value: 'market' | 'limit'; label: string; descrip
   { value: 'market', label: 'Market', description: 'Fills at the day\'s closing price after 16:35 PKT' },
   { value: 'limit',  label: 'Limit',  description: 'Fill only if the day\'s low/high reaches your price' },
 ]
-
-function ChallengeOrderStatusBadge({ status }: { status: string }) {
-  const map: Record<string, { icon: typeof CheckCircle2; label: string; variant: 'success' | 'danger' | 'warning' | 'neutral' }> = {
-    filled:    { icon: CheckCircle2, label: 'Filled',    variant: 'success' },
-    pending:   { icon: Clock,        label: 'Pending',   variant: 'neutral'  },
-    cancelled: { icon: XCircle,      label: 'Cancelled', variant: 'neutral'  },
-    rejected:  { icon: XCircle,      label: 'Rejected',  variant: 'danger'   },
-  }
-  const cfg = map[status] ?? map.pending
-  const Icon = cfg.icon
-  return (
-    <Badge variant={cfg.variant} size="sm">
-      <Icon className="w-2.5 h-2.5 mr-0.5 inline" />
-      {cfg.label}
-    </Badge>
-  )
-}
 
 function OrdersTab({ challengeId }: { challengeId: string }) {
   const qc = useQueryClient()

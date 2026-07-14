@@ -61,7 +61,8 @@
       "WebFetch(domain:dps.psx.com.pk)",
       "Bash(curl -s \"https://dps.psx.com.pk/payouts\" -H \"User-Agent: Mozilla/5.0\")",
       "Bash(curl -s -X POST \"https://dps.psx.com.pk/payouts\" -H \"User-Agent: Mozilla/5.0\" --data \"symbol=&count=200&offset=0&date_from=&date_to=\")",
-      "Bash(curl -s -X POST \"https://dps.psx.com.pk/payouts\" -H \"User-Agent: Mozilla/5.0\" --data \"symbol=HBL&count=25&offset=0&date_from=&date_to=\")"
+      "Bash(curl -s -X POST \"https://dps.psx.com.pk/payouts\" -H \"User-Agent: Mozilla/5.0\" --data \"symbol=HBL&count=25&offset=0&date_from=&date_to=\")",
+      "Bash(python -c \"import bcrypt; print\\(bcrypt.hashpw\\(b'password123', bcrypt.gensalt\\(12\\)\\).decode\\(\\)\\)\")"
     ]
   }
 }

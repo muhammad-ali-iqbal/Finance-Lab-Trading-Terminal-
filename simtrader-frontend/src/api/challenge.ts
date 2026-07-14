@@ -113,6 +113,12 @@ export const challengeApi = {
     return data
   },
 
+  // A single enrolled student's own order/decision ledger, admin drill-down
+  adminParticipantOrders: async (id: string, participantId: string): Promise<{ orders: ChallengeOrder[] }> => {
+    const { data } = await client.get(`/admin/challenges/${id}/participants/${participantId}/orders`)
+    return data
+  },
+
   // ── EOD chart data ─────────────────────────────────────────────────────────
 
   getEODSymbols: async (): Promise<{ symbols: string[] }> => {
