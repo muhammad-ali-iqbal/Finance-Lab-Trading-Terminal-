@@ -31,6 +31,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	admin := app.Group("/api/admin/announcements", authMW, adminMW)
 	admin.Get("/", h.List)
 	admin.Post("/", h.Create)
+	admin.Post("/preview", h.Preview)
 }
 
 type createRequest struct {
@@ -88,6 +89,35 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusAccepted).JSON(a)
+}
+
+type previewRequest struct {
+	Heading string `json:"heading"`
+	Body    string `json:"body"`
+}
+
+// Preview godoc
+// POST /api/admin/announcements/preview
+// Body: { heading, body }
+// Returns the exact HTML/plain-text the send would produce, for a live
+// compose-time preview. Renders through the same RenderHTML/RenderPlainText
+// used by sendBatch, so the preview can never drift from what actually sends.
+func (h *Handler) Preview(c *fiber.Ctx) error {
+	var req previewRequest
+	if err := c.BodyParser(&req); err != nil {
+		return httputil.BadRequest(c, "invalid request body")
+	}
+	req.Heading = strings.TrimSpace(req.Heading)
+	req.Body = strings.TrimSpace(req.Body)
+
+	if len(req.Heading) > maxHeadingLen || len(req.Body) > maxBodyLen {
+		return httputil.BadRequest(c, "heading or body exceeds the maximum length")
+	}
+
+	return c.JSON(fiber.Map{
+		"html":  RenderHTML(req.Heading, req.Body),
+		"plain": RenderPlainText(req.Heading, req.Body),
+	})
 }
 
 // List godoc

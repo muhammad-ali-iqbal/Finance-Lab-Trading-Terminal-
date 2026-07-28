@@ -275,6 +275,16 @@ export interface CreateAnnouncementInput {
   excludeUserIds?: string[]
 }
 
+export interface PreviewAnnouncementInput {
+  heading: string
+  body: string
+}
+
+export interface PreviewAnnouncementResult {
+  html: string
+  plain: string
+}
+
 // ── Dividend announcement types (proxied from the PSX data portal) ─────────
 
 export interface DividendPayout {
