@@ -1,12 +1,12 @@
 // src/pages/admin/AdminAnnouncementsPage.tsx
 // Admin view: compose and broadcast branded email announcements to all active students.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { announcementApi, userApi } from '@/api'
 import type { Announcement } from '@/api'
 import { Spinner, Badge, Button } from '@/components/ui'
-import { Megaphone, Plus, X, Users, Clock, Search } from 'lucide-react'
+import { Megaphone, Plus, X, Users, Clock, Search, Bold, Italic, Link2 } from 'lucide-react'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -84,6 +84,47 @@ function ComposeModal({ onClose, onSent }: { onClose: () => void; onSent: () => 
 
   const recipientCount = activeStudents.length - excludedIds.size
 
+  const bodyRef = useRef<HTMLTextAreaElement>(null)
+
+  // Wraps the current selection (or a placeholder, if nothing is selected)
+  // in the given markers and re-selects the wrapped text so formatting can
+  // be chained or the placeholder typed over immediately.
+  const wrapSelection = (before: string, after: string, placeholder: string) => {
+    const el = bodyRef.current
+    if (!el) return
+    const start = el.selectionStart ?? 0
+    const end = el.selectionEnd ?? 0
+    const value = form.body
+    const selected = value.slice(start, end) || placeholder
+    const newValue = value.slice(0, start) + before + selected + after + value.slice(end)
+    setForm(f => ({ ...f, body: newValue }))
+    requestAnimationFrame(() => {
+      el.focus()
+      el.setSelectionRange(start + before.length, start + before.length + selected.length)
+    })
+  }
+
+  const handleBold = () => wrapSelection('**', '**', 'bold text')
+  const handleItalic = () => wrapSelection('*', '*', 'italic text')
+
+  const handleLink = () => {
+    const el = bodyRef.current
+    if (!el) return
+    const start = el.selectionStart ?? 0
+    const end = el.selectionEnd ?? 0
+    const selected = form.body.slice(start, end) || 'link text'
+    const url = window.prompt('Link URL (https://...)', 'https://')
+    if (!url) return
+    const inserted = `[${selected}](${url.trim()})`
+    const newValue = form.body.slice(0, start) + inserted + form.body.slice(end)
+    setForm(f => ({ ...f, body: newValue }))
+    requestAnimationFrame(() => {
+      el.focus()
+      const pos = start + inserted.length
+      el.setSelectionRange(pos, pos)
+    })
+  }
+
   const debouncedHeading = useDebounced(form.heading, 400)
   const debouncedBody = useDebounced(form.body, 400)
   const { data: previewData, isFetching: previewLoading } = useQuery({
@@ -150,7 +191,34 @@ function ComposeModal({ onClose, onSent }: { onClose: () => void; onSent: () => 
               </div>
               <div>
                 <label className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide block mb-1">Body *</label>
+                <div className="flex items-center gap-0.5 mb-1.5 p-0.5 rounded border border-border dark:border-dark-border bg-surface-secondary dark:bg-dark-surface-secondary w-fit">
+                  <button
+                    type="button"
+                    onClick={handleBold}
+                    title="Bold (**text**)"
+                    className="p-1.5 rounded text-ink-secondary dark:text-dark-ink-secondary hover:bg-white dark:hover:bg-dark-surface hover:text-ink dark:hover:text-dark-ink"
+                  >
+                    <Bold className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleItalic}
+                    title="Italic (*text*)"
+                    className="p-1.5 rounded text-ink-secondary dark:text-dark-ink-secondary hover:bg-white dark:hover:bg-dark-surface hover:text-ink dark:hover:text-dark-ink"
+                  >
+                    <Italic className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLink}
+                    title="Insert link"
+                    className="p-1.5 rounded text-ink-secondary dark:text-dark-ink-secondary hover:bg-white dark:hover:bg-dark-surface hover:text-ink dark:hover:text-dark-ink"
+                  >
+                    <Link2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
                 <textarea
+                  ref={bodyRef}
                   value={form.body}
                   onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                   placeholder="Message to students. Leave a blank line between paragraphs."

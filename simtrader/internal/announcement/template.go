@@ -11,23 +11,62 @@ package announcement
 import (
 	"fmt"
 	"html"
+	"regexp"
 	"strings"
 )
 
 // RenderHTML builds the branded announcement email body. heading and each
 // paragraph derived from body are individually HTML-escaped before being
-// interpolated into the static template.
+// interpolated into the static template. Within a paragraph, a small inline
+// markdown subset (**bold**, *italic*, [text](url)) is then applied on top
+// of the already-escaped text — see formatInline.
 func RenderHTML(heading, body string) string {
 	escHeading := html.EscapeString(heading)
 
 	var sb strings.Builder
 	for _, p := range splitParagraphs(body) {
 		sb.WriteString(`<p class="em-body-p" style="margin: 0 0 18px 0; font-size: 17px; color: #3A2A2E; line-height: 1.75;">`)
-		sb.WriteString(html.EscapeString(p))
+		sb.WriteString(formatInline(p))
 		sb.WriteString(`</p>`)
 	}
 
 	return fmt.Sprintf(announcementHTMLTemplate, escHeading, sb.String())
+}
+
+// ---------------------------------------------------------------------------
+// Inline markdown subset: **bold**, *italic*, [text](url).
+// The paragraph is HTML-escaped first, so these regexes only ever see and
+// insert markup around already-safe text — admin-authored body text can
+// never inject arbitrary HTML.
+// ---------------------------------------------------------------------------
+
+var (
+	boldRe   = regexp.MustCompile(`\*\*(.+?)\*\*`)
+	italicRe = regexp.MustCompile(`\*(.+?)\*`)
+	linkRe   = regexp.MustCompile(`\[([^\]\n]+)\]\(([^)\s]+)\)`)
+)
+
+// formatInline HTML-escapes p, then applies the inline markdown subset.
+func formatInline(p string) string {
+	escaped := html.EscapeString(p)
+	escaped = boldRe.ReplaceAllString(escaped, `<strong style="font-weight:600;color:#1A0A0E;">$1</strong>`)
+	escaped = italicRe.ReplaceAllString(escaped, `<em>$1</em>`)
+	escaped = linkRe.ReplaceAllStringFunc(escaped, func(m string) string {
+		parts := linkRe.FindStringSubmatch(m)
+		text, url := parts[1], parts[2]
+		if !isSafeLinkURL(url) {
+			return m
+		}
+		return fmt.Sprintf(`<a href="%s" style="color:#8B1A2A;text-decoration:underline;">%s</a>`, url, text)
+	})
+	return escaped
+}
+
+// isSafeLinkURL rejects schemes like javascript: — only http(s)/mailto links
+// are turned into anchors; anything else is left as literal escaped text.
+func isSafeLinkURL(url string) bool {
+	lower := strings.ToLower(url)
+	return strings.HasPrefix(lower, "http://") || strings.HasPrefix(lower, "https://") || strings.HasPrefix(lower, "mailto:")
 }
 
 // RenderPlainText builds the plain-text alternative part.
