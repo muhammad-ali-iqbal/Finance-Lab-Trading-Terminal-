@@ -3,6 +3,12 @@
 FROM node:20.15.1-alpine AS builder
 WORKDIR /app
 
+# Reverse-proxy subpath (e.g. "/simtrader") to build asset paths and the
+# router basename against — see vite.config.ts. Passed via docker-compose.yml
+# build.args; leave unset to build for domain-root deployment.
+ARG VITE_BASE_PATH=""
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+
 COPY package*.json ./
 RUN npm ci
 

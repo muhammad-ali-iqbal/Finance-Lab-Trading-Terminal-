@@ -35,10 +35,14 @@ type PasswordVerifier interface {
 type Handler struct {
 	repo     *Repository
 	verifier PasswordVerifier
+	// basePath prefixes avatar URLs returned to the browser (e.g. "/simtrader")
+	// so they resolve back through the reverse proxy correctly when this app
+	// isn't served from the domain root. Empty when served from the root.
+	basePath string
 }
 
-func NewHandler(repo *Repository, verifier PasswordVerifier) *Handler {
-	return &Handler{repo: repo, verifier: verifier}
+func NewHandler(repo *Repository, verifier PasswordVerifier, basePath string) *Handler {
+	return &Handler{repo: repo, verifier: verifier, basePath: basePath}
 }
 
 // RegisterRoutes mounts user management routes.
@@ -362,7 +366,7 @@ func (h *Handler) UploadAvatar(c *fiber.Ctx) error {
 		return httputil.InternalError(c)
 	}
 
-	avatarURL := "/uploads/avatars/" + filename
+	avatarURL := h.basePath + "/uploads/avatars/" + filename
 	if err := h.repo.SetAvatarURL(c.Context(), uid, avatarURL); err != nil {
 		return httputil.InternalError(c)
 	}
@@ -398,7 +402,7 @@ func (h *Handler) SetPresetAvatar(c *fiber.Ctx) error {
 		return httputil.BadRequest(c, "invalid preset name")
 	}
 
-	avatarURL := "/avatars/" + req.Preset + ".svg"
+	avatarURL := h.basePath + "/avatars/" + req.Preset + ".svg"
 	if err := h.repo.SetAvatarURL(c.Context(), uid, avatarURL); err != nil {
 		return httputil.InternalError(c)
 	}

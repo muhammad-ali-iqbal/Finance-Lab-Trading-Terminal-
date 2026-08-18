@@ -167,7 +167,7 @@ export function ProfilePage() {
         </p>
         <div className="grid grid-cols-8 gap-2">
           {PRESETS.map(preset => {
-            const isSelected = user?.avatarUrl === `/avatars/${preset}.svg`
+            const isSelected = user?.avatarUrl === `${import.meta.env.BASE_URL}avatars/${preset}.svg`
             return (
               <button
                 key={preset}
@@ -180,7 +180,7 @@ export function ProfilePage() {
                     : 'opacity-70 hover:opacity-100',
                 )}
               >
-                <img src={`/avatars/${preset}.svg`} alt={preset} className="w-full h-full" />
+                <img src={`${import.meta.env.BASE_URL}avatars/${preset}.svg`} alt={preset} className="w-full h-full" />
               </button>
             )
           })}

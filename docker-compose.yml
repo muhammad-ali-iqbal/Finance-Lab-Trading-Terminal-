@@ -55,6 +55,12 @@ services:
       PSX_TRACKER_DIR: /app/psx_tracker
       PYTHON_CMD: python3
       PSX_DB_PATH: /data/psx_data.db
+      # Prefixes avatar URLs (uploaded + preset) with the subpath SimTrader is
+      # served under, since Caddy strips it before proxying here (see root
+      # Caddyfile's `handle_path /simtrader/*`) — the browser still needs the
+      # prefix to route back through Caddy correctly. Leave blank if serving
+      # from the domain root.
+      BASE_PATH: /simtrader
     volumes:
       - uploads:/app/uploads       # user avatar uploads
       - psx_data:/data             # SQLite database shared with psx_tracker
@@ -67,7 +73,13 @@ services:
 
   # ── React frontend (Nginx) ────────────────────────────────────────────────────
   frontend:
-    build: ./simtrader-frontend
+    build:
+      context: ./simtrader-frontend
+      args:
+        # Baked into the Vite build (asset base path + router basename) — see
+        # vite.config.ts. Must match the Caddyfile's `/simtrader` prefix and
+        # the backend's BASE_PATH above. Leave blank to build for domain-root.
+        VITE_BASE_PATH: /simtrader
     restart: unless-stopped
     depends_on:
       backend:

@@ -72,7 +72,7 @@ func main() {
 	}
 	authService := auth.NewService(userRepo, cfg, mailer)
 	authHandler := auth.NewHandler(authService)
-	userHandler := user.NewHandler(userRepo, authService)
+	userHandler := user.NewHandler(userRepo, authService, cfg.BasePath)
 
 	// Middleware. The status guard makes admin blocks take effect within ~30s
 	// instead of waiting out the access-token TTL (AUTH-04).

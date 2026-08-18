@@ -48,6 +48,14 @@ type Config struct {
 
 	// PythonCmd is the Python executable name (python or python3).
 	PythonCmd string
+
+	// BasePath is the subpath SimTrader is served under behind the reverse
+	// proxy (e.g. "/simtrader"), or "" when served from the domain root.
+	// Caddy's handle_path strips it before requests reach this container, so
+	// internal routing is unaffected — but avatar URLs returned to the
+	// browser (UploadAvatar/SetPreset) must include it, or the browser will
+	// resolve them against the domain root instead of back through the proxy.
+	BasePath string
 }
 
 // Load reads .env (if present) then environment variables.
@@ -65,6 +73,7 @@ func Load() (*Config, error) {
 	cfg.FrontendURL = getEnv("FRONTEND_URL", "http://localhost:5173")
 	cfg.PSXTrackerDir = getEnv("PSX_TRACKER_DIR", "../psx_tracker")
 	cfg.PythonCmd = getEnv("PYTHON_CMD", "python")
+	cfg.BasePath = getEnv("BASE_PATH", "")
 
 	// Required — app cannot function without these
 	cfg.DatabaseURL = requireEnv("DATABASE_URL", &missing)

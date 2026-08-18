@@ -84,7 +84,10 @@ client.interceptors.response.use(
     } catch (refreshError) {
       processPending(refreshError)
       useAuthStore.getState().logout()
-      window.location.href = '/login'
+      // Absolute path resolves against the domain root, not this app's
+      // subpath — prefix with BASE_URL (always has a trailing slash) so it
+      // still routes back through the reverse proxy correctly (see App.tsx).
+      window.location.href = `${import.meta.env.BASE_URL}login`
       return Promise.reject(refreshError)
     } finally {
       isRefreshing = false

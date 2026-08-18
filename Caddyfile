@@ -21,7 +21,15 @@
 		-Server
 	}
 
-	reverse_proxy frontend:80 {
-		header_up X-Forwarded-Proto https
+	redir /simtrader /simtrader/ 308
+
+	handle_path /simtrader/* {
+		reverse_proxy frontend:80 {
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	handle {
+		reverse_proxy financelab-test:80
 	}
 }

@@ -72,7 +72,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 flex items-center gap-3">
           <img
-            src="/iba-logo.png"
+            src={`${import.meta.env.BASE_URL}iba-logo.png`}
             alt="IBA"
             className="h-9 w-auto object-contain"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
@@ -126,7 +126,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2.5 mb-10">
             <img
-              src="/iba-logo.png"
+              src={`${import.meta.env.BASE_URL}iba-logo.png`}
               alt="IBA"
               className="h-7 w-auto object-contain"
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}

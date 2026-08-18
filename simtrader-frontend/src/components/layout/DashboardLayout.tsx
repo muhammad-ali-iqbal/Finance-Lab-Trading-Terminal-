@@ -162,7 +162,7 @@ export default function DashboardLayout() {
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border dark:border-dark-border flex-shrink-0">
           <img
-            src="/iba-logo.png"
+            src={`${import.meta.env.BASE_URL}iba-logo.png`}
             alt="IBA"
             className="h-7 w-auto object-contain flex-shrink-0"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
