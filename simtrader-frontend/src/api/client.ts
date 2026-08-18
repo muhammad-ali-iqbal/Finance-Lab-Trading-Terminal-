@@ -7,7 +7,10 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/store/auth'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
+// BASE_URL is an absolute path, so it must include the reverse-proxy subpath
+// (BASE_URL env, e.g. "/simtrader/") — otherwise the browser resolves it
+// against the domain root instead of back through this app's own proxy path.
+const BASE_URL = import.meta.env.VITE_API_URL ?? `${import.meta.env.BASE_URL}api`
 
 export const client = axios.create({
   baseURL: BASE_URL,
