@@ -28,7 +28,10 @@ func NewSMTPMailer(cfg *config.Config) *SMTPMailer {
 
 // SendInvite sends the registration invite email to a new student.
 func (m *SMTPMailer) SendInvite(toEmail, firstName, inviteToken string) error {
-	registrationURL := fmt.Sprintf("%s/register?token=%s", m.cfg.FrontendURL, inviteToken)
+	// FrontendURL must stay a bare origin (scheme://host) — it also feeds CORS's
+	// AllowOrigins, which rejects a path component — so the reverse-proxy
+	// subpath (if any) is appended separately via BasePath.
+	registrationURL := fmt.Sprintf("%s%s/register?token=%s", m.cfg.FrontendURL, m.cfg.BasePath, inviteToken)
 
 	subject := "You've been invited to SimTrader"
 
@@ -53,7 +56,7 @@ If you didn't expect this invitation, you can ignore this email.
 
 // SendPasswordReset sends a password reset link.
 func (m *SMTPMailer) SendPasswordReset(toEmail, firstName, resetToken string) error {
-	resetURL := fmt.Sprintf("%s/reset-password?token=%s", m.cfg.FrontendURL, resetToken)
+	resetURL := fmt.Sprintf("%s%s/reset-password?token=%s", m.cfg.FrontendURL, m.cfg.BasePath, resetToken)
 
 	subject := "Reset your SimTrader password"
 
