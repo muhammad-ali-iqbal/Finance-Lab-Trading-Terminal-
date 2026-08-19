@@ -70,14 +70,17 @@ export default function LoginPage() {
             style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.18), transparent)' }} />
         </>}
 
-        <div className="relative z-10 flex items-center gap-3">
+        <div className="relative z-10 self-start">
           <img
             src={`${import.meta.env.BASE_URL}iba-logo.png`}
-            alt="IBA"
-            className="h-9 w-auto object-contain"
+            alt="Institute of Business Administration — 70 Years & Beyond"
+            className="h-24 w-auto object-contain"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
-          <div>
+          <div
+            className="mt-6 pt-5 border-t"
+            style={{ borderColor: dark ? 'rgba(255,255,255,0.10)' : 'rgba(242,241,239,0.16)' }}
+          >
             <p className="font-semibold tracking-tight text-sm leading-tight"
               style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
               SimTrader
@@ -126,9 +129,9 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2.5 mb-10">
             <img
-              src={`${import.meta.env.BASE_URL}iba-logo.png`}
+              src={`${import.meta.env.BASE_URL}iba-mark.png`}
               alt="IBA"
-              className="h-7 w-auto object-contain"
+              className="h-8 w-auto object-contain"
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
             <div>
