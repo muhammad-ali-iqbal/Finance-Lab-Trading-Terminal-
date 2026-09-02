@@ -151,6 +151,20 @@ export interface Challenge {
 export interface ChallengeWithMeta extends Challenge {
   participantCount: number
   joined?: boolean        // present on student list endpoint
+  // Challenges are locked by default: false means the admin has not granted
+  // this student access, and the card renders locked. Absent on admin lists.
+  hasAccess?: boolean
+}
+
+// One row of the admin access roster for a challenge.
+export interface ChallengeAccessRow {
+  userId: string
+  email: string
+  firstName: string
+  lastName: string
+  status: UserStatus
+  granted: boolean
+  joined: boolean
 }
 
 export interface ChallengeOrder {

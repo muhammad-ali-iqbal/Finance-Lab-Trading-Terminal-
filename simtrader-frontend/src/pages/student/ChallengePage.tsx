@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { challengeApi } from '@/api'
 import type { ChallengeWithMeta } from '@/api'
 import { Spinner, Badge, Button } from '@/components/ui'
-import { Trophy, Calendar, Users, TrendingUp, ChevronRight } from 'lucide-react'
+import { Trophy, Calendar, Users, TrendingUp, ChevronRight, Lock } from 'lucide-react'
 
 function fmtDate(d: string) {
   return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -33,24 +33,40 @@ function ChallengeCard({
   joining: boolean
 }) {
   const navigate = useNavigate()
+  // Challenges are locked by default — the admin grants access per challenge,
+  // so a student sees an unopenable card until then.
+  const locked = challenge.hasAccess === false
+  const openable = !locked && challenge.joined
 
   return (
     <div
-      className="group relative bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg p-5 hover:border-ink/30 dark:hover:border-dark-ink/30 transition-all cursor-pointer"
-      onClick={() => challenge.joined && navigate(`/dashboard/challenges/${challenge.id}`)}
+      className={
+        'group relative bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg p-5 transition-all' +
+        (locked
+          ? ' opacity-60'
+          : ' cursor-pointer hover:border-ink/30 dark:hover:border-dark-ink/30')
+      }
+      onClick={() => openable && navigate(`/dashboard/challenges/${challenge.id}`)}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
-            <Trophy className="w-4 h-4 text-surface dark:text-dark-surface" />
+          <div className={
+            'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ' +
+            (locked
+              ? 'bg-surface-secondary dark:bg-dark-surface-secondary border border-border dark:border-dark-border'
+              : 'bg-ink dark:bg-dark-ink')
+          }>
+            {locked
+              ? <Lock className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary" />
+              : <Trophy className="w-4 h-4 text-surface dark:text-dark-surface" />}
           </div>
           <div className="min-w-0">
             <h3 className="font-semibold text-sm text-ink dark:text-dark-ink truncate">{challenge.name}</h3>
-            {statusBadge(challenge.status)}
+            {locked ? <Badge variant="neutral" size="sm">Locked</Badge> : statusBadge(challenge.status)}
           </div>
         </div>
-        {challenge.joined && (
+        {openable && (
           <ChevronRight className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
         )}
       </div>
@@ -80,7 +96,11 @@ function ChallengeCard({
 
       {/* Action */}
       <div className="flex items-center justify-end gap-2">
-        {challenge.joined ? (
+        {locked ? (
+          <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary italic">
+            Access required — contact your instructor
+          </span>
+        ) : challenge.joined ? (
           <Button
             size="sm"
             variant="primary"

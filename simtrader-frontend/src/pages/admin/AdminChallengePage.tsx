@@ -4,12 +4,13 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { challengeApi } from '@/api'
-import type { ChallengeWithMeta, LeaderboardEntry } from '@/api'
-import { Spinner, Badge, Button } from '@/components/ui'
+import type { ChallengeAccessRow, ChallengeWithMeta, LeaderboardEntry } from '@/api'
+import { Spinner, Badge, Button, Input, Alert } from '@/components/ui'
 import { DecisionTimeline } from '@/components/challenge/DecisionTimeline'
 import {
   Trophy, Plus, X, Users, Calendar, DollarSign,
   PlayCircle, CheckCircle, RotateCcw, ChevronDown, ChevronRight, Download,
+  Lock, Search, Check,
 } from 'lucide-react'
 import { downloadCSV } from '@/utils/csv'
 import clsx from 'clsx'
@@ -189,6 +190,169 @@ function ParticipantDecisionsModal({
   )
 }
 
+// ── Access modal ──────────────────────────────────────────────────────────────
+//
+// A challenge is locked by default. Granting access unlocks it for a student
+// and enrolls them in one step; revoking locks them out but keeps their
+// portfolio, orders and leaderboard placement, so re-granting restores them.
+
+function fullName(r: ChallengeAccessRow) {
+  const name = `${r.firstName} ${r.lastName}`.trim()
+  return name || r.email
+}
+
+function AccessModal({
+  challengeId, challengeName, onClose,
+}: {
+  challengeId: string
+  challengeName: string
+  onClose: () => void
+}) {
+  const qc = useQueryClient()
+  const [search, setSearch] = useState('')
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['challenge-access', challengeId],
+    queryFn: () => challengeApi.adminListAccess(challengeId),
+  })
+
+  // Granting changes the participant count, so the challenge list is stale too.
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['challenge-access', challengeId] })
+    qc.invalidateQueries({ queryKey: ['admin-challenges'] })
+  }
+
+  const grantMut = useMutation({
+    mutationFn: (userIds: string[]) => challengeApi.adminGrantAccess(challengeId, userIds),
+    onSuccess: invalidate,
+  })
+  const revokeMut = useMutation({
+    mutationFn: (userId: string) => challengeApi.adminRevokeAccess(challengeId, userId),
+    onSuccess: invalidate,
+  })
+
+  const roster = data?.roster ?? []
+  const grantedCount = roster.filter(r => r.granted).length
+
+  const q = search.trim().toLowerCase()
+  const visible = q
+    ? roster.filter(r =>
+        r.email.toLowerCase().includes(q) || fullName(r).toLowerCase().includes(q))
+    : roster
+  const ungranted = visible.filter(r => !r.granted)
+
+  const error = (grantMut.error ?? revokeMut.error) as
+    { response?: { data?: { error?: string } } } | null
+  const pendingUserId = revokeMut.isPending ? revokeMut.variables : undefined
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-ink/30 dark:bg-dark-ink/30" onClick={onClose} />
+      <div className="relative w-full max-w-2xl max-h-[80vh] flex flex-col bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-xl shadow-xl">
+        {/* Header */}
+        <div className="flex items-start justify-between px-5 py-4 border-b border-border dark:border-dark-border flex-shrink-0">
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-ink dark:text-dark-ink flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5" />
+              Access — {challengeName}
+            </h2>
+            <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5">
+              {grantedCount} of {roster.length} student{roster.length !== 1 ? 's' : ''} have access.
+              Granting also enrolls them.
+            </p>
+          </div>
+          <button onClick={onClose} className="p-1 text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-border dark:border-dark-border flex-shrink-0">
+          <div className="flex-1">
+            <Input
+              placeholder="Search name or email…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              leftIcon={<Search className="w-3.5 h-3.5" />}
+            />
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={ungranted.length === 0 || grantMut.isPending}
+            onClick={() => grantMut.mutate(ungranted.map(r => r.userId))}
+          >
+            <Check className="w-3.5 h-3.5 mr-1" />
+            Grant {q ? 'shown' : 'all'} ({ungranted.length})
+          </Button>
+        </div>
+
+        {error && (
+          <div className="px-5 pt-3 flex-shrink-0">
+            <Alert
+              variant="error"
+              message={error.response?.data?.error ?? 'Failed to update access'}
+            />
+          </div>
+        )}
+
+        {/* Roster */}
+        <div className="overflow-y-auto">
+          {isLoading ? (
+            <div className="flex justify-center py-10"><Spinner /></div>
+          ) : visible.length === 0 ? (
+            <div className="flex items-center justify-center py-10 text-sm text-ink-tertiary dark:text-dark-ink-tertiary">
+              {roster.length === 0 ? 'No students yet. Invite students first.' : 'No students match that search.'}
+            </div>
+          ) : (
+            <div className="divide-y divide-border dark:divide-dark-border">
+              {visible.map(r => (
+                <div key={r.userId} className="flex items-center gap-3 px-5 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-ink dark:text-dark-ink truncate">{fullName(r)}</span>
+                      {r.status === 'pending' && <Badge variant="warning" size="sm">Invited</Badge>}
+                      {r.joined && <Badge variant="neutral" size="sm">Enrolled</Badge>}
+                    </div>
+                    <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary truncate">{r.email}</p>
+                  </div>
+                  {r.granted ? (
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      disabled={pendingUserId === r.userId}
+                      onClick={() => revokeMut.mutate(r.userId)}
+                    >
+                      Revoke
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={grantMut.isPending}
+                      onClick={() => grantMut.mutate([r.userId])}
+                    >
+                      Grant
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer note — revoke keeps the student's data */}
+        <div className="px-5 py-3 border-t border-border dark:border-dark-border flex-shrink-0">
+          <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary">
+            Revoking locks the student out but keeps their portfolio, orders and leaderboard
+            placement — re-granting restores everything.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Expandable challenge row ──────────────────────────────────────────────────
 
 function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
@@ -196,6 +360,7 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
   const [expanded, setExpanded] = useState(false)
   const [reconcileDate, setReconcileDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null)
+  const [showAccess, setShowAccess] = useState(false)
 
   const activateMut = useMutation({
     mutationFn: () => challengeApi.adminActivate(ch.id),
@@ -209,7 +374,7 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
     mutationFn: () => challengeApi.adminEnrollAll(ch.id),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ['admin-challenges'] })
-      alert(`Enrolled ${data.enrolled} new student(s).`)
+      alert(`Granted access to ${data.enrolled} new student(s).`)
     },
   })
   const reconcileMut = useMutation({
@@ -252,6 +417,12 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
 
         {/* Action buttons */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {ch.status !== 'completed' && (
+            <Button size="sm" variant="ghost" onClick={() => setShowAccess(true)}>
+              <Lock className="w-3.5 h-3.5 mr-1" />
+              Manage Access
+            </Button>
+          )}
           {ch.status === 'draft' && (
             <Button size="sm" variant="primary" onClick={() => activateMut.mutate()} disabled={activateMut.isPending}>
               <PlayCircle className="w-3.5 h-3.5 mr-1" />
@@ -262,7 +433,7 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
             <>
               <Button size="sm" variant="ghost" onClick={() => enrollMut.mutate()} disabled={enrollMut.isPending}>
                 <Users className="w-3.5 h-3.5 mr-1" />
-                Enroll All
+                Grant All
               </Button>
               <input
                 type="date"
@@ -290,7 +461,7 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
             <div className="flex justify-center py-8"><Spinner /></div>
           ) : !leaderboard?.leaderboard?.length ? (
             <div className="flex items-center justify-center py-8 text-sm text-ink-tertiary dark:text-dark-ink-tertiary">
-              No participants yet. Use "Enroll All" to add students.
+              No participants yet. Use "Manage Access" or "Grant All" to add students.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -350,6 +521,14 @@ function ChallengeRow({ ch }: { ch: ChallengeWithMeta }) {
         </div>
       )}
 
+      {showAccess && (
+        <AccessModal
+          challengeId={ch.id}
+          challengeName={ch.name}
+          onClose={() => setShowAccess(false)}
+        />
+      )}
+
       {selectedEntry && (
         <ParticipantDecisionsModal
           challengeId={ch.id}
@@ -398,7 +577,8 @@ export default function AdminChallengePage() {
 
       {/* Info banner */}
       <div className="mb-5 p-3 rounded-lg bg-surface-secondary dark:bg-dark-surface-secondary border border-border dark:border-dark-border text-xs text-ink-secondary dark:text-dark-ink-secondary space-y-1">
-        <p><strong>Workflow:</strong> Create → Activate → Enroll All students → Challenge runs for the semester → Complete.</p>
+        <p><strong>Workflow:</strong> Create → Activate → Grant access to students → Challenge runs for the semester → Complete.</p>
+        <p>Challenges are <strong>locked by default</strong>. Use <strong>Manage Access</strong> to pick students (or <strong>Grant All</strong> for everyone) — granting also enrolls them.</p>
         <p>Orders placed by students are filled automatically each night at ~16:35 PKT once psx_tracker pushes daily prices.</p>
         <p>Use <strong>Reconcile</strong> to manually trigger a fill for today's date (useful after backfilling prices).</p>
       </div>

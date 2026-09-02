@@ -1,20 +1,69 @@
 // src/pages/admin/AdminUsersPage.tsx
 import { useState, type FormEvent } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { userApi } from '@/api'
+import { challengeApi, userApi } from '@/api'
+import type { BulkInviteStatus } from '@/api/user'
 import {
   Card, Button, Input, Badge, Alert, Spinner, EmptyState
 } from '@/components/ui'
 import {
   Users, UserPlus, X, Shield, ShieldOff, Mail, Clock, Trash2
 } from 'lucide-react'
+import clsx from 'clsx'
 import type { User } from '@/types'
 
 // ── Invite modal ──────────────────────────────────────────────────────────────
+//
+// Two modes share one modal: a single address, or a pasted list for a whole
+// section. The bulk mode can also grant access to a challenge, since a
+// challenge is locked until the admin grants it — inviting a section and
+// unlocking their challenge is one action rather than two.
+
+type InviteMode = 'single' | 'bulk'
+
+const BULK_INVITE_LIMIT = 100
+
+// splitEmails mirrors the backend's parseEmailList: split on any whitespace,
+// comma or semicolon, lowercase, drop blanks, de-duplicate. Kept client-side
+// only for the live count and to avoid posting an obviously empty list.
+function splitEmails(raw: string): { emails: string[]; duplicates: number } {
+  const seen = new Set<string>()
+  const emails: string[] = []
+  let duplicates = 0
+  for (const part of raw.split(/[\s,;]+/)) {
+    const email = part.trim().toLowerCase()
+    if (!email) continue
+    if (seen.has(email)) { duplicates++; continue }
+    seen.add(email)
+    emails.push(email)
+  }
+  return { emails, duplicates }
+}
+
+const BULK_STATUS_LABEL: Record<BulkInviteStatus, string> = {
+  invited: 'Invited',
+  email_failed: 'Email failed',
+  already_exists: 'Already exists',
+  invalid: 'Invalid address',
+}
+
+function bulkStatusVariant(status: BulkInviteStatus) {
+  if (status === 'invited') return 'success' as const
+  if (status === 'email_failed') return 'warning' as const
+  return 'neutral' as const
+}
+
 function InviteModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient()
+  const [mode, setMode] = useState<InviteMode>('single')
+
+  // Single-invite state
   const [email, setEmail] = useState('')
   const [success, setSuccess] = useState(false)
+
+  // Bulk-invite state
+  const [bulkText, setBulkText] = useState('')
+  const [challengeId, setChallengeId] = useState('')
 
   const invite = useMutation({
     mutationFn: () => userApi.inviteStudent({ email, firstName: '', lastName: '' }),
@@ -24,61 +73,223 @@ function InviteModal({ onClose }: { onClose: () => void }) {
     },
   })
 
+  const { emails: parsedEmails, duplicates } = splitEmails(bulkText)
+
+  const bulkInvite = useMutation({
+    mutationFn: () => userApi.bulkInvite({
+      emails: parsedEmails,
+      challengeId: challengeId || undefined,
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
+  })
+
+  // Challenges available to grant alongside the invite. Completed ones are
+  // excluded — there is nothing left to trade in them.
+  const { data: challengeData } = useQuery({
+    queryKey: ['admin-challenges'],
+    queryFn: challengeApi.adminList,
+    enabled: mode === 'bulk',
+    staleTime: 30_000,
+  })
+  const grantable = (challengeData?.challenges ?? []).filter(c => c.status !== 'completed')
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     if (!email) return
     invite.mutate()
   }
 
+  const handleBulkSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    if (parsedEmails.length === 0 || parsedEmails.length > BULK_INVITE_LIMIT) return
+    bulkInvite.mutate()
+  }
+
+  const resetBulk = () => {
+    setBulkText('')
+    bulkInvite.reset()
+  }
+
+  const bulkResults = bulkInvite.data
+  const tooMany = parsedEmails.length > BULK_INVITE_LIMIT
+
+  const inputClass = 'w-full px-3 py-2 rounded border border-border dark:border-dark-border bg-white dark:bg-dark-surface-secondary text-sm text-ink dark:text-dark-ink focus:outline-none focus:border-ink dark:focus:border-dark-ink'
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 dark:bg-dark-ink/20 p-4">
-      <div className="bg-surface dark:bg-dark-surface rounded-xl border border-border dark:border-dark-border shadow-modal w-full max-w-sm">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border">
-          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Invite student</h2>
+      <div className={clsx(
+        'bg-surface dark:bg-dark-surface rounded-xl border border-border dark:border-dark-border shadow-modal w-full flex flex-col max-h-[85vh]',
+        mode === 'single' ? 'max-w-sm' : 'max-w-lg',
+      )}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border dark:border-dark-border flex-shrink-0">
+          <h2 className="text-sm font-semibold text-ink dark:text-dark-ink">Invite students</h2>
           <button onClick={onClose} className="text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-5">
-          {success ? (
-            <div className="text-center py-4 space-y-2">
-              <div className="w-10 h-10 bg-success-muted dark:bg-dark-success-muted rounded-full flex items-center justify-center mx-auto">
-                <Mail className="w-5 h-5 text-success dark:text-dark-success" />
+        {/* Mode switch */}
+        <div className="flex gap-1 px-5 pt-4 flex-shrink-0">
+          {(['single', 'bulk'] as InviteMode[]).map(m => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={clsx(
+                'px-3 py-1.5 text-xs rounded-md transition-colors',
+                mode === m
+                  ? 'bg-ink dark:bg-dark-ink text-surface dark:text-dark-surface font-medium'
+                  : 'text-ink-secondary dark:text-dark-ink-secondary hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary',
+              )}
+            >
+              {m === 'single' ? 'One student' : 'Paste a list'}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-5 overflow-y-auto">
+          {mode === 'single' ? (
+            success ? (
+              <div className="text-center py-4 space-y-2">
+                <div className="w-10 h-10 bg-success-muted dark:bg-dark-success-muted rounded-full flex items-center justify-center mx-auto">
+                  <Mail className="w-5 h-5 text-success dark:text-dark-success" />
+                </div>
+                <p className="text-sm font-medium text-ink dark:text-dark-ink">Invite sent!</p>
+                <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">
+                  {email} will receive a registration link via email.
+                </p>
+                <div className="pt-2 flex gap-2">
+                  <Button size="sm" variant="secondary" fullWidth onClick={() => { setEmail(''); setSuccess(false) }}>
+                    Invite another
+                  </Button>
+                  <Button size="sm" fullWidth onClick={onClose}>Done</Button>
+                </div>
               </div>
-              <p className="text-sm font-medium text-ink dark:text-dark-ink">Invite sent!</p>
-              <p className="text-xs text-ink-secondary dark:text-dark-ink-secondary">
-                {email} will receive a registration link via email.
-              </p>
-              <div className="pt-2 flex gap-2">
-                <Button size="sm" variant="secondary" fullWidth onClick={() => { setEmail(''); setSuccess(false) }}>
-                  Invite another
-                </Button>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {invite.isError && (
+                  <Alert
+                    variant="error"
+                    message={(invite.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to send invite'}
+                  />
+                )}
+                <Input
+                  label="Student email address"
+                  type="email"
+                  placeholder="student@university.edu"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  autoFocus
+                  required
+                  hint="They'll receive a link to set up their password"
+                />
+                <div className="flex gap-2 pt-1">
+                  <Button type="button" variant="ghost" size="sm" fullWidth onClick={onClose}>Cancel</Button>
+                  <Button type="submit" size="sm" fullWidth loading={invite.isPending}>
+                    Send invite
+                  </Button>
+                </div>
+              </form>
+            )
+          ) : bulkResults ? (
+            /* ── Bulk results report ── */
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="success">{bulkResults.invited} invited</Badge>
+                {bulkResults.failed > 0 && <Badge variant="warning">{bulkResults.failed} not sent</Badge>}
+                {bulkResults.duplicates > 0 && <Badge variant="neutral">{bulkResults.duplicates} duplicate</Badge>}
+              </div>
+
+              <div className="border border-border dark:border-dark-border rounded-lg divide-y divide-border dark:divide-dark-border max-h-64 overflow-y-auto">
+                {bulkResults.results.map(r => (
+                  <div key={r.email} className="flex items-start justify-between gap-3 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="text-xs text-ink dark:text-dark-ink truncate">{r.email}</p>
+                      {r.detail && (
+                        <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary">{r.detail}</p>
+                      )}
+                    </div>
+                    <Badge variant={bulkStatusVariant(r.status)} size="sm">
+                      {BULK_STATUS_LABEL[r.status]}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" fullWidth onClick={resetBulk}>Invite more</Button>
                 <Button size="sm" fullWidth onClick={onClose}>Done</Button>
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {invite.isError && (
+            /* ── Bulk form ── */
+            <form onSubmit={handleBulkSubmit} className="space-y-4">
+              {bulkInvite.isError && (
                 <Alert
                   variant="error"
-                  message={(invite.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to send invite'}
+                  message={(bulkInvite.error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to send invites'}
                 />
               )}
-              <Input
-                label="Student email address"
-                type="email"
-                placeholder="student@university.edu"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                autoFocus
-                required
-                hint="They'll receive a link to set up their password"
-              />
+
+              <div>
+                <label htmlFor="bulk-emails" className="block text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary mb-1.5">
+                  Student email addresses
+                </label>
+                <textarea
+                  id="bulk-emails"
+                  rows={7}
+                  value={bulkText}
+                  onChange={e => setBulkText(e.target.value)}
+                  autoFocus
+                  placeholder={'one@iba.edu.pk\ntwo@iba.edu.pk\nthree@iba.edu.pk'}
+                  className={clsx(inputClass, 'font-mono text-xs resize-y')}
+                />
+                <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-1.5">
+                  Separate with new lines, commas or semicolons.
+                  {' '}
+                  {parsedEmails.length > 0 && (
+                    <span className={tooMany ? 'text-danger dark:text-dark-danger' : ''}>
+                      {parsedEmails.length} address{parsedEmails.length !== 1 ? 'es' : ''} detected
+                      {duplicates > 0 && ` · ${duplicates} duplicate${duplicates !== 1 ? 's' : ''} removed`}
+                      {tooMany && ` · max ${BULK_INVITE_LIMIT} per batch`}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="grant-challenge" className="block text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary mb-1.5">
+                  Also grant access to a challenge <span className="text-ink-tertiary dark:text-dark-ink-tertiary">(optional)</span>
+                </label>
+                <select
+                  id="grant-challenge"
+                  value={challengeId}
+                  onChange={e => setChallengeId(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">No challenge</option>
+                  {grantable.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} ({c.status})</option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-1.5">
+                  Challenges are locked until access is granted. This unlocks and enrolls
+                  every invitee, taking effect as soon as they register.
+                </p>
+              </div>
+
               <div className="flex gap-2 pt-1">
                 <Button type="button" variant="ghost" size="sm" fullWidth onClick={onClose}>Cancel</Button>
-                <Button type="submit" size="sm" fullWidth loading={invite.isPending}>
-                  Send invite
+                <Button
+                  type="submit"
+                  size="sm"
+                  fullWidth
+                  loading={bulkInvite.isPending}
+                  disabled={parsedEmails.length === 0 || tooMany}
+                >
+                  {bulkInvite.isPending
+                    ? 'Sending…'
+                    : `Send ${parsedEmails.length || ''} invite${parsedEmails.length !== 1 ? 's' : ''}`}
                 </Button>
               </div>
             </form>

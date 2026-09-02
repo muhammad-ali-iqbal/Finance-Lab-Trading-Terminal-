@@ -30,6 +30,14 @@ var reDateYMD = regexp.MustCompile(`^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[
 // max 12 chars — used to normalise/validate order symbols (INPUT-03).
 var reSymbol = regexp.MustCompile(`^[A-Z0-9.\-]{1,12}$`)
 
+// maxAccessGrantBatch bounds a single grant request so a malformed or hostile
+// payload cannot open an unbounded transaction.
+const maxAccessGrantBatch = 500
+
+// noAccessMsg is the 403 shown to a student for a challenge they have not been
+// granted access to — the frontend renders it as a locked card.
+const noAccessMsg = "no access \u2014 your instructor must grant you access to this challenge"
+
 // lastInitial returns the uppercased first rune of a (possibly empty) last
 // name, or "" when there is none — avoids an out-of-range rune slice (INPUT-01).
 func lastInitial(lastName string) string {
@@ -149,6 +157,9 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW, internalLimite
 	adm.Post("/:id/enroll-all",         h.AdminEnrollAll)
 	adm.Post("/:id/reconcile",          h.AdminReconcile)
 	adm.Get("/:id/leaderboard",         h.AdminLeaderboard)
+	adm.Get("/:id/access",              h.AdminListAccess)
+	adm.Post("/:id/access",             h.AdminGrantAccess)
+	adm.Delete("/:id/access/:uid",      h.AdminRevokeAccess)
 	adm.Get("/:id/participants/:pid/orders", h.AdminParticipantOrders)
 
 	// Student routes
@@ -384,16 +395,15 @@ func (h *Handler) AdminEnrollAll(c *fiber.Ctx) error {
 	if err != nil || ch == nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
 	}
-	userIDs, err := h.repo.ListNonParticipantUsers(c.Context(), id)
+	userIDs, err := h.repo.ListUngrantedUsers(c.Context(), id)
 	if err != nil {
 		return httputil.InternalError(c)
 	}
-	for _, uid := range userIDs {
-		if err := h.repo.EnrollUser(c.Context(), id, uid, ch.InitialCapital); err != nil {
-			return httputil.InternalError(c)
-		}
+	granted, err := h.repo.GrantAccessBulk(c.Context(), id, userIDs, adminID(c), ch.InitialCapital)
+	if err != nil {
+		return httputil.InternalError(c)
 	}
-	return c.JSON(fiber.Map{"enrolled": len(userIDs)})
+	return c.JSON(fiber.Map{"enrolled": granted})
 }
 
 func (h *Handler) AdminReconcile(c *fiber.Ctx) error {
@@ -452,7 +462,133 @@ func (h *Handler) AdminParticipantOrders(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"orders": orders})
 }
 
+// ── Admin access control ───────────────────────────────
+//
+// A challenge is locked by default. Granting access unlocks it for a student
+// and enrols them in the same step; revoking locks them out but keeps their
+// portfolio, orders and leaderboard placement (see Repository.RevokeAccess).
+
+// adminID returns the calling admin's user id, or uuid.Nil if it cannot be
+// parsed — granted_by is nullable, so an unparseable id is not fatal.
+func adminID(c *fiber.Ctx) uuid.UUID {
+	claims := middleware.GetClaims(c)
+	if claims == nil {
+		return uuid.Nil
+	}
+	id, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return uuid.Nil
+	}
+	return id
+}
+
+// AdminListAccess godoc
+// GET /api/admin/challenges/:id/access
+// Every non-blocked student with their granted/joined state for this challenge.
+func (h *Handler) AdminListAccess(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid id")
+	}
+	roster, err := h.repo.ListAccessRoster(c.Context(), id)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(fiber.Map{"roster": roster})
+}
+
+// AdminGrantAccess godoc
+// POST /api/admin/challenges/:id/access
+// Body: { userIds: [uuid, ...] } — grants access and enrols each student.
+func (h *Handler) AdminGrantAccess(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid id")
+	}
+	ch, err := h.repo.GetByID(c.Context(), id)
+	if err != nil || ch == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
+	}
+
+	var req struct {
+		UserIDs []string `json:"userIds"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return httputil.BadRequest(c, "invalid body")
+	}
+	if len(req.UserIDs) == 0 {
+		return httputil.BadRequest(c, "userIds is required")
+	}
+	if len(req.UserIDs) > maxAccessGrantBatch {
+		return httputil.BadRequest(c, "too many users in one request")
+	}
+
+	ids := make([]uuid.UUID, 0, len(req.UserIDs))
+	for _, raw := range req.UserIDs {
+		uid, err := uuid.Parse(raw)
+		if err != nil {
+			return httputil.BadRequest(c, "invalid user id: "+raw)
+		}
+		ids = append(ids, uid)
+	}
+
+	granted, err := h.repo.GrantAccessBulk(c.Context(), id, ids, adminID(c), ch.InitialCapital)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(fiber.Map{"granted": granted})
+}
+
+// AdminRevokeAccess godoc
+// DELETE /api/admin/challenges/:id/access/:uid
+// Locks the student out. Their participant row and history are preserved, so
+// re-granting restores the portfolio exactly as it was.
+func (h *Handler) AdminRevokeAccess(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid id")
+	}
+	uid, err := uuid.Parse(c.Params("uid"))
+	if err != nil {
+		return httputil.BadRequest(c, "invalid user id")
+	}
+	if err := h.repo.RevokeAccess(c.Context(), id, uid); err != nil {
+		return httputil.InternalError(c)
+	}
+	return c.JSON(fiber.Map{"revoked": true})
+}
+
 // ── Student handlers ──────────────────────────────────────────────────────────
+
+// requireAccess resolves the caller's participant row for a challenge. It is
+// the single gate every challenge-scoped student endpoint goes through:
+// students without an access grant are refused even when a participant row
+// still exists from an earlier grant (revoke keeps that row deliberately).
+// Admins bypass the access check so admin tooling reusing these routes keeps
+// working. A nil participant means the caller has already been answered (403
+// or 500) — note the fiber response helpers return nil on a successful write,
+// so the participant, not the error, is what says whether to continue.
+func (h *Handler) requireAccess(c *fiber.Ctx, challengeID, userID uuid.UUID) (*Participant, error) {
+	claims := middleware.GetClaims(c)
+	if claims == nil || claims.Role != types.RoleAdmin {
+		ok, err := h.repo.HasAccess(c.Context(), challengeID, userID)
+		if err != nil {
+			return nil, httputil.InternalError(c)
+		}
+		if !ok {
+			return nil, c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": noAccessMsg})
+		}
+	}
+	p, err := h.repo.GetParticipant(c.Context(), challengeID, userID)
+	if err != nil {
+		return nil, httputil.InternalError(c)
+	}
+	if p == nil {
+		return nil, c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	}
+	return p, nil
+}
+
 
 func (h *Handler) StudentList(c *fiber.Ctx) error {
 	claims := middleware.GetClaims(c)
@@ -466,16 +602,31 @@ func (h *Handler) StudentList(c *fiber.Ctx) error {
 		challenges = []Challenge{}
 	}
 
+	// One query for the caller's whole access set, rather than a per-challenge
+	// lookup. Locked challenges are still returned — the student sees them as
+	// a locked card, not a hole in the list.
+	access, err := h.repo.ListAccessibleChallengeIDs(c.Context(), userID)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	isAdmin := claims != nil && claims.Role == types.RoleAdmin
+
 	type item struct {
 		Challenge
-		ParticipantCount int    `json:"participantCount"`
-		Joined           bool   `json:"joined"`
+		ParticipantCount int  `json:"participantCount"`
+		Joined           bool `json:"joined"`
+		HasAccess        bool `json:"hasAccess"`
 	}
 	out := make([]item, 0, len(challenges))
 	for _, ch := range challenges {
 		n, _ := h.repo.GetParticipantCount(c.Context(), ch.ID)
 		p, _ := h.repo.GetParticipant(c.Context(), ch.ID, userID)
-		out = append(out, item{Challenge: ch, ParticipantCount: n, Joined: p != nil})
+		out = append(out, item{
+			Challenge:        ch,
+			ParticipantCount: n,
+			Joined:           p != nil,
+			HasAccess:        isAdmin || access[ch.ID],
+		})
 	}
 	return c.JSON(fiber.Map{"challenges": out})
 }
@@ -491,8 +642,17 @@ func (h *Handler) StudentGet(c *fiber.Ctx) error {
 	if err != nil || ch == nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
 	}
+	// Metadata is returned even without access so the detail page can render a
+	// locked state; no participant data is included.
+	hasAccess, err := h.repo.HasAccess(c.Context(), id, userID)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if claims != nil && claims.Role == types.RoleAdmin {
+		hasAccess = true
+	}
 	p, _ := h.repo.GetParticipant(c.Context(), id, userID)
-	return c.JSON(fiber.Map{"challenge": ch, "joined": p != nil})
+	return c.JSON(fiber.Map{"challenge": ch, "joined": p != nil, "hasAccess": hasAccess})
 }
 
 func (h *Handler) StudentJoin(c *fiber.Ctx) error {
@@ -508,6 +668,16 @@ func (h *Handler) StudentJoin(c *fiber.Ctx) error {
 	}
 	if ch.Status != "active" {
 		return httputil.BadRequest(c, "challenge is not active")
+	}
+	// Granting access already enrols the student, so this path is a defensive
+	// fallback rather than the normal flow — but it must not become a way
+	// around the access list.
+	hasAccess, err := h.repo.HasAccess(c.Context(), id, userID)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if !hasAccess {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": noAccessMsg})
 	}
 	p, err := h.repo.JoinChallenge(c.Context(), id, userID, ch.InitialCapital)
 	if err != nil {
@@ -527,9 +697,9 @@ func (h *Handler) StudentPortfolio(c *fiber.Ctx) error {
 	if err != nil || ch == nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled in this challenge"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 	positions, err := h.repo.GetPositions(c.Context(), p.ID)
 	if err != nil {
@@ -597,9 +767,9 @@ func (h *Handler) StudentPortfolioHistory(c *fiber.Ctx) error {
 	if err != nil {
 		return httputil.BadRequest(c, "invalid id")
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 	snaps, err := h.repo.GetSnapshots(c.Context(), p.ID)
 	if err != nil {
@@ -625,9 +795,9 @@ func (h *Handler) StudentPlaceOrder(c *fiber.Ctx) error {
 	if ch.Status != "active" {
 		return httputil.BadRequest(c, "challenge is not active")
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled — join the challenge first"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 
 	var req struct {
@@ -732,9 +902,9 @@ func (h *Handler) StudentListOrders(c *fiber.Ctx) error {
 	if err != nil {
 		return httputil.BadRequest(c, "invalid id")
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 	orders, err := h.repo.ListOrders(c.Context(), p.ID)
 	if err != nil {
@@ -757,9 +927,9 @@ func (h *Handler) StudentCancelOrder(c *fiber.Ctx) error {
 	if err != nil {
 		return httputil.BadRequest(c, "invalid order id")
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 	if err := h.repo.CancelOrder(c.Context(), oid, p.ID); err != nil {
 		if err == pgx.ErrNoRows {
@@ -780,9 +950,9 @@ func (h *Handler) StudentDividends(c *fiber.Ctx) error {
 	if err != nil {
 		return httputil.BadRequest(c, "invalid id")
 	}
-	p, err := h.repo.GetParticipant(c.Context(), id, userID)
-	if err != nil || p == nil {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "not enrolled"})
+	p, respErr := h.requireAccess(c, id, userID)
+	if p == nil {
+		return respErr
 	}
 	dividends, err := h.repo.ListDividends(c.Context(), p.ID)
 	if err != nil {
@@ -807,6 +977,14 @@ func (h *Handler) StudentLeaderboard(c *fiber.Ctx) error {
 	ch, err := h.repo.GetByID(c.Context(), id)
 	if err != nil || ch == nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
+	}
+	userID, _ := uuid.Parse(claims.UserID)
+	hasAccess, err := h.repo.HasAccess(c.Context(), id, userID)
+	if err != nil {
+		return httputil.InternalError(c)
+	}
+	if !hasAccess {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": noAccessMsg})
 	}
 	board, err := h.buildLeaderboard(c.Context(), id, ch.InitialCapital, true /* anonymize */)
 	if err != nil {

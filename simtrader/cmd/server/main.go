@@ -58,6 +58,9 @@ func main() {
 
 	// Auth
 	userRepo := user.NewRepository(db.Pool)
+	// Created up here because the user handler's bulk-invite flow can grant
+	// challenge access; the rest of the challenge wiring stays below.
+	challengeRepo := challenge.NewRepository(db.Pool)
 	var mailer auth.Mailer
 	if cfg.SMTPHost != "" {
 		mailer = auth.NewSMTPMailer(cfg)
@@ -72,7 +75,7 @@ func main() {
 	}
 	authService := auth.NewService(userRepo, cfg, mailer)
 	authHandler := auth.NewHandler(authService)
-	userHandler := user.NewHandler(userRepo, authService, cfg.BasePath)
+	userHandler := user.NewHandler(userRepo, authService, cfg.BasePath, challengeRepo)
 
 	// Middleware. The status guard makes admin blocks take effect within ~30s
 	// instead of waiting out the access-token TTL (AUTH-04).
@@ -101,8 +104,7 @@ func main() {
 	dividendService := dividend.NewService()
 	dividendHandler := dividend.NewHandler(dividendService)
 
-	// Challenge
-	challengeRepo := challenge.NewRepository(db.Pool)
+	// Challenge (challengeRepo is created above, next to userRepo)
 	challengeReconciler := challenge.NewReconciler(challengeRepo, db.Pool, dividendService)
 	challengeHandler := challenge.NewHandler(challengeRepo, challengeReconciler, cfg.InternalSecret)
 	ctx, cancelReconciler := context.WithCancel(context.Background())

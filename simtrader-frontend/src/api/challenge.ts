@@ -4,6 +4,7 @@ import { client } from './client'
 import type {
   Challenge, ChallengeWithMeta, ChallengeOrder, ChallengePortfolio,
   ChallengeSnapshot, ChallengeDividend, LeaderboardEntry, CreateChallengeInput, EODBar,
+  ChallengeAccessRow,
 } from './index'
 
 export const challengeApi = {
@@ -14,7 +15,7 @@ export const challengeApi = {
     return data
   },
 
-  get: async (id: string): Promise<{ challenge: Challenge; joined: boolean }> => {
+  get: async (id: string): Promise<{ challenge: Challenge; joined: boolean; hasAccess: boolean }> => {
     const { data } = await client.get(`/challenges/${id}`)
     return data
   },
@@ -111,6 +112,24 @@ export const challengeApi = {
   adminLeaderboard: async (id: string): Promise<{ leaderboard: LeaderboardEntry[] }> => {
     const { data } = await client.get(`/admin/challenges/${id}/leaderboard`)
     return data
+  },
+
+  // ── Admin access control ───────────────────────────────────────────────────
+  // A challenge is locked until the admin grants access; granting also enrolls
+  // the student, and revoking locks them out while keeping their portfolio.
+
+  adminListAccess: async (id: string): Promise<{ roster: ChallengeAccessRow[] }> => {
+    const { data } = await client.get(`/admin/challenges/${id}/access`)
+    return data
+  },
+
+  adminGrantAccess: async (id: string, userIds: string[]): Promise<{ granted: number }> => {
+    const { data } = await client.post(`/admin/challenges/${id}/access`, { userIds })
+    return data
+  },
+
+  adminRevokeAccess: async (id: string, userId: string): Promise<void> => {
+    await client.delete(`/admin/challenges/${id}/access/${userId}`)
   },
 
   // A single enrolled student's own order/decision ledger, admin drill-down

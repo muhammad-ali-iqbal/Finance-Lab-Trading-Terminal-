@@ -18,7 +18,7 @@ import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   ArrowLeft, Trophy,
   Briefcase, ListOrdered, Medal, BarChart3,
-  Activity, Download, Banknote,
+  Activity, Download, Banknote, Lock,
 } from 'lucide-react'
 import { downloadCSV } from '@/utils/csv'
 import EODChartTab from './EODChartTab'
@@ -744,6 +744,29 @@ export default function ChallengeDetailPage() {
     return (
       <div className="p-6">
         <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">Challenge not found.</p>
+      </div>
+    )
+  }
+
+  // Challenges are locked by default. Without an access grant every
+  // challenge-scoped endpoint 403s, so bail out before mounting any tab.
+  if (data && !data.hasAccess) {
+    return (
+      <div className="p-6 max-w-4xl">
+        <button
+          onClick={() => navigate('/dashboard/challenges')}
+          className="flex items-center gap-1.5 text-xs text-ink-tertiary dark:text-dark-ink-tertiary hover:text-ink dark:hover:text-dark-ink transition-colors mb-6"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          All Challenges
+        </button>
+        <Card>
+          <EmptyState
+            icon={<Lock className="w-10 h-10 text-ink-disabled dark:text-dark-ink-disabled" />}
+            title={`${challenge.name} is locked`}
+            description="Your instructor has not granted you access to this challenge yet. Contact them if you think this is a mistake."
+          />
+        </Card>
       </div>
     )
   }

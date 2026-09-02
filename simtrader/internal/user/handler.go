@@ -32,17 +32,43 @@ type PasswordVerifier interface {
 	InviteStudent(ctx context.Context, email string) (*User, error)
 }
 
+// ChallengeAccessGranter lets the bulk-invite flow grant challenge access
+// without the user package importing challenge (same dependency-breaking
+// trick as PasswordVerifier above). *challenge.Repository implements it.
+type ChallengeAccessGranter interface {
+	GrantAccess(ctx context.Context, challengeID, userID, grantedBy uuid.UUID, capital float64) error
+	GetChallengeCapital(ctx context.Context, challengeID uuid.UUID) (float64, error)
+}
+
 type Handler struct {
 	repo     *Repository
 	verifier PasswordVerifier
+	// access is optional — nil simply means the bulk-invite endpoint cannot
+	// also grant challenge access.
+	access ChallengeAccessGranter
 	// basePath prefixes avatar URLs returned to the browser (e.g. "/simtrader")
 	// so they resolve back through the reverse proxy correctly when this app
 	// isn't served from the domain root. Empty when served from the root.
 	basePath string
 }
 
-func NewHandler(repo *Repository, verifier PasswordVerifier, basePath string) *Handler {
-	return &Handler{repo: repo, verifier: verifier, basePath: basePath}
+func NewHandler(repo *Repository, verifier PasswordVerifier, basePath string, access ChallengeAccessGranter) *Handler {
+	return &Handler{repo: repo, verifier: verifier, basePath: basePath, access: access}
+}
+
+// adminUserID returns the calling admin's id, or uuid.Nil when it cannot be
+// parsed — audit columns like challenge_access.granted_by are nullable, so an
+// unparseable id must not fail the request.
+func adminUserID(c *fiber.Ctx) uuid.UUID {
+	claims := middleware.GetClaims(c)
+	if claims == nil {
+		return uuid.Nil
+	}
+	id, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return uuid.Nil
+	}
+	return id
 }
 
 // RegisterRoutes mounts user management routes.
@@ -62,6 +88,7 @@ func (h *Handler) RegisterRoutes(app *fiber.App, authMW, adminMW fiber.Handler) 
 	admin := app.Group("/api/admin/users", authMW, adminMW)
 	admin.Get("/", h.ListUsers)
 	admin.Post("/invite", h.InviteStudent)
+	admin.Post("/invite/bulk", h.BulkInviteStudents)
 	admin.Get("/:id", h.GetUser)
 	admin.Post("/:id/block", h.BlockUser)
 	admin.Post("/:id/unblock", h.UnblockUser)

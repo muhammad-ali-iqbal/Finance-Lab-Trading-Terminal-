@@ -61,6 +61,22 @@ func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (*Challenge, err
 	return c, nil
 }
 
+// GetChallengeCapital returns just the starting capital for a challenge, for
+// callers that only need it to enrol someone (e.g. the bulk-invite flow).
+func (r *Repository) GetChallengeCapital(ctx context.Context, id uuid.UUID) (float64, error) {
+	var capital float64
+	err := r.db.QueryRow(ctx,
+		`SELECT initial_capital FROM challenges WHERE id=$1`, id,
+	).Scan(&capital)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return 0, pgx.ErrNoRows
+		}
+		return 0, err
+	}
+	return capital, nil
+}
+
 func (r *Repository) ListAll(ctx context.Context) ([]Challenge, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT id, name, description, start_date::text, end_date::text, initial_capital, status, created_by, created_at
@@ -154,15 +170,6 @@ func (r *Repository) ListParticipants(ctx context.Context, challengeID uuid.UUID
 	return out, rows.Err()
 }
 
-func (r *Repository) EnrollUser(ctx context.Context, challengeID, userID uuid.UUID, capital float64) error {
-	_, err := r.db.Exec(ctx, `
-		INSERT INTO challenge_participants (id, challenge_id, user_id, cash_balance)
-		VALUES ($1,$2,$3,$4) ON CONFLICT (challenge_id, user_id) DO NOTHING`,
-		uuid.New(), challengeID, userID, capital,
-	)
-	return err
-}
-
 func (r *Repository) GetParticipantByID(ctx context.Context, participantID uuid.UUID) (*Participant, error) {
 	p := &Participant{}
 	err := r.db.QueryRow(ctx, `
@@ -175,11 +182,160 @@ func (r *Repository) GetParticipantByID(ctx context.Context, participantID uuid.
 	return p, nil
 }
 
-func (r *Repository) ListNonParticipantUsers(ctx context.Context, challengeID uuid.UUID) ([]uuid.UUID, error) {
+// ── Access ────────────────────────────────────────────────────────────────────
+//
+// A challenge is locked by default: without a challenge_access row the student
+// sees it as locked and every challenge-scoped endpoint refuses them. Granting
+// access also enrols the student (auto-enrol), and revoking removes only the
+// access row so their portfolio, orders and leaderboard placement survive.
+
+// AccessRow is one line of the admin access roster: a student plus whether
+// they currently have access to, and have been enrolled in, the challenge.
+type AccessRow struct {
+	UserID    uuid.UUID `json:"userId"`
+	Email     string    `json:"email"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Status    string    `json:"status"`
+	Granted   bool      `json:"granted"`
+	Joined    bool      `json:"joined"`
+}
+
+func (r *Repository) HasAccess(ctx context.Context, challengeID, userID uuid.UUID) (bool, error) {
+	var ok bool
+	err := r.db.QueryRow(ctx, `
+		SELECT EXISTS (
+			SELECT 1 FROM challenge_access WHERE challenge_id=$1 AND user_id=$2
+		)`, challengeID, userID,
+	).Scan(&ok)
+	return ok, err
+}
+
+// GrantAccess unlocks a challenge for one student and enrols them in the same
+// transaction. Both inserts are ON CONFLICT DO NOTHING, so re-granting someone
+// who was previously revoked restores their access without resetting the cash
+// balance or positions they already had.
+func (r *Repository) GrantAccess(ctx context.Context, challengeID, userID, grantedBy uuid.UUID, capital float64) error {
+	_, err := r.GrantAccessBulk(ctx, challengeID, []uuid.UUID{userID}, grantedBy, capital)
+	return err
+}
+
+// GrantAccessBulk grants and enrols many students at once, returning how many
+// were newly granted (already-granted users are counted as zero).
+func (r *Repository) GrantAccessBulk(ctx context.Context, challengeID uuid.UUID, userIDs []uuid.UUID, grantedBy uuid.UUID, capital float64) (int, error) {
+	if len(userIDs) == 0 {
+		return 0, nil
+	}
+
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback(ctx)
+
+	var by *uuid.UUID
+	if grantedBy != uuid.Nil {
+		by = &grantedBy
+	}
+
+	granted := 0
+	for _, uid := range userIDs {
+		tag, err := tx.Exec(ctx, `
+			INSERT INTO challenge_access (id, challenge_id, user_id, granted_by)
+			VALUES ($1,$2,$3,$4) ON CONFLICT (challenge_id, user_id) DO NOTHING`,
+			uuid.New(), challengeID, uid, by,
+		)
+		if err != nil {
+			return 0, err
+		}
+		granted += int(tag.RowsAffected())
+
+		// Auto-enrol: ON CONFLICT DO NOTHING, so an existing participant
+		// keeps their cash balance untouched.
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO challenge_participants (id, challenge_id, user_id, cash_balance)
+			VALUES ($1,$2,$3,$4) ON CONFLICT (challenge_id, user_id) DO NOTHING`,
+			uuid.New(), challengeID, uid, capital,
+		); err != nil {
+			return 0, err
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return 0, err
+	}
+	return granted, nil
+}
+
+// RevokeAccess locks the student out. It deliberately leaves
+// challenge_participants (and therefore positions, orders, snapshots and their
+// leaderboard row) intact.
+func (r *Repository) RevokeAccess(ctx context.Context, challengeID, userID uuid.UUID) error {
+	_, err := r.db.Exec(ctx,
+		`DELETE FROM challenge_access WHERE challenge_id=$1 AND user_id=$2`,
+		challengeID, userID,
+	)
+	return err
+}
+
+// ListAccessRoster returns every non-blocked student with their access and
+// enrolment state for one challenge. Pending (invited but not yet registered)
+// students are included so an admin can grant access ahead of registration.
+func (r *Repository) ListAccessRoster(ctx context.Context, challengeID uuid.UUID) ([]AccessRow, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT u.id, u.email, u.first_name, u.last_name, u.status,
+		       (ca.user_id IS NOT NULL) AS granted,
+		       (cp.user_id IS NOT NULL) AS joined
+		FROM users u
+		LEFT JOIN challenge_access ca       ON ca.user_id = u.id AND ca.challenge_id = $1
+		LEFT JOIN challenge_participants cp ON cp.user_id = u.id AND cp.challenge_id = $1
+		WHERE u.role = 'student' AND u.status <> 'blocked'
+		ORDER BY u.first_name, u.last_name, u.email`,
+		challengeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := make([]AccessRow, 0)
+	for rows.Next() {
+		var a AccessRow
+		if err := rows.Scan(&a.UserID, &a.Email, &a.FirstName, &a.LastName,
+			&a.Status, &a.Granted, &a.Joined); err != nil {
+			return nil, err
+		}
+		out = append(out, a)
+	}
+	return out, rows.Err()
+}
+
+// ListAccessibleChallengeIDs returns the set of challenges one student may see
+// unlocked — a single query, so the student list doesn't need a per-challenge
+// access lookup.
+func (r *Repository) ListAccessibleChallengeIDs(ctx context.Context, userID uuid.UUID) (map[uuid.UUID]bool, error) {
+	rows, err := r.db.Query(ctx,
+		`SELECT challenge_id FROM challenge_access WHERE user_id=$1`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := make(map[uuid.UUID]bool)
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		out[id] = true
+	}
+	return out, rows.Err()
+}
+
+// ListUngrantedUsers lists active students who do not yet have access to the
+// challenge — the target set for "Grant access to all".
+func (r *Repository) ListUngrantedUsers(ctx context.Context, challengeID uuid.UUID) ([]uuid.UUID, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT id FROM users
 		WHERE status='active' AND role='student'
-		  AND id NOT IN (SELECT user_id FROM challenge_participants WHERE challenge_id=$1)`,
+		  AND id NOT IN (SELECT user_id FROM challenge_access WHERE challenge_id=$1)`,
 		challengeID)
 	if err != nil {
 		return nil, err

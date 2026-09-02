@@ -15,6 +15,25 @@ export interface InviteUserInput {
   lastName: string
 }
 
+export type BulkInviteStatus =
+  | 'invited'
+  | 'email_failed'
+  | 'already_exists'
+  | 'invalid'
+
+export interface BulkInviteResult {
+  email: string
+  status: BulkInviteStatus
+  detail?: string
+}
+
+export interface BulkInviteResponse {
+  results: BulkInviteResult[]
+  invited: number
+  failed: number
+  duplicates: number
+}
+
 export interface UsersListResponse {
   users: User[]
   total: number
@@ -47,6 +66,13 @@ export const userApi = {
 
   inviteStudent: async (input: InviteUserInput) => {
     const { data } = await client.post<User>('/admin/users/invite', input)
+    return data
+  },
+
+  // Bulk invite: one pending account + invite email per address, with an
+  // optional challenge access grant applied to every invitee.
+  bulkInvite: async (input: { emails: string[]; challengeId?: string }) => {
+    const { data } = await client.post<BulkInviteResponse>('/admin/users/invite/bulk', input)
     return data
   },
 
