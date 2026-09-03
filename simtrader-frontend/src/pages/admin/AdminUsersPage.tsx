@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { challengeApi, userApi } from '@/api'
 import type { BulkInviteStatus } from '@/api/user'
 import {
-  Card, Button, Input, Badge, Alert, Spinner, EmptyState
+  Card, Button, Input, Badge, Alert, Spinner, EmptyState, Avatar
 } from '@/components/ui'
 import {
   Users, UserPlus, X, Shield, ShieldOff, Mail, Clock, Trash2
@@ -358,7 +358,7 @@ function WipeModal({ user, onClose, onConfirm, isPending }: {
 }
 
 // ── User row ──────────────────────────────────────────────────────────────────
-function UserRow({ user }: { user: User }) {
+function UserRow({ user, paletteIndex = 0 }: { user: User; paletteIndex?: number }) {
   const qc = useQueryClient()
   const invalidate = () => qc.invalidateQueries({ queryKey: ['admin', 'users'] })
   const [showWipe, setShowWipe] = useState(false)
@@ -367,7 +367,6 @@ function UserRow({ user }: { user: User }) {
   const unblock = useMutation({ mutationFn: () => userApi.unblockUser(user.id), onSuccess: invalidate })
   const del     = useMutation({ mutationFn: () => userApi.delete(user.id), onSuccess: () => { setShowWipe(false); invalidate() } })
 
-  const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || user.email[0].toUpperCase()
   const displayName = user.firstName && user.lastName
     ? `${user.firstName} ${user.lastName}`
     : user.email
@@ -384,9 +383,7 @@ function UserRow({ user }: { user: User }) {
     )}
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary transition-colors">
       {/* Avatar */}
-      <div className="w-8 h-8 rounded-full bg-ink dark:bg-dark-ink flex items-center justify-center flex-shrink-0">
-        <span className="text-[11px] font-semibold text-surface dark:text-dark-surface">{initials}</span>
-      </div>
+      <Avatar name={displayName} paletteIndex={paletteIndex} />
 
       {/* Info */}
       <div className="flex-1 min-w-0">
@@ -505,7 +502,7 @@ export default function AdminUsersPage() {
             {students.length} student{students.length !== 1 ? 's' : ''} registered
           </p>
         </div>
-        <Button size="sm" onClick={() => setShowInvite(true)}>
+        <Button size="sm" variant="brand" onClick={() => setShowInvite(true)}>
           <UserPlus className="w-4 h-4" />
           Invite student
         </Button>
@@ -560,8 +557,8 @@ export default function AdminUsersPage() {
           />
         ) : (
           <div className="divide-y divide-border dark:divide-dark-border">
-            {filtered.map(user => (
-              <UserRow key={user.id} user={user} />
+            {filtered.map((user, i) => (
+              <UserRow key={user.id} user={user} paletteIndex={i} />
             ))}
           </div>
         )}

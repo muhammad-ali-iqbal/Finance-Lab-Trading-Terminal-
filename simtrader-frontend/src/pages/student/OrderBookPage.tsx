@@ -142,7 +142,7 @@ export default function OrderBookPage() {
               <span className="text-[11px] font-mono font-semibold text-success dark:text-dark-success w-14 shrink-0">
                 {bidPct.toFixed(2)}%
               </span>
-              <div className="flex-1 h-1.5 rounded-full overflow-hidden flex bg-danger/25 dark:bg-dark-danger/25">
+              <div className="flex-1 h-2.5 rounded-full overflow-hidden flex bg-danger/25 dark:bg-dark-danger/25">
                 <div
                   className="bg-success dark:bg-dark-success h-full transition-all duration-500"
                   style={{ width: `${bidPct}%` }}
@@ -177,33 +177,33 @@ export default function OrderBookPage() {
               return (
                 <div
                   key={i}
-                  className="relative grid grid-cols-[1fr_1fr_1fr_1fr] border-t border-border/25 dark:border-dark-border/25"
+                  className="relative grid grid-cols-[1fr_1fr_1fr_1fr] border-t border-border/40 dark:border-dark-border/40"
                 >
                   {/* Bid depth bar: right edge anchored at center, grows leftward */}
                   {bid && (
                     <div
-                      className="absolute top-0 bottom-0 bg-success/10 dark:bg-dark-success/10 pointer-events-none transition-all duration-300"
+                      className="absolute top-0 bottom-0 bg-success/[0.16] dark:bg-dark-success/20 pointer-events-none transition-all duration-300"
                       style={{ right: '50%', width: `${(bid.cum / maxBidCum) * 50}%` }}
                     />
                   )}
                   {/* Ask depth bar: left edge anchored at center, grows rightward */}
                   {ask && (
                     <div
-                      className="absolute top-0 bottom-0 bg-danger/10 dark:bg-dark-danger/10 pointer-events-none transition-all duration-300"
+                      className="absolute top-0 bottom-0 bg-danger/[0.16] dark:bg-dark-danger/20 pointer-events-none transition-all duration-300"
                       style={{ left: '50%', width: `${(ask.cum / maxAskCum) * 50}%` }}
                     />
                   )}
 
-                  <span className="relative z-10 px-3 py-1 text-xs font-mono text-ink dark:text-dark-ink">
+                  <span className="relative z-10 px-3 py-1.5 text-[13px] font-mono font-medium text-ink dark:text-dark-ink">
                     {bid ? bid.quantity.toLocaleString() : ''}
                   </span>
-                  <span className="relative z-10 px-3 py-1 text-xs font-mono font-semibold text-success dark:text-dark-success text-right">
+                  <span className="relative z-10 px-3 py-1.5 text-[13px] font-mono font-semibold text-success dark:text-dark-success text-right">
                     {bid ? fmt(bid.price) : ''}
                   </span>
-                  <span className="relative z-10 px-3 py-1 text-xs font-mono font-semibold text-danger dark:text-dark-danger">
+                  <span className="relative z-10 px-3 py-1.5 text-[13px] font-mono font-semibold text-danger dark:text-dark-danger">
                     {ask ? fmt(ask.price) : ''}
                   </span>
-                  <span className="relative z-10 px-3 py-1 text-xs font-mono text-ink dark:text-dark-ink text-right">
+                  <span className="relative z-10 px-3 py-1.5 text-[13px] font-mono font-medium text-ink dark:text-dark-ink text-right">
                     {ask ? ask.quantity.toLocaleString() : ''}
                   </span>
                 </div>

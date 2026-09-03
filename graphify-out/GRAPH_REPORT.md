@@ -1,11 +1,11 @@
-# Graph Report - .  (2026-09-02)
+# Graph Report - .  (2026-09-03)
 
 ## Corpus Check
-- 102 files · ~1,574,833 words
+- 102 files · ~1,575,777 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 809 nodes · 1503 edges · 120 communities detected
+- 812 nodes · 1507 edges · 120 communities detected
 - Extraction: 58% EXTRACTED · 42% INFERRED · 0% AMBIGUOUS · INFERRED: 634 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -148,12 +148,12 @@
   simtrader\cmd\server\main.go → simtrader\internal\auth\mailer.go
 - `main()` --calls--> `NewEngine()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\order\engine.go
+- `main()` --calls--> `NewOrderRepository()`  [INFERRED]
+  simtrader\cmd\server\main.go → simtrader\internal\order\handler.go
 - `main()` --calls--> `NewReconciler()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\challenge\reconciler.go
 - `jsonErrorHandler()` --calls--> `Status`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\user\model.go
-- `get_connection()` --calls--> `Connect()`  [INFERRED]
-  psx_tracker\database.py → simtrader\internal\db\db.go
 
 ## Hyperedges (group relationships)
 - **Student Trading Flow (Order â†’ Portfolio â†’ P&L)** — claudemd_order_module, claudemd_portfolio_module, claudemd_simulation_clock [INFERRED 0.85]
@@ -166,11 +166,11 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.07
-Nodes (14): GetClaims(), Handler, BadRequest(), InternalError(), adminID(), adminUserID(), Handler, Handler (+6 more)
+Nodes (13): GetClaims(), Handler, NewClock(), BadRequest(), InternalError(), adminID(), Handler, Handler (+5 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (23): Announcement, AccessRow, EODBar, LeaderboardRow, Reconciler, Repository, Close(), Connect() (+15 more)
+Cohesion: 0.04
+Nodes (23): AccessRow, EODBar, LeaderboardRow, Reconciler, Repository, Close(), Migrate(), OrderRepository (+15 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
@@ -182,55 +182,55 @@ Nodes (23): authResponse, forgotPasswordRequest, Handler, loginRequest, logoutRe
 
 ### Community 4 - "Community 4"
 Cohesion: 0.07
-Nodes (13): NewClock(), toggle(), startTokenCleanup(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry (+5 more)
+Nodes (13): toggle(), respond(), Handler, parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry (+5 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.08
-Nodes (25): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+17 more)
+Cohesion: 0.05
+Nodes (32): Announcement, extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), handler(), Config, getEnv() (+24 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (21): Challenge, ChallengeOrder, ChallengePosition, EODPrice, leaderboardEntry, Participant, Security, Snapshot (+13 more)
+Cohesion: 0.06
+Nodes (26): Challenge, ChallengeOrder, ChallengePosition, EODPrice, leaderboardEntry, Participant, Security, Snapshot (+18 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.08
-Nodes (14): handler(), ParsedPayout, onClickOutside(), td(), toDateStr(), ParseAnnouncement(), ParseBookClosureStart(), TestParseAnnouncement() (+6 more)
+Cohesion: 0.09
+Nodes (14): createRequest, Handler, Mailer, previewRequest, Repository, Service, StudentLister, excludeStudents() (+6 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.1
-Nodes (14): createRequest, Handler, Mailer, previewRequest, Repository, Service, StudentLister, excludeStudents() (+6 more)
+Nodes (24): Admin Route Prefix Convention, Go Backend Architecture, Bloomberg to SimTrader CSV Conversion Tool, Directory Structure and Project Layout, React Frontend Architecture, Go 1.22+ with Fiber v2, Insufficient Resources WebSocket Issue, Invite-Only Registration Pattern (+16 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.1
-Nodes (24): Admin Route Prefix Convention, Go Backend Architecture, Bloomberg to SimTrader CSV Conversion Tool, Directory Structure and Project Layout, React Frontend Architecture, Go 1.22+ with Fiber v2, Insufficient Resources WebSocket Issue, Invite-Only Registration Pattern (+16 more)
+Nodes (9): clsx(), fmt(), fmtPKR(), handleDownload(), pct(), PerformanceChart(), downloadCSV(), useTheme() (+1 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.11
-Nodes (8): fmt(), fmtPKR(), handleDownload(), pct(), PerformanceChart(), downloadCSV(), useTheme(), ThemeToggle()
-
-### Community 11 - "Community 11"
 Cohesion: 0.18
 Nodes (18): detect_columns(), expand_daily_to_minutes(), forward_fill_gaps(), _in_session(), main(), parse_daily_file(), parse_datetime(), parse_intraday_file() (+10 more)
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 0.14
 Nodes (10): cacheEntry, Handler, Payout, Result, Service, Symbol, cleanCell(), parsePayoutsHTML() (+2 more)
 
-### Community 13 - "Community 13"
+### Community 12 - "Community 12"
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
-### Community 14 - "Community 14"
+### Community 13 - "Community 13"
 Cohesion: 0.27
 Nodes (4): loginAuth, SMTPMailer, newLoginAuth(), NewSMTPMailer()
 
-### Community 15 - "Community 15"
+### Community 14 - "Community 14"
 Cohesion: 0.22
 Nodes (3): handleBold(), handleItalic(), wrapSelection()
 
-### Community 16 - "Community 16"
+### Community 15 - "Community 15"
 Cohesion: 0.24
 Nodes (8): appendDetail(), parseEmailList(), assertSlice(), TestAppendDetail(), TestParseEmailList(), bulkInviteRequest, bulkInviteResult, parsedEmails
+
+### Community 16 - "Community 16"
+Cohesion: 0.22
+Nodes (3): onClickOutside(), td(), toDateStr()
 
 ### Community 17 - "Community 17"
 Cohesion: 0.36
@@ -242,11 +242,11 @@ Nodes (3): calcFees(), NewEngine(), Engine
 
 ### Community 19 - "Community 19"
 Cohesion: 0.25
-Nodes (5): HistoryPoint, LeaderboardEntry, Portfolio, Position, SimRepo
+Nodes (0): 
 
 ### Community 20 - "Community 20"
-Cohesion: 0.25
-Nodes (0): 
+Cohesion: 0.33
+Nodes (5): ParsedPayout, ParseAnnouncement(), ParseBookClosureStart(), TestParseAnnouncement(), TestParseBookClosureStart()
 
 ### Community 21 - "Community 21"
 Cohesion: 0.29
@@ -261,12 +261,12 @@ Cohesion: 0.4
 Nodes (2): calcEMA(), calcMACD()
 
 ### Community 24 - "Community 24"
-Cohesion: 0.5
-Nodes (3): Simulation, Status, TickBroadcast
+Cohesion: 0.4
+Nodes (0): 
 
 ### Community 25 - "Community 25"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (3): Simulation, Status, TickBroadcast
 
 ### Community 26 - "Community 26"
 Cohesion: 0.5
@@ -281,20 +281,20 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 29 - "Community 29"
-Cohesion: 0.5
-Nodes (0): 
-
-### Community 30 - "Community 30"
 Cohesion: 0.83
 Nodes (3): fmt(), fmtPct(), fmtPKR()
 
-### Community 31 - "Community 31"
+### Community 30 - "Community 30"
 Cohesion: 0.67
 Nodes (1): End-to-end test suite for psx_tracker. Tests: DB schema, ticker loading, single-
 
-### Community 32 - "Community 32"
+### Community 31 - "Community 31"
 Cohesion: 0.67
 Nodes (2): DividendRecord, PayoutSource
+
+### Community 32 - "Community 32"
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 33 - "Community 33"
 Cohesion: 0.67
@@ -334,11 +334,11 @@ Nodes (0):
 
 ### Community 42 - "Community 42"
 Cohesion: 1.0
-Nodes (2): AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01), Bloomberg â†’ SimTrader CSV Workflow
+Nodes (0): 
 
 ### Community 43 - "Community 43"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01), Bloomberg â†’ SimTrader CSV Workflow
 
 ### Community 44 - "Community 44"
 Cohesion: 1.0
@@ -651,57 +651,57 @@ Nodes (1): Light/Dark Mode Toggle UI Component
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 37`** (2 nodes): `clsx()`, `DashboardLayout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (2 nodes): `useSymbolDisplay.ts`, `useSymbolDisplay()`
+- **Thin community `Community 38`** (2 nodes): `clsx()`, `index.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (2 nodes): `handleSubmit()`, `AdminSettingsPage.tsx`
+- **Thin community `Community 39`** (2 nodes): `useSymbolDisplay.ts`, `useSymbolDisplay()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (2 nodes): `fmt()`, `ChartPageold.tsx`
+- **Thin community `Community 40`** (2 nodes): `handleSubmit()`, `AdminSettingsPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
+- **Thin community `Community 41`** (2 nodes): `fmt()`, `ChartPageold.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (2 nodes): `AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01)`, `Bloomberg â†’ SimTrader CSV Workflow`
+- **Thin community `Community 42`** (2 nodes): `fmt()`, `OrderBookPage.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (1 nodes): `gemma.py`
+- **Thin community `Community 43`** (2 nodes): `AAPL Bloomberg OHLCV Raw Data (1-min bars, 2026-04-01)`, `Bloomberg â†’ SimTrader CSV Workflow`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (1 nodes): `config.py`
+- **Thin community `Community 44`** (1 nodes): `gemma.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (1 nodes): `adapter.go`
+- **Thin community `Community 45`** (1 nodes): `config.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (1 nodes): `postcss.config.js`
+- **Thin community `Community 46`** (1 nodes): `adapter.go`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (1 nodes): `tailwind.config.js`
+- **Thin community `Community 47`** (1 nodes): `postcss.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (1 nodes): `vite.config.ts`
+- **Thin community `Community 48`** (1 nodes): `tailwind.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (1 nodes): `App.tsx`
+- **Thin community `Community 49`** (1 nodes): `vite.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (1 nodes): `main.tsx`
+- **Thin community `Community 50`** (1 nodes): `App.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (1 nodes): `vite-env.d.ts`
+- **Thin community `Community 51`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (1 nodes): `announcement.ts`
+- **Thin community `Community 52`** (1 nodes): `vite-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (1 nodes): `auth.ts`
+- **Thin community `Community 53`** (1 nodes): `announcement.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (1 nodes): `challenge.ts`
+- **Thin community `Community 54`** (1 nodes): `auth.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (1 nodes): `dividend.ts`
+- **Thin community `Community 55`** (1 nodes): `challenge.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (1 nodes): `index.ts`
+- **Thin community `Community 56`** (1 nodes): `dividend.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (1 nodes): `order.ts`
+- **Thin community `Community 57`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (1 nodes): `portfolio.ts`
+- **Thin community `Community 58`** (1 nodes): `order.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (1 nodes): `psx.ts`
+- **Thin community `Community 59`** (1 nodes): `portfolio.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (1 nodes): `securities.ts`
+- **Thin community `Community 60`** (1 nodes): `psx.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (1 nodes): `simulation.ts`
+- **Thin community `Community 61`** (1 nodes): `securities.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (1 nodes): `user.ts`
+- **Thin community `Community 62`** (1 nodes): `simulation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (1 nodes): `index.tsx`
+- **Thin community `Community 63`** (1 nodes): `user.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 64`** (1 nodes): `AdminLayout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -819,12 +819,12 @@ Nodes (1): Light/Dark Mode Toggle UI Component
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 6`, `Community 8`, `Community 14`, `Community 18`?**
-  _High betweenness centrality (0.149) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 5`, `Community 6`, `Community 12`, `Community 14`, `Community 18`?**
+- **Why does `main()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 6`, `Community 7`, `Community 13`, `Community 18`?**
+  _High betweenness centrality (0.148) - this node is a cross-community bridge._
+- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 5`, `Community 6`, `Community 11`, `Community 13`, `Community 18`?**
   _High betweenness centrality (0.076) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Community 4`, `Community 3`, `Community 12`, `Community 5`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
+- **Why does `Status` connect `Community 0` to `Community 1`, `Community 3`, `Community 4`, `Community 5`, `Community 11`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
 - **Are the 65 inferred relationships involving `BadRequest()` (e.g. with `.Create()` and `.Preview()`) actually correct?**
   _`BadRequest()` has 65 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 62 inferred relationships involving `InternalError()` (e.g. with `.Create()` and `.List()`) actually correct?**

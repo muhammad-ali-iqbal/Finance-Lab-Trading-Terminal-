@@ -10,7 +10,7 @@ import clsx from 'clsx'
 // ── Button ───────────────────────────────────────────────────────────────────
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'brand'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
   fullWidth?: boolean
@@ -25,6 +25,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-surface text-ink hover:bg-surface-secondary border border-border dark:bg-dark-surface dark:text-dark-ink dark:hover:bg-dark-surface-secondary dark:border-dark-border',
       ghost:     'bg-transparent text-ink-secondary hover:bg-surface-secondary hover:text-ink dark:text-dark-ink-secondary dark:hover:bg-dark-surface-secondary dark:hover:text-dark-ink border border-transparent',
       danger:    'bg-danger text-white hover:bg-danger/90 border border-danger dark:bg-dark-danger dark:hover:bg-dark-danger/90 dark:border-dark-danger',
+      // IBA-maroon fill — primary CTAs that should read as the brand action (e.g. "New simulation", "Invite student")
+      brand:     'bg-iba text-white hover:bg-iba/90 border border-iba dark:bg-dark-iba dark:hover:bg-dark-iba/90 dark:border-dark-iba',
     }
 
     const sizes = {
@@ -187,11 +189,28 @@ interface StatCardProps {
   delta?: number       // positive = green, negative = red
   deltaLabel?: string
   mono?: boolean
-  variant?: 'solid' | 'glass'
+  /** 'featured' is the dark maroon-gradient treatment for a single headline metric (e.g. Portfolio Value) */
+  variant?: 'solid' | 'glass' | 'featured'
   className?: string
 }
 
 export function StatCard({ label, value, delta, deltaLabel, mono, variant = 'solid', className }: StatCardProps) {
+  if (variant === 'featured') {
+    return (
+      <div className={clsx('surface-feature flex flex-col gap-1 p-4', className)}>
+        <span className="relative text-[11px] font-medium uppercase tracking-widest text-white/50">{label}</span>
+        <span className={clsx('relative font-display text-3xl text-white', mono && 'font-mono tabular-nums')}>
+          {value}
+        </span>
+        {delta !== undefined && (
+          <span className={clsx('relative text-xs font-semibold', delta >= 0 ? 'text-dark-success' : 'text-dark-danger')}>
+            {delta >= 0 ? '+' : ''}{delta.toFixed(2)}% {deltaLabel}
+          </span>
+        )}
+      </div>
+    )
+  }
+
   return (
     <Card variant={variant} className={clsx('flex flex-col gap-1', className)}>
       <span className="text-[11px] font-medium uppercase tracking-widest text-ink-tertiary dark:text-dark-ink-tertiary">{label}</span>
@@ -204,6 +223,78 @@ export function StatCard({ label, value, delta, deltaLabel, mono, variant = 'sol
         </span>
       )}
     </Card>
+  )
+}
+
+// ── Progress bar ─────────────────────────────────────────────────────────────
+
+interface ProgressBarProps {
+  /** 0-100 */
+  value: number
+  /** 'gradient' = brand blue→maroon sweep (semester/date-range progress). 'solid' = single status color. */
+  variant?: 'gradient' | 'solid'
+  /** Fill color for variant="solid" — a Tailwind background class, e.g. 'bg-success dark:bg-dark-success'. */
+  color?: string
+  size?: 'sm' | 'md'
+  className?: string
+}
+
+export function ProgressBar({ value, variant = 'gradient', color, size = 'sm', className }: ProgressBarProps) {
+  const pct = Math.min(100, Math.max(0, value))
+  const heights = { sm: 'h-1.5', md: 'h-2.5' }
+  return (
+    <div className={clsx('w-full rounded-full overflow-hidden bg-surface-tertiary dark:bg-dark-surface-tertiary', heights[size], className)}>
+      <div
+        className={clsx(
+          'h-full rounded-full transition-all duration-500',
+          variant === 'gradient' ? 'bg-gradient-to-r from-accent to-iba dark:from-dark-accent dark:to-dark-iba' : (color ?? 'bg-ink dark:bg-dark-ink'),
+        )}
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  )
+}
+
+// ── Avatar ───────────────────────────────────────────────────────────────────
+
+const AVATAR_PALETTE = [
+  'bg-accent dark:bg-dark-accent',
+  'bg-iba dark:bg-dark-iba',
+  'bg-success dark:bg-dark-success',
+  'bg-warning dark:bg-dark-warning',
+  'bg-ink-tertiary dark:bg-dark-ink-tertiary',
+]
+
+function initialsFrom(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0][0]!.toUpperCase()
+  return (parts[0][0]! + parts[parts.length - 1][0]!).toUpperCase()
+}
+
+interface AvatarProps {
+  name: string
+  /** Rotates through a fixed palette — pass the row/rank index for a stable, varied set of colors. */
+  paletteIndex?: number
+  /** Highlights this avatar as the current user with a blue→maroon gradient, overriding the palette. */
+  isSelf?: boolean
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
+}
+
+export function Avatar({ name, paletteIndex = 0, isSelf, size = 'md', className }: AvatarProps) {
+  const sizes = { sm: 'w-6 h-6 text-[10px]', md: 'w-8 h-8 text-[11px]', lg: 'w-11 h-11 text-sm' }
+  return (
+    <div
+      className={clsx(
+        'flex items-center justify-center rounded-full font-semibold text-white flex-shrink-0',
+        sizes[size],
+        isSelf ? 'bg-gradient-to-br from-accent to-iba dark:from-dark-accent dark:to-dark-iba' : AVATAR_PALETTE[paletteIndex % AVATAR_PALETTE.length],
+        className,
+      )}
+    >
+      {initialsFrom(name)}
+    </div>
   )
 }
 

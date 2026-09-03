@@ -234,6 +234,25 @@ export default function DividendsPage() {
         </p>
       )}
 
+      {/* Featured announcements — most recent 3 of the current (filtered or unfiltered) list */}
+      {!isLoading && !isError && payouts.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          {payouts.slice(0, 3).map((p, i) => (
+            <div key={`${p.symbol}-${p.announcedAt}-${i}`} className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="font-mono font-bold text-sm text-ink dark:text-dark-ink">{p.symbol}</span>
+                {kindBadge(p.announcement)}
+              </div>
+              <p className="text-[11px] text-ink-secondary dark:text-dark-ink-secondary mb-3 truncate">{p.company}</p>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-base font-semibold text-ink dark:text-dark-ink">{payoutAmount(p.announcement)}</span>
+                <span className="text-[10px] text-ink-tertiary dark:text-dark-ink-tertiary whitespace-nowrap">closes {p.bookClosure}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Table */}
       {isLoading ? (
         <div className="flex items-center justify-center py-20">

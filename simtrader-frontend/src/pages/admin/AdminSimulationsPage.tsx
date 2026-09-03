@@ -135,6 +135,13 @@ function SimulationCard({ sim }: { sim: Simulation }) {
         <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary hidden sm:block flex-shrink-0">
           {sim.speedMultiplier}× · PKR {(sim.startingCash ?? 100000).toLocaleString()}
         </span>
+
+        {hasTimer && (
+          <div className="w-28 flex-shrink-0 hidden md:block">
+            <SimulationTimer simulationId={sim.id} compact />
+          </div>
+        )}
+
         <StatusBadge status={sim.status} />
 
         {/* Manage / Delete */}
@@ -442,7 +449,7 @@ export default function AdminSimulationsPage() {
             Create simulations, upload Bloomberg PSX data, control playback
           </p>
         </div>
-        <Button size="sm" onClick={() => setShowCreate(true)}>
+        <Button size="sm" variant="brand" onClick={() => setShowCreate(true)}>
           <Plus className="w-4 h-4" /> New simulation
         </Button>
       </div>

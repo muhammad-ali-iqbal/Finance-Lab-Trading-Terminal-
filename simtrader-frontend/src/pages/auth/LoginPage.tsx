@@ -4,9 +4,8 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
-import { ThemeToggle } from '@/components/ui'
-import { useTheme } from '@/context/ThemeContext'
-import { Eye, EyeOff } from 'lucide-react'
+import { ThemeToggle, Input, Button, Alert } from '@/components/ui'
+import { Eye, EyeOff, Calendar, TrendingUp, Trophy } from 'lucide-react'
 
 /** Small candlestick glyph so SimTrader has a mark to pair with the IBA crest, not just a wordmark. */
 function SimTraderGlyph({ accent, dim, size = 30 }: { accent: string; dim: string; size?: number }) {
@@ -23,10 +22,8 @@ function SimTraderGlyph({ accent, dim, size = 30 }: { accent: string; dim: strin
 }
 
 export default function LoginPage() {
-  const navigate  = useNavigate()
-  const setAuth   = useAuthStore(s => s.setAuth)
-  const { theme } = useTheme()
-  const dark      = theme === 'dark'
+  const navigate = useNavigate()
+  const setAuth  = useAuthStore(s => s.setAuth)
 
   const [email, setEmail]               = useState('')
   const [password, setPassword]         = useState('')
@@ -46,44 +43,19 @@ export default function LoginPage() {
     login.mutate()
   }
 
-  const inputBase: React.CSSProperties = {
-    width: '100%',
-    borderRadius: 6,
-    padding: '0.5rem 0.75rem',
-    fontSize: '0.875rem',
-    outline: 'none',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-    backgroundColor: dark ? '#3a2535' : '#ffffff',
-    border:          `1px solid ${dark ? 'rgba(255,255,255,0.08)' : '#E4E4E0'}`,
-    color:           dark ? 'rgba(255,255,255,0.9)' : '#0F0F0E',
-    caretColor:      dark ? '#b81481' : '#1A5CFF',
-  }
-  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => Object.assign(e.currentTarget.style, {
-    borderColor: dark ? '#b81481' : '#1A5CFF',
-    boxShadow:   dark ? '0 0 0 3px rgba(184,20,129,0.2)' : '0 0 0 2px rgba(26,92,255,0.15)',
-  })
-  const onBlur = (e: React.FocusEvent<HTMLInputElement>) => Object.assign(e.currentTarget.style, {
-    borderColor: dark ? 'rgba(255,255,255,0.08)' : '#E4E4E0',
-    boxShadow:   'none',
-  })
+  const errorMessage = login.isError
+    ? (login.error as { response?: { data?: { error?: string } } })?.response?.data?.error
+      ?? 'Login failed. Please try again.'
+    : null
 
   return (
-    <div
-      className="min-h-screen flex"
-      style={{ backgroundColor: dark ? '#21111c' : '#F8F8F7' }}
-    >
-      {/* ── Left branding panel ── */}
-      <div
-        className="hidden lg:flex w-[480px] flex-shrink-0 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ backgroundColor: dark ? '#2d1b28' : '#0F0F0E' }}
-      >
-        {dark && <>
-          <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full blur-3xl pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(184,20,129,0.25), transparent)' }} />
-          <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full blur-3xl pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.18), transparent)' }} />
-        </>}
+    <div className="min-h-screen flex bg-surface-secondary dark:bg-dark-surface">
+      {/* ── Left branding panel — an always-dark surface (brand statement), independent of the site's own theme toggle ── */}
+      <div className="hidden lg:flex w-[480px] flex-shrink-0 flex-col justify-between p-12 relative overflow-hidden bg-ink dark:bg-dark-surface-secondary">
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl pointer-events-none bg-iba/40" />
+        <div className="absolute bottom-20 -left-16 w-64 h-64 rounded-full blur-3xl pointer-events-none bg-accent/20" />
 
+        {/* IBA × SimTrader peer lockup */}
         <div className="relative z-10 self-start flex items-center gap-4">
           <img
             src={`${import.meta.env.BASE_URL}iba-logo.png`}
@@ -91,55 +63,62 @@ export default function LoginPage() {
             className="h-16 w-auto object-contain"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
-          <div className="h-12 w-px flex-shrink-0"
-            style={{ backgroundColor: dark ? 'rgba(255,255,255,0.14)' : 'rgba(242,241,239,0.22)' }} />
+          <div className="h-12 w-px flex-shrink-0 bg-white/15" />
           <div className="flex items-center gap-2.5">
-            <SimTraderGlyph
-              accent={dark ? '#b81481' : '#8B1A2A'}
-              dim={dark ? 'rgba(255,255,255,0.45)' : 'rgba(242,241,239,0.55)'}
-            />
+            <SimTraderGlyph accent="#C4526A" dim="rgba(255,255,255,0.45)" />
             <div>
-              <p className="font-semibold tracking-tight text-lg leading-tight"
-                style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
-                SimTrader
-              </p>
-              <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
-                style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
-                Finance Lab
-              </p>
+              <p className="font-semibold tracking-tight text-lg leading-tight text-white">SimTrader</p>
+              <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight text-dark-iba">Finance Lab</p>
             </div>
           </div>
         </div>
 
         <div className="relative z-10 space-y-6">
-          <div className="w-8 h-0.5" style={{ backgroundColor: dark ? '#b81481' : '#8B1A2A' }} />
-          <p className="font-display text-4xl leading-snug italic"
-            style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
+          <div className="w-8 h-0.5 bg-dark-iba" />
+          <p className="font-display text-4xl leading-snug italic text-white">
             Learn markets by<br />participating in them.
           </p>
-          <p className="text-sm leading-relaxed max-w-xs"
-            style={{ color: dark ? 'rgba(255,255,255,0.45)' : 'rgba(242,241,239,0.5)' }}>
+          <p className="text-sm leading-relaxed max-w-xs text-white/50">
             A controlled simulation environment built for IBA students to understand order types,
             portfolio mechanics, and market microstructure using real PSX data.
           </p>
+
+          {/* Live challenge feature card */}
+          <div className="rounded-xl border border-white/10 bg-black/20 overflow-hidden">
+            <div className="px-5 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold tracking-widest uppercase text-white/40">This semester</p>
+                <p className="mt-0.5 text-[13px] font-semibold text-white">Live trading challenges</p>
+              </div>
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-dark-success">
+                <span className="w-1.5 h-1.5 rounded-full bg-dark-success animate-pulse_dot" />
+                Active
+              </span>
+            </div>
+            <div className="border-t border-white/10 px-5 py-4 flex gap-6">
+              <div className="flex items-center gap-1.5 text-[11px] text-white/60">
+                <Calendar className="w-3.5 h-3.5 text-white/40" />
+                Semester-long
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-white/60">
+                <TrendingUp className="w-3.5 h-3.5 text-white/40" />
+                Real EOD prices
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-white/60">
+                <Trophy className="w-3.5 h-3.5 text-white/40" />
+                Ranked leaderboard
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="relative z-10 text-xs"
-          style={{ color: dark ? 'rgba(255,255,255,0.22)' : 'rgba(242,241,239,0.3)' }}>
+        <p className="relative z-10 text-xs text-white/25">
           © {new Date().getFullYear()} Institute of Business Administration, Karachi
-        </div>
+        </p>
       </div>
 
       {/* ── Right form panel ── */}
-      <div
-        className="flex-1 flex items-center justify-center p-6 relative"
-        style={{ backgroundColor: dark ? '#21111c' : '#F8F8F7' }}
-      >
-        {dark && (
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none"
-            style={{ backgroundColor: '#b81481', opacity: 0.06 }} />
-        )}
-
+      <div className="flex-1 flex items-center justify-center p-6 relative ambient-bg">
         <div className="absolute top-4 right-4 z-10">
           <ThemeToggle />
         </div>
@@ -153,147 +132,77 @@ export default function LoginPage() {
               className="h-8 w-auto object-contain"
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
-            <div className="h-6 w-px flex-shrink-0"
-              style={{ backgroundColor: dark ? 'rgba(255,255,255,0.14)' : 'rgba(15,15,14,0.14)' }} />
+            <div className="h-6 w-px flex-shrink-0 bg-ink/15 dark:bg-white/15" />
             <div className="flex items-center gap-2">
-              <SimTraderGlyph
-                size={22}
-                accent={dark ? '#b81481' : '#8B1A2A'}
-                dim={dark ? 'rgba(255,255,255,0.45)' : 'rgba(15,15,14,0.4)'}
-              />
+              <SimTraderGlyph size={22} accent="#8B1A2A" dim="rgba(15,15,14,0.4)" />
               <div>
-                <p className="font-semibold tracking-tight text-sm leading-tight"
-                  style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
-                  SimTrader
-                </p>
-                <p className="text-[9px] font-semibold tracking-widest uppercase leading-tight"
-                  style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
-                  Finance Lab
-                </p>
+                <p className="font-semibold tracking-tight text-sm leading-tight text-ink dark:text-dark-ink">SimTrader</p>
+                <p className="text-[9px] font-semibold tracking-widest uppercase leading-tight text-iba dark:text-dark-iba">Finance Lab</p>
               </div>
             </div>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-semibold tracking-tight"
-              style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
-              Sign in
-            </h1>
-            <p className="text-sm mt-1"
-              style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
+            <h1 className="text-2xl font-semibold tracking-tight text-ink dark:text-dark-ink">Sign in</h1>
+            <p className="text-sm mt-1 text-ink-secondary dark:text-dark-ink-secondary">
               Enter your credentials to access your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {login.isError && (
-              <div
-                className="rounded px-3 py-2.5 text-sm font-medium"
-                style={dark ? {
-                  backgroundColor: 'rgba(224,64,46,0.12)',
-                  color: '#f87171',
-                  border: '1px solid rgba(224,64,46,0.25)',
-                } : {
-                  backgroundColor: '#FEF0EE',
-                  color: '#C8291A',
-                  border: '1px solid rgba(200,41,26,0.15)',
-                }}
-              >
-                {(login.error as { response?: { data?: { error?: string } } })?.response?.data?.error
-                  ?? 'Login failed. Please try again.'}
-              </div>
-            )}
+            {errorMessage && <Alert variant="error" message={errorMessage} />}
 
-            {/* Email */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium"
-                style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
-                Email address
-              </label>
-              <input
-                type="email"
-                placeholder="you@university.edu"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                autoComplete="email"
-                autoFocus
-                required
-                style={inputBase}
-                onFocus={onFocus}
-                onBlur={onBlur}
-              />
-            </div>
+            <Input
+              label="Email address"
+              type="email"
+              placeholder="you@iba.edu.pk"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              autoComplete="email"
+              autoFocus
+              required
+            />
 
-            {/* Password */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium"
-                style={{ color: dark ? 'rgba(255,255,255,0.4)' : '#4A4A47' }}>
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                  style={{ ...inputBase, paddingRight: '2.5rem' }}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                />
+            <Input
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              rightIcon={
                 <button
                   type="button"
                   onClick={() => setShowPassword(s => !s)}
                   tabIndex={-1}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                  style={{ color: dark ? 'rgba(255,255,255,0.35)' : '#8A8A85' }}
+                  className="pointer-events-auto hover:text-ink dark:hover:text-dark-ink transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
-              </div>
-            </div>
+              }
+            />
 
             <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-xs hover:underline"
-                style={{ color: dark ? '#b81481' : '#1A5CFF' }}
-              >
+              <Link to="/forgot-password" className="text-xs text-accent dark:text-dark-accent hover:underline">
                 Forgot password?
               </Link>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={login.isPending || !email || !password}
-              className="w-full h-11 px-6 text-sm font-medium rounded transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              style={dark ? {
-                background: 'linear-gradient(135deg, #b81481, #d91b98)',
-                color: '#ffffff',
-                boxShadow: '0 8px 24px rgba(184,20,129,0.25)',
-              } : {
-                backgroundColor: '#0F0F0E',
-                color: '#F2F1EF',
-                border: '1px solid #0F0F0E',
-              }}
+              size="lg"
+              fullWidth
+              loading={login.isPending}
+              disabled={!email || !password}
             >
-              {login.isPending ? (
-                <>
-                  <svg className="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in…
-                </>
-              ) : 'Sign in'}
-            </button>
+              {login.isPending ? 'Signing in…' : 'Sign in'}
+            </Button>
           </form>
 
-          <p className="text-xs text-center mt-6"
-            style={{ color: dark ? 'rgba(255,255,255,0.25)' : '#8A8A85' }}>
+          <p className="text-xs text-center mt-6 text-ink-tertiary dark:text-dark-ink-tertiary">
             Don't have an account?{' '}
-            <span style={{ color: dark ? 'rgba(255,255,255,0.45)' : '#4A4A47' }}>
+            <span className="text-ink-secondary dark:text-dark-ink-secondary">
               Contact your instructor to receive an invite link.
             </span>
           </p>

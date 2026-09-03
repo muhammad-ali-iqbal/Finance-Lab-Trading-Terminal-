@@ -172,6 +172,31 @@
       radial-gradient(ellipse 80% 40% at 50% 55%, rgba(20, 160, 107, 0.06) 0%, transparent 70%);
   }
   .ambient-bg > * { position: relative; z-index: 1; }
+
+  /* Feature surface — dark ink→maroon gradient with a soft radial highlight.
+     The one "hero" treatment reused for the login live-challenge card, the
+     Challenges hero banner, the featured Portfolio-Value stat, and the
+     leaderboard's #1 podium slot. */
+  .surface-feature {
+    position: relative;
+    overflow: hidden;
+    border-radius: theme('borderRadius.lg');
+    background-image: linear-gradient(135deg, theme('colors.ink.DEFAULT'), theme('colors.iba.DEFAULT'));
+  }
+  .dark .surface-feature {
+    background-image: linear-gradient(135deg, theme('colors.dark-surface.DEFAULT'), theme('colors.dark-iba.DEFAULT'));
+  }
+  .surface-feature::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle at 90% 0%, rgba(139, 26, 42, 0.55), transparent 70%);
+  }
+  .dark .surface-feature::before {
+    background-image: radial-gradient(circle at 90% 0%, rgba(196, 82, 106, 0.45), transparent 70%);
+  }
+  .surface-feature > * { position: relative; z-index: 1; }
 }
 
 /* AG Grid — institutional theme override (light) */

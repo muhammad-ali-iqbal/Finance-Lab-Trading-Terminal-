@@ -6,7 +6,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { challengeApi } from '@/api'
 import type { ChallengeWithMeta } from '@/api'
-import { Spinner, Badge, Button } from '@/components/ui'
+import { useAuthStore } from '@/store/auth'
+import { Spinner, Badge, Button, ProgressBar } from '@/components/ui'
 import { Trophy, Calendar, Users, TrendingUp, ChevronRight, Lock } from 'lucide-react'
 
 function fmtDate(d: string) {
@@ -23,6 +24,16 @@ function statusBadge(status: string) {
   if (status === 'active') return <Badge variant="success" size="sm">Active</Badge>
   if (status === 'completed') return <Badge variant="neutral" size="sm">Completed</Badge>
   return <Badge variant="neutral" size="sm">Draft</Badge>
+}
+
+/** % of the way through the challenge's date range, today. Purely client-computed — no new backend field. */
+function pctElapsed(start: string, end: string): number {
+  const s = new Date(start + 'T00:00:00').getTime()
+  const e = new Date(end + 'T00:00:00').getTime()
+  const now = Date.now()
+  if (now <= s) return 0
+  if (now >= e) return 100
+  return Math.round(((now - s) / (e - s)) * 100)
 }
 
 function ChallengeCard({
@@ -55,11 +66,15 @@ function ChallengeCard({
             'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ' +
             (locked
               ? 'bg-surface-secondary dark:bg-dark-surface-secondary border border-border dark:border-dark-border'
-              : 'bg-ink dark:bg-dark-ink')
+              : challenge.joined
+                ? 'bg-gradient-to-br from-accent to-iba dark:from-dark-accent dark:to-dark-iba'
+                : 'bg-ink dark:bg-dark-ink')
           }>
             {locked
               ? <Lock className="w-4 h-4 text-ink-tertiary dark:text-dark-ink-tertiary" />
-              : <Trophy className="w-4 h-4 text-surface dark:text-dark-surface" />}
+              : challenge.joined
+                ? <Trophy className="w-4 h-4 text-white" />
+                : <Trophy className="w-4 h-4 text-surface dark:text-dark-surface" />}
           </div>
           <div className="min-w-0">
             <h3 className="font-semibold text-sm text-ink dark:text-dark-ink truncate">{challenge.name}</h3>
@@ -93,6 +108,16 @@ function ChallengeCard({
           {fmtCurrency(challenge.initialCapital)} starting capital
         </span>
       </div>
+
+      {/* Semester progress */}
+      {!locked && challenge.status !== 'draft' && (
+        <div className="mb-4">
+          <ProgressBar value={pctElapsed(challenge.startDate, challenge.endDate)} variant="gradient" />
+          <p className="mt-1.5 text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary">
+            {pctElapsed(challenge.startDate, challenge.endDate)}% through the semester
+          </p>
+        </div>
+      )}
 
       {/* Action */}
       <div className="flex items-center justify-end gap-2">
@@ -129,6 +154,7 @@ function ChallengeCard({
 
 export default function ChallengePage() {
   const qc = useQueryClient()
+  const user = useAuthStore(s => s.user)
 
   const { data, isLoading } = useQuery({
     queryKey: ['challenges'],
@@ -142,18 +168,22 @@ export default function ChallengePage() {
   })
 
   const challenges = data?.challenges ?? []
+  const enrolledCount = challenges.filter(ch => ch.joined).length
 
   return (
     <div className="p-6 max-w-4xl">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2.5 mb-1">
-          <Trophy className="w-5 h-5 text-ink dark:text-dark-ink" />
-          <h1 className="text-xl font-semibold text-ink dark:text-dark-ink">Challenges</h1>
+      {/* Hero */}
+      <div className="surface-feature mb-6 px-7 py-8 flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-dark-iba">Welcome back</p>
+          <h1 className="mt-1.5 font-display text-3xl italic text-white">
+            Good to see you{user?.firstName ? `, ${user.firstName}` : ''}.
+          </h1>
         </div>
-        <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">
-          Semester-long paper-trading competitions using live PSX market data.
-        </p>
+        <div>
+          <p className="text-[9px] font-semibold tracking-widest uppercase text-white/40">Enrolled in</p>
+          <p className="mt-0.5 font-mono text-xl font-semibold text-white">{enrolledCount}</p>
+        </div>
       </div>
 
       {/* List */}

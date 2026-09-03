@@ -8,12 +8,13 @@ import {
   createChart, type IChartApi, type ISeriesApi,
   ColorType, LineStyle, CrosshairMode,
 } from 'lightweight-charts'
-import { challengeApi } from '@/api'
+import { challengeApi, dividendApi } from '@/api'
 import type { ChallengeOrder, ChallengePosition, ChallengeDividend, LeaderboardEntry } from '@/api'
-import { Spinner, Badge, Button, Input, Alert, Card, EmptyState } from '@/components/ui'
+import { Spinner, Badge, Button, Input, Alert, Card, EmptyState, StatCard, Avatar } from '@/components/ui'
 import { SymbolPicker } from '@/components/ui/SymbolPicker'
 import { ChallengeOrderStatusBadge } from '@/components/challenge/DecisionTimeline'
 import { useTheme } from '@/context/ThemeContext'
+import { useAuthStore } from '@/store/auth'
 import { useSymbolDisplay } from '@/hooks/useSymbolDisplay'
 import {
   ArrowLeft, Trophy,
@@ -23,6 +24,34 @@ import {
 import { downloadCSV } from '@/utils/csv'
 import EODChartTab from './EODChartTab'
 import clsx from 'clsx'
+
+// ── Sector coloring (Positions table dots) ────────────────────────────────────
+// Reuses the PSX securities directory already served by `dividendApi.symbols()`
+// (same endpoint that powers the Dividends page's search) — no new backend call.
+
+const SECTOR_DOT: { match: RegExp; className: string }[] = [
+  { match: /bank/i,                    className: 'bg-accent dark:bg-dark-accent' },
+  { match: /cement/i,                  className: 'bg-warning dark:bg-dark-warning' },
+  { match: /chemical|fertilizer/i,     className: 'bg-success dark:bg-dark-success' },
+  { match: /oil|gas|energy|exploration/i, className: 'bg-iba dark:bg-dark-iba' },
+]
+
+function sectorDotClass(sectorName?: string): string {
+  if (!sectorName) return 'bg-ink-disabled dark:bg-dark-ink-disabled'
+  const hit = SECTOR_DOT.find(s => s.match.test(sectorName))
+  return hit?.className ?? 'bg-ink-disabled dark:bg-dark-ink-disabled'
+}
+
+function useSectorMap() {
+  const { data } = useQuery({
+    queryKey: ['psx-symbols'],
+    queryFn: () => dividendApi.symbols(),
+    staleTime: 24 * 60 * 60_000,
+  })
+  const map = new Map<string, { sectorName: string; name: string }>()
+  data?.symbols.forEach(s => map.set(s.symbol.toUpperCase(), { sectorName: s.sectorName, name: s.name }))
+  return map
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -66,7 +95,7 @@ function PerformanceChart({ challengeId, initialCapital }: { challengeId: string
   const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
-  const seriesRef = useRef<ISeriesApi<'Line'> | null>(null)
+  const seriesRef = useRef<ISeriesApi<'Area'> | null>(null)
   const isDark = theme === 'dark'
 
   const { data } = useQuery({
@@ -95,8 +124,10 @@ function PerformanceChart({ challengeId, initialCapital }: { challengeId: string
       height: 240,
     })
 
-    const series = chart.addLineSeries({
-      color: lineColor, lineWidth: 2,
+    const series = chart.addAreaSeries({
+      lineColor, lineWidth: 2,
+      topColor: isDark ? 'rgba(77,136,255,0.28)' : 'rgba(26,92,255,0.22)',
+      bottomColor: isDark ? 'rgba(77,136,255,0)' : 'rgba(26,92,255,0)',
       priceLineVisible: false, lastValueVisible: true,
       crosshairMarkerRadius: 4,
     })
@@ -139,6 +170,7 @@ function PerformanceChart({ challengeId, initialCapital }: { challengeId: string
 
 function PortfolioTab({ challengeId }: { challengeId: string }) {
   const { formatSymbol } = useSymbolDisplay()
+  const sectorMap = useSectorMap()
   const { data, isLoading } = useQuery({
     queryKey: ['challenge-portfolio', challengeId],
     queryFn: () => challengeApi.getPortfolio(challengeId),
@@ -150,15 +182,22 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
   if (!data) return null
 
   const up = data.returnPct >= 0
+  const gainLoss = data.totalValue - data.initialCapital
 
   return (
     <div className="space-y-5">
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Stat label="Portfolio Value" value={fmtPKR(data.totalValue)} />
+      <div className="grid grid-cols-2 sm:grid-cols-[1.3fr_1fr_1fr_1fr] gap-3">
+        <StatCard
+          variant="featured"
+          label="Portfolio Value"
+          value={fmtPKR(data.totalValue)}
+          delta={data.returnPct}
+          deltaLabel={`· ${gainLoss >= 0 ? '+' : ''}${fmtPKR(gainLoss)}`}
+        />
         <Stat label="Cash Balance" value={fmtPKR(data.cashBalance)} />
         <Stat label="Invested" value={fmtPKR(data.marketValue)} />
-        <Stat label="Total Return" value={pct(data.returnPct)} sub={fmtPKR(data.totalValue - data.initialCapital)} positive={up} />
+        <Stat label="Total Return" value={pct(data.returnPct)} sub={fmtPKR(gainLoss)} positive={up} />
       </div>
 
       {/* Performance chart */}
@@ -196,7 +235,12 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
                   const up = p.unrealizedPnL >= 0
                   return (
                     <tr key={p.symbol} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
-                      <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{formatSymbol(p.symbol)}</td>
+                      <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">
+                        <span className="flex items-center gap-2">
+                          <span className={clsx('w-1.5 h-1.5 rounded-full flex-shrink-0', sectorDotClass(sectorMap.get(p.symbol.toUpperCase())?.sectorName))} />
+                          {formatSymbol(p.symbol)}
+                        </span>
+                      </td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{p.quantity.toLocaleString()}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink-secondary dark:text-dark-ink-secondary">{fmt(p.avgCost)}</td>
                       <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{fmt(p.currentPrice)}</td>
@@ -253,41 +297,30 @@ function DividendsSection({ challengeId }: { challengeId: string }) {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border dark:border-dark-border text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide">
-                <th className="text-left px-4 py-2">Symbol</th>
-                <th className="text-left px-4 py-2">Type</th>
-                <th className="text-left px-4 py-2">Announcement</th>
-                <th className="text-right px-4 py-2">Shares Held</th>
-                <th className="text-right px-4 py-2">Credited</th>
-                <th className="text-right px-4 py-2">Book Closure</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border dark:divide-dark-border">
-              {dividends.map((d: ChallengeDividend) => (
-                <tr key={d.id} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
-                  <td className="px-4 py-2.5 font-mono font-semibold text-ink dark:text-dark-ink">{formatSymbol(d.symbol)}</td>
-                  <td className="px-4 py-2.5">
-                    <Badge variant={d.kind === 'dividend' ? 'success' : 'accent'} size="sm">
-                      {d.kind === 'dividend' ? 'Dividend' : 'Bonus'}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2.5 text-ink-secondary dark:text-dark-ink-secondary font-mono text-xs">{d.announcement}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-ink-secondary dark:text-dark-ink-secondary">{d.quantityHeld.toLocaleString()}</td>
-                  <td className="px-4 py-2.5 text-right font-mono font-semibold text-success dark:text-dark-success">
-                    {d.kind === 'dividend'
-                      ? `+PKR ${fmt(d.cashCredited)}`
-                      : `+${d.sharesCredited.toLocaleString()} shares`}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-xs text-ink-tertiary dark:text-dark-ink-tertiary">
-                    {new Date(d.bookClosureStart + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="divide-y divide-border dark:divide-dark-border">
+          {dividends.map((d: ChallengeDividend) => (
+            <div key={d.id} className="flex items-center gap-3.5 px-4 py-3">
+              <div className="w-7 h-7 rounded-md bg-success-muted dark:bg-dark-success-muted flex items-center justify-center flex-shrink-0">
+                <Banknote className="w-3.5 h-3.5 text-success dark:text-dark-success" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-ink dark:text-dark-ink">
+                  <span className="font-mono font-semibold">{formatSymbol(d.symbol)}</span>
+                  {' · '}{d.kind === 'dividend' ? 'Cash dividend' : 'Bonus shares'}
+                  <span className="text-ink-tertiary dark:text-dark-ink-tertiary font-mono text-xs"> ({d.announcement})</span>
+                </p>
+                <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-0.5">
+                  Credited {new Date(d.bookClosureStart + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  {' · '}{d.quantityHeld.toLocaleString()} shares held
+                </p>
+              </div>
+              <span className="font-mono font-semibold text-success dark:text-dark-success text-sm flex-shrink-0">
+                {d.kind === 'dividend'
+                  ? `+PKR ${fmt(d.cashCredited)}`
+                  : `+${d.sharesCredited.toLocaleString()} shares`}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -304,6 +337,7 @@ const CHALLENGE_ORDER_TYPES: { value: 'market' | 'limit'; label: string; descrip
 function OrdersTab({ challengeId }: { challengeId: string }) {
   const qc = useQueryClient()
   const { formatSymbol } = useSymbolDisplay()
+  const sectorMap = useSectorMap()
   const [symbol, setSymbol] = useState('')
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market')
@@ -330,9 +364,12 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
     enabled: !!symbol,
     staleTime: 8 * 60 * 60_000,
   })
-  const lastPrice = eodHistory?.bars?.length
-    ? eodHistory.bars[eodHistory.bars.length - 1].close
-    : undefined
+  const bars = eodHistory?.bars ?? []
+  const lastBar = bars[bars.length - 1]
+  const prevBar = bars[bars.length - 2]
+  const lastPrice = lastBar?.close
+  const priceChange = lastBar && prevBar ? lastBar.close - prevBar.close : undefined
+  const priceChangePct = priceChange !== undefined && prevBar.close ? (priceChange / prevBar.close) * 100 : undefined
 
   const { data, isLoading } = useQuery({
     queryKey: ['challenge-orders', challengeId],
@@ -388,6 +425,26 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
       <div className="space-y-4">
         <Card>
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Live quote strip */}
+            {symbol && lastPrice !== undefined && (
+              <div className="flex items-center justify-between pb-4 border-b border-border dark:border-dark-border">
+                <div>
+                  <p className="font-mono text-lg font-semibold text-ink dark:text-dark-ink">{formatSymbol(symbol)}</p>
+                  <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary">
+                    {sectorMap.get(symbol.toUpperCase())?.name ?? '—'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-mono text-lg font-semibold text-ink dark:text-dark-ink">{fmt(lastPrice)}</p>
+                  {priceChange !== undefined && priceChangePct !== undefined && (
+                    <p className={clsx('text-[11px] font-semibold', priceChange >= 0 ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
+                      {priceChange >= 0 ? '+' : ''}{fmt(priceChange)} ({priceChange >= 0 ? '+' : ''}{fmt(priceChangePct)}%)
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* EOD fill notice */}
             <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary border border-border dark:border-dark-border rounded px-3 py-2 bg-surface-secondary dark:bg-dark-surface-secondary">
               Orders fill at end-of-day (16:35 PKT) using live PSX closing prices.
@@ -615,6 +672,7 @@ function OrdersTab({ challengeId }: { challengeId: string }) {
 // ── Leaderboard tab ───────────────────────────────────────────────────────────
 
 function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; initialCapital: number }) {
+  const user = useAuthStore(s => s.user)
   const { data, isLoading } = useQuery({
     queryKey: ['challenge-leaderboard', challengeId],
     queryFn: () => challengeApi.getLeaderboard(challengeId),
@@ -625,6 +683,13 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
   if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>
 
   const board = data?.leaderboard ?? []
+  const myName = user ? `${user.firstName} ${user.lastName}` : null
+  // Best-effort "is this me" match — the leaderboard doesn't carry the viewer's own
+  // participant id, so we compare against the logged-in student's full name.
+  const isYou = (entry: LeaderboardEntry) => entry.email ? entry.email === user?.email : entry.displayName === myName
+  const topValue = board[0]?.portfolioValue || 1
+  const podium = board.slice(0, 3)
+  const rest = board.slice(3)
 
   function handleDownload() {
     const rows: string[][] = [['Rank', 'Name', 'Portfolio Value (PKR)', 'Return %', 'Gain/Loss (PKR)']]
@@ -639,11 +704,9 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
     })
     downloadCSV(rows, `leaderboard-${challengeId}.csv`)
   }
-  const top3Colors = ['text-yellow-500', 'text-slate-400', 'text-amber-600']
-
   return (
-    <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg overflow-hidden">
-      <div className="px-4 py-3 border-b border-border dark:border-dark-border flex items-center gap-2">
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
         <Trophy className="w-4 h-4 text-ink dark:text-dark-ink" />
         <p className="text-sm font-medium text-ink dark:text-dark-ink">Leaderboard</p>
         <span className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary ml-auto">
@@ -660,46 +723,81 @@ function LeaderboardTab({ challengeId, initialCapital }: { challengeId: string; 
           </button>
         )}
       </div>
+
       {board.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-10 gap-2">
+        <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg flex flex-col items-center justify-center py-10 gap-2">
           <Medal className="w-6 h-6 text-ink-disabled dark:text-dark-ink-disabled" />
           <p className="text-sm text-ink-tertiary dark:text-dark-ink-tertiary">No participants yet</p>
         </div>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border dark:border-dark-border text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary uppercase tracking-wide">
-              <th className="text-left px-4 py-2">#</th>
-              <th className="text-left px-4 py-2">Participant</th>
-              <th className="text-right px-4 py-2">Portfolio</th>
-              <th className="text-right px-4 py-2">Return</th>
-              <th className="text-right px-4 py-2">vs Initial</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border dark:divide-dark-border">
-            {board.map((entry: LeaderboardEntry) => {
-              const up = entry.returnPct >= 0
-              const gainLoss = entry.portfolioValue - initialCapital
-              return (
-                <tr key={entry.participantId} className="hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary">
-                  <td className="px-4 py-2.5">
-                    <span className={clsx('font-bold text-sm', entry.rank <= 3 ? top3Colors[entry.rank - 1] : 'text-ink-tertiary dark:text-dark-ink-tertiary')}>
-                      {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : `#${entry.rank}`}
+        <>
+          {/* Podium — ranks 1-3 */}
+          {podium.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 items-end">
+              {[podium[1], podium[0], podium[2]].map((entry, slot) => {
+                if (!entry) return <div key={slot} />
+                const isFirst = entry.rank === 1
+                return (
+                  <div
+                    key={entry.participantId}
+                    className={clsx(
+                      'rounded-lg text-center px-4',
+                      isFirst ? 'surface-feature py-6 shadow-modal' : 'bg-surface dark:bg-dark-surface border border-border dark:border-dark-border py-4.5',
+                    )}
+                  >
+                    <Avatar name={entry.displayName} paletteIndex={entry.rank} isSelf={isYou(entry)} size={isFirst ? 'lg' : 'md'} className="mx-auto" />
+                    <p className={clsx('mt-2', isFirst ? 'text-2xl' : 'text-lg')}>{['🥇', '🥈', '🥉'][entry.rank - 1]}</p>
+                    <p className={clsx('mt-1 font-medium truncate', isFirst ? 'text-sm text-white' : 'text-xs text-ink dark:text-dark-ink')}>
+                      {entry.displayName}
+                    </p>
+                    <p className={clsx(
+                      'font-mono font-bold mt-0.5',
+                      isFirst ? 'text-base' : 'text-sm',
+                      entry.returnPct >= 0 ? (isFirst ? 'text-dark-success' : 'text-success dark:text-dark-success') : (isFirst ? 'text-dark-danger' : 'text-danger dark:text-dark-danger'),
+                    )}>
+                      {pct(entry.returnPct)}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Ranks 4+ */}
+          {rest.length > 0 && (
+            <div className="bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg overflow-hidden divide-y divide-border dark:divide-dark-border">
+              {rest.map((entry: LeaderboardEntry) => {
+                const up = entry.returnPct >= 0
+                const gainLoss = entry.portfolioValue - initialCapital
+                const you = isYou(entry)
+                return (
+                  <div
+                    key={entry.participantId}
+                    className={clsx('relative flex items-center gap-3 px-4 py-2.5', you && 'bg-accent-muted/40 dark:bg-dark-accent-muted/40')}
+                  >
+                    <div
+                      className="absolute inset-y-0 left-0 bg-accent/[0.04] dark:bg-dark-accent/[0.06] pointer-events-none"
+                      style={{ width: `${Math.min(100, (entry.portfolioValue / topValue) * 100)}%` }}
+                    />
+                    <span className="relative w-6 text-xs font-bold text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0">#{entry.rank}</span>
+                    <Avatar name={entry.displayName} paletteIndex={entry.rank} isSelf={you} size="sm" className="relative" />
+                    <span className="relative flex-1 min-w-0 flex items-center gap-2 text-sm font-medium text-ink dark:text-dark-ink truncate">
+                      {entry.displayName}
+                      {you && <Badge variant="accent" size="sm">YOU</Badge>}
                     </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-medium text-ink dark:text-dark-ink">{entry.displayName}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-ink dark:text-dark-ink">{fmtPKR(entry.portfolioValue)}</td>
-                  <td className={clsx('px-4 py-2.5 text-right font-mono font-semibold', up ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
-                    {pct(entry.returnPct)}
-                  </td>
-                  <td className={clsx('px-4 py-2.5 text-right font-mono text-sm', up ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
-                    {gainLoss >= 0 ? '+' : ''}{fmt(gainLoss, 0)}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                    <span className="relative font-mono text-sm text-ink dark:text-dark-ink w-28 text-right flex-shrink-0">{fmtPKR(entry.portfolioValue)}</span>
+                    <span className={clsx('relative font-mono text-sm font-semibold w-20 text-right flex-shrink-0', up ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
+                      {pct(entry.returnPct)}
+                    </span>
+                    <span className={clsx('relative font-mono text-xs w-20 text-right flex-shrink-0 hidden sm:inline', up ? 'text-success dark:text-dark-success' : 'text-danger dark:text-dark-danger')}>
+                      {gainLoss >= 0 ? '+' : ''}{fmt(gainLoss, 0)}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
