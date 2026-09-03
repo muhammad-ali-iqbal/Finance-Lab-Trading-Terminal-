@@ -8,6 +8,20 @@ import { ThemeToggle } from '@/components/ui'
 import { useTheme } from '@/context/ThemeContext'
 import { Eye, EyeOff } from 'lucide-react'
 
+/** Small candlestick glyph so SimTrader has a mark to pair with the IBA crest, not just a wordmark. */
+function SimTraderGlyph({ accent, dim, size = 30 }: { accent: string; dim: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="7" y="11" width="4" height="12" rx="1" fill={dim} />
+      <line x1="9" y1="6" x2="9" y2="11" stroke={dim} strokeWidth="1.5" />
+      <line x1="9" y1="23" x2="9" y2="26" stroke={dim} strokeWidth="1.5" />
+      <rect x="19" y="4" width="4" height="14" rx="1" fill={accent} />
+      <line x1="21" y1="2" x2="21" y2="4" stroke={accent} strokeWidth="1.5" />
+      <line x1="21" y1="18" x2="21" y2="21" stroke={accent} strokeWidth="1.5" />
+    </svg>
+  )
+}
+
 export default function LoginPage() {
   const navigate  = useNavigate()
   const setAuth   = useAuthStore(s => s.setAuth)
@@ -70,25 +84,30 @@ export default function LoginPage() {
             style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.18), transparent)' }} />
         </>}
 
-        <div className="relative z-10 self-start">
+        <div className="relative z-10 self-start flex items-center gap-4">
           <img
             src={`${import.meta.env.BASE_URL}iba-logo.png`}
             alt="Institute of Business Administration — 70 Years & Beyond"
-            className="h-24 w-auto object-contain"
+            className="h-16 w-auto object-contain"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
-          <div
-            className="mt-6 pt-5 border-t"
-            style={{ borderColor: dark ? 'rgba(255,255,255,0.10)' : 'rgba(242,241,239,0.16)' }}
-          >
-            <p className="font-semibold tracking-tight text-sm leading-tight"
-              style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
-              SimTrader
-            </p>
-            <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
-              style={{ color: dark ? '#b81481' : '#C4526A' }}>
-              Finance Lab
-            </p>
+          <div className="h-12 w-px flex-shrink-0"
+            style={{ backgroundColor: dark ? 'rgba(255,255,255,0.14)' : 'rgba(242,241,239,0.22)' }} />
+          <div className="flex items-center gap-2.5">
+            <SimTraderGlyph
+              accent={dark ? '#b81481' : '#8B1A2A'}
+              dim={dark ? 'rgba(255,255,255,0.45)' : 'rgba(242,241,239,0.55)'}
+            />
+            <div>
+              <p className="font-semibold tracking-tight text-lg leading-tight"
+                style={{ color: dark ? '#ffffff' : '#F2F1EF' }}>
+                SimTrader
+              </p>
+              <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
+                style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
+                Finance Lab
+              </p>
+            </div>
           </div>
         </div>
 
@@ -126,23 +145,32 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-sm animate-fade-up">
-          {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2.5 mb-10">
+          {/* Mobile logo — same peer lockup as the desktop panel, scaled down */}
+          <div className="flex lg:hidden items-center gap-3 mb-10">
             <img
               src={`${import.meta.env.BASE_URL}iba-mark.png`}
               alt="IBA"
               className="h-8 w-auto object-contain"
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />
-            <div>
-              <p className="font-semibold tracking-tight text-sm leading-tight"
-                style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
-                SimTrader
-              </p>
-              <p className="text-[9px] font-semibold tracking-widest uppercase leading-tight"
-                style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
-                Finance Lab
-              </p>
+            <div className="h-6 w-px flex-shrink-0"
+              style={{ backgroundColor: dark ? 'rgba(255,255,255,0.14)' : 'rgba(15,15,14,0.14)' }} />
+            <div className="flex items-center gap-2">
+              <SimTraderGlyph
+                size={22}
+                accent={dark ? '#b81481' : '#8B1A2A'}
+                dim={dark ? 'rgba(255,255,255,0.45)' : 'rgba(15,15,14,0.4)'}
+              />
+              <div>
+                <p className="font-semibold tracking-tight text-sm leading-tight"
+                  style={{ color: dark ? '#ffffff' : '#0F0F0E' }}>
+                  SimTrader
+                </p>
+                <p className="text-[9px] font-semibold tracking-widest uppercase leading-tight"
+                  style={{ color: dark ? '#b81481' : '#8B1A2A' }}>
+                  Finance Lab
+                </p>
+              </div>
             </div>
           </div>
 
