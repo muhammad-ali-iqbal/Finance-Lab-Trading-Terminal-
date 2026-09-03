@@ -192,6 +192,7 @@ function PortfolioTab({ challengeId }: { challengeId: string }) {
           variant="featured"
           label="Portfolio Value"
           value={fmtPKR(data.totalValue)}
+          mono
           delta={data.returnPct}
           deltaLabel={`· ${gainLoss >= 0 ? '+' : ''}${fmtPKR(gainLoss)}`}
         />

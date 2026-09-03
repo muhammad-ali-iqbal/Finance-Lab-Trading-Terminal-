@@ -199,7 +199,7 @@ export function StatCard({ label, value, delta, deltaLabel, mono, variant = 'sol
     return (
       <div className={clsx('surface-feature flex flex-col gap-1 p-4', className)}>
         <span className="relative text-[11px] font-medium uppercase tracking-widest text-white/50">{label}</span>
-        <span className={clsx('relative font-display text-3xl text-white', mono && 'font-mono tabular-nums')}>
+        <span className={clsx('relative text-3xl text-white', mono ? 'font-mono tabular-nums' : 'font-display')}>
           {value}
         </span>
         {delta !== undefined && (
