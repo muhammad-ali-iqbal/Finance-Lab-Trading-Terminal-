@@ -5,8 +5,9 @@ import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/auth'
 import { Button, Input, Alert, ThemeToggle } from '@/components/ui'
-import { Eye, EyeOff, TrendingUp, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
 import { passwordRequirements as requirements, isPasswordValid } from '@/utils/password'
+import { AuthBrandingPanel, AuthMobileLockup } from './AuthBranding'
 
 export default function RegisterPage() {
   const [params] = useSearchParams()
@@ -45,38 +46,45 @@ export default function RegisterPage() {
 
   if (!inviteToken) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-secondary dark:bg-dark-surface-secondary">
-        <div className="text-center space-y-2 max-w-sm px-4">
-          <h2 className="text-lg font-semibold text-ink dark:text-dark-ink">Invalid invitation link</h2>
-          <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">
-            This link is missing a token. Please use the link from your invitation email, or contact your instructor.
-          </p>
+      <div className="min-h-screen flex bg-surface-secondary dark:bg-dark-surface">
+        <AuthBrandingPanel />
+        <div className="flex-1 flex items-center justify-center p-6 relative ambient-bg">
+          <div className="absolute top-4 right-4 z-10">
+            <ThemeToggle />
+          </div>
+          <div className="relative z-10 text-center space-y-2 max-w-sm px-4">
+            <h2 className="text-lg font-semibold text-ink dark:text-dark-ink">Invalid invitation link</h2>
+            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary">
+              This link is missing a token. Please use the link from your invitation email, or contact your instructor.
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-surface-secondary dark:bg-dark-surface-secondary flex items-center justify-center p-6 relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-md animate-fade-up">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-7 h-7 bg-ink dark:bg-dark-ink rounded-sm flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-surface dark:text-dark-surface" strokeWidth={2.5} />
+    <div className="min-h-screen flex bg-surface-secondary dark:bg-dark-surface">
+      {/* ── Left branding panel ── */}
+      <AuthBrandingPanel />
+
+      {/* ── Right form panel ── */}
+      <div className="flex-1 flex items-center justify-center p-6 relative ambient-bg">
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
+        </div>
+        <div className="relative z-10 w-full max-w-md animate-fade-up">
+          {/* Mobile logo — same peer lockup as the desktop panel, scaled down */}
+          <AuthMobileLockup />
+
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-ink dark:text-dark-ink tracking-tight">Create your account</h1>
+            <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-1">
+              You've been invited to SimTrader. Set up your profile to get started.
+            </p>
           </div>
-          <span className="font-semibold tracking-tight text-ink dark:text-dark-ink">SimTrader</span>
-        </div>
 
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-ink dark:text-dark-ink tracking-tight">Create your account</h1>
-          <p className="text-sm text-ink-secondary dark:text-dark-ink-secondary mt-1">
-            You've been invited to SimTrader. Set up your profile to get started.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
           {register.isError && (
             <Alert
               variant="error"
@@ -153,6 +161,7 @@ export default function RegisterPage() {
             Create account
           </Button>
         </form>
+        </div>
       </div>
     </div>
   )
