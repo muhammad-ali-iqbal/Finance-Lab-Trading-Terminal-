@@ -1,11 +1,11 @@
 # Graph Report - .  (2026-09-04)
 
 ## Corpus Check
-- 103 files · ~1,575,922 words
+- 103 files · ~1,576,102 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 814 nodes · 1508 edges · 121 communities detected
+- 816 nodes · 1510 edges · 121 communities detected
 - Extraction: 58% EXTRACTED · 42% INFERRED · 0% AMBIGUOUS · INFERRED: 634 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -147,14 +147,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `main()` --calls--> `NewSMTPMailer()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\auth\mailer.go
+- `main()` --calls--> `NewEngine()`  [INFERRED]
+  simtrader\cmd\server\main.go → simtrader\internal\order\engine.go
 - `main()` --calls--> `NewOrderRepository()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\order\handler.go
 - `main()` --calls--> `NewReconciler()`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\challenge\reconciler.go
 - `jsonErrorHandler()` --calls--> `Status`  [INFERRED]
   simtrader\cmd\server\main.go → simtrader\internal\user\model.go
-- `get_connection()` --calls--> `Connect()`  [INFERRED]
-  psx_tracker\database.py → simtrader\internal\db\db.go
 
 ## Hyperedges (group relationships)
 - **Student Trading Flow (Order â†’ Portfolio â†’ P&L)** — claudemd_order_module, claudemd_portfolio_module, claudemd_simulation_clock [INFERRED 0.85]
@@ -166,40 +166,40 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.07
-Nodes (15): GetClaims(), Handler, BadRequest(), InternalError(), adminID(), adminUserID(), mapAuthError(), Handler (+7 more)
+Cohesion: 0.08
+Nodes (13): GetClaims(), Handler, BadRequest(), InternalError(), adminID(), adminUserID(), Handler, Handler (+5 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.05
-Nodes (18): Announcement, AccessRow, EODBar, LeaderboardRow, Reconciler, Repository, Close(), Migrate() (+10 more)
+Nodes (20): AccessRow, EODBar, LeaderboardRow, Reconciler, Repository, Close(), Connect(), Migrate() (+12 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
 Nodes (58): db(), get_connection(), get_known_tickers(), get_ticker_names(), init_db(), last_fetch_date(), log_fetch(), securities: list of dicts with keys symbol, name, sector.     Backfills name/sec (+50 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.07
-Nodes (12): NewClock(), toggle(), parseCSVRow(), validateHeader(), Client, Clock, ClockRegistry, Repository (+4 more)
+Cohesion: 0.06
+Nodes (23): authResponse, forgotPasswordRequest, Handler, loginRequest, logoutRequest, Mailer, NoOpMailer, refreshRequest (+15 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.08
-Nodes (15): Handler, Mailer, NoOpMailer, Service, TokenPair, generateSecureToken(), hashPassword(), hashToken() (+7 more)
+Cohesion: 0.07
+Nodes (14): Announcement, NewClock(), toggle(), NewRepository(), parseCSVRow(), validateHeader(), Client, Clock (+6 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.05
-Nodes (32): authResponse, forgotPasswordRequest, loginRequest, logoutRequest, refreshRequest, registerRequest, resetPasswordRequest, Challenge (+24 more)
+Cohesion: 0.07
+Nodes (21): Mailer, Repository, Service, StudentLister, cacheEntry, Handler, Payout, Result (+13 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (23): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+15 more)
+Cohesion: 0.06
+Nodes (28): createRequest, Handler, previewRequest, Challenge, ChallengeOrder, ChallengePosition, EODPrice, leaderboardEntry (+20 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.08
 Nodes (14): handler(), ParsedPayout, onClickOutside(), td(), toDateStr(), ParseAnnouncement(), ParseBookClosureStart(), TestParseAnnouncement() (+6 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.1
-Nodes (14): createRequest, Handler, Mailer, previewRequest, Repository, Service, StudentLister, excludeStudents() (+6 more)
+Cohesion: 0.11
+Nodes (20): extractBearerToken(), NewStatusGuard(), RequireAuth(), RequireRole(), Config, getEnv(), Load(), parseDuration() (+12 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.1
@@ -210,44 +210,44 @@ Cohesion: 0.1
 Nodes (9): clsx(), fmt(), fmtPKR(), handleDownload(), pct(), PerformanceChart(), downloadCSV(), useTheme() (+1 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.17
-Nodes (7): Connect(), requireTLS(), respond(), OrderRepository, Handler, main(), sync_to_simtrader.py -------------------- One-shot script to bulk-push all histo
-
-### Community 12 - "Community 12"
-Cohesion: 0.13
-Nodes (10): cacheEntry, Handler, Payout, Result, Service, Symbol, cleanCell(), parsePayoutsHTML() (+2 more)
-
-### Community 13 - "Community 13"
 Cohesion: 0.18
 Nodes (18): detect_columns(), expand_daily_to_minutes(), forward_fill_gaps(), _in_session(), main(), parse_daily_file(), parse_datetime(), parse_intraday_file() (+10 more)
 
-### Community 14 - "Community 14"
+### Community 12 - "Community 12"
 Cohesion: 0.17
 Nodes (17): forward_fill_gaps(), _in_session(), main(), parse_bloomberg_paste(), _parse_price(), _parse_volume(), _pkt_to_datetime(), _pkt_to_utc() (+9 more)
 
-### Community 15 - "Community 15"
+### Community 13 - "Community 13"
+Cohesion: 0.16
+Nodes (7): Handler, HistoryPoint, LeaderboardEntry, Portfolio, Position, Repository, SimRepo
+
+### Community 14 - "Community 14"
 Cohesion: 0.27
 Nodes (4): loginAuth, SMTPMailer, newLoginAuth(), NewSMTPMailer()
+
+### Community 15 - "Community 15"
+Cohesion: 0.22
+Nodes (9): appendDetail(), parseEmailList(), assertSlice(), TestAppendDetail(), TestParseEmailList(), bulkInviteRequest, bulkInviteResult, challengeGrant (+1 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.22
 Nodes (3): handleBold(), handleItalic(), wrapSelection()
 
 ### Community 17 - "Community 17"
-Cohesion: 0.24
-Nodes (8): appendDetail(), parseEmailList(), assertSlice(), TestAppendDetail(), TestParseEmailList(), bulkInviteRequest, bulkInviteResult, parsedEmails
+Cohesion: 0.42
+Nodes (2): respond(), Handler
 
 ### Community 18 - "Community 18"
 Cohesion: 0.36
 Nodes (9): forward_fill(), in_session(), main(), parse_file(), parse_row_date(), pf(), pkt_to_utc(), PSO.PK.txt  →  PSO   (strips exchange suffix like .PK, .KAR) (+1 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.25
-Nodes (5): HistoryPoint, LeaderboardEntry, Portfolio, Position, SimRepo
+Cohesion: 0.22
+Nodes (0): 
 
 ### Community 20 - "Community 20"
-Cohesion: 0.25
-Nodes (0): 
+Cohesion: 0.39
+Nodes (3): calcFees(), NewEngine(), Engine
 
 ### Community 21 - "Community 21"
 Cohesion: 0.29
@@ -650,7 +650,7 @@ Cohesion: 1.0
 Nodes (1): Light/Dark Mode Toggle UI Component
 
 ## Knowledge Gaps
-- **168 isolated node(s):** `securities: list of dicts with keys symbol, name, sector.     Backfills name/sec`, `Return ticker symbols. By default only active series (status=1) are returned.`, `rows: list of dicts with keys symbol, date, open, high, low, close, volume`, `Return ticker symbols. By default only active series (status=1) are returned.`, `Mark `active_symbols` with status=1 and every other known ticker with status=0.` (+163 more)
+- **169 isolated node(s):** `securities: list of dicts with keys symbol, name, sector.     Backfills name/sec`, `Return ticker symbols. By default only active series (status=1) are returned.`, `rows: list of dicts with keys symbol, date, open, high, low, close, volume`, `Return ticker symbols. By default only active series (status=1) are returned.`, `Mark `active_symbols` with status=1 and every other known ticker with status=0.` (+164 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 36`** (2 nodes): `processPending()`, `client.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -826,11 +826,11 @@ Nodes (1): Light/Dark Mode Toggle UI Component
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `main()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 8`, `Community 11`, `Community 15`?**
+- **Why does `main()` connect `Community 8` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 14`, `Community 17`, `Community 20`?**
   _High betweenness centrality (0.147) - this node is a cross-community bridge._
-- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 11`, `Community 12`, `Community 15`?**
+- **Why does `Close()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 5`, `Community 6`, `Community 8`, `Community 13`, `Community 14`, `Community 20`?**
   _High betweenness centrality (0.075) - this node is a cross-community bridge._
-- **Why does `Status` connect `Community 0` to `Community 3`, `Community 12`, `Community 6`?**
+- **Why does `Status` connect `Community 0` to `Community 3`, `Community 4`, `Community 5`, `Community 8`, `Community 13`?**
   _High betweenness centrality (0.060) - this node is a cross-community bridge._
 - **Are the 65 inferred relationships involving `BadRequest()` (e.g. with `.Create()` and `.Preview()`) actually correct?**
   _`BadRequest()` has 65 INFERRED edges - model-reasoned connections that need verification._
