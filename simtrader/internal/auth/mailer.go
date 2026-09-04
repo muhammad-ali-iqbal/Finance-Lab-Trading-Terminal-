@@ -338,7 +338,7 @@ body { margin: 0; padding: 0; background-color: #F4F1EC; }
         <!-- CTA button -->
         <div style="text-align: center; margin: 0 0 32px 0;">
           <a class="em-btn" href="%s" style="display: inline-block; padding: 14px 36px; background-color: #8B1A2A; border-bottom: 2px solid #5E1020; font-family: 'EB Garamond', Georgia, serif; font-size: 15px; font-weight: 600; color: #F4F1EC; text-decoration: none; letter-spacing: 2px; text-transform: uppercase;">
-            Establish Your Account
+            Verify Your Account
           </a>
         </div>
 
