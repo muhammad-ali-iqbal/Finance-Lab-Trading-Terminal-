@@ -69,9 +69,9 @@ export const userApi = {
     return data
   },
 
-  // Bulk invite: one pending account + invite email per address, with an
-  // optional challenge access grant applied to every invitee.
-  bulkInvite: async (input: { emails: string[]; challengeId?: string }) => {
+  // Bulk invite: one pending account + invite email per address, with
+  // optional challenge access grants (one or more) applied to every invitee.
+  bulkInvite: async (input: { emails: string[]; challengeIds?: string[] }) => {
     const { data } = await client.post<BulkInviteResponse>('/admin/users/invite/bulk', input)
     return data
   },

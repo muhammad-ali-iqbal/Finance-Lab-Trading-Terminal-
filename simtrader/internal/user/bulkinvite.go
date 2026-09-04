@@ -2,7 +2,7 @@
 //
 // Bulk student invites. An admin pastes a list of emails (one classroom
 // section at a time) and gets a per-email report back, optionally granting
-// access to a challenge in the same action.
+// access to one or more challenges in the same action.
 //
 // Each email goes through the same PasswordVerifier.InviteStudent call the
 // single-invite endpoint uses, so token generation, expiry and mailing stay in
@@ -42,11 +42,18 @@ const (
 
 type bulkInviteRequest struct {
 	Emails []string `json:"emails"`
-	// ChallengeID optionally grants access to a challenge as part of the
-	// invite, so a section can be invited and enrolled in one step. Access is
-	// granted against the pending user row, so it takes effect the moment they
-	// finish registration.
-	ChallengeID string `json:"challengeId,omitempty"`
+	// ChallengeIDs optionally grants access to one or more challenges as part
+	// of the invite, so a section can be invited and enrolled into several
+	// challenges in one step. Access is granted against the pending user row,
+	// so it takes effect the moment they finish registration.
+	ChallengeIDs []string `json:"challengeIds,omitempty"`
+}
+
+// challengeGrant is one challenge (and its resolved starting capital) to
+// grant every invitee access to.
+type challengeGrant struct {
+	id      uuid.UUID
+	capital float64
 }
 
 type bulkInviteResult struct {
@@ -96,7 +103,7 @@ func parseEmailList(raw []string) parsedEmails {
 
 // BulkInviteStudents godoc
 // POST /api/admin/users/invite/bulk
-// Body: { emails: [...], challengeId?: uuid }
+// Body: { emails: [...], challengeIds?: uuid[] }
 // Creates a pending student account per address and sends each invite email.
 func (h *Handler) BulkInviteStudents(c *fiber.Ctx) error {
 	var req bulkInviteRequest
@@ -112,26 +119,24 @@ func (h *Handler) BulkInviteStudents(c *fiber.Ctx) error {
 		return httputil.BadRequest(c, "too many emails in one request (max 100)")
 	}
 
-	// Resolve the optional challenge up front so a bad id fails before any
-	// invite is sent, and so the starting capital is fetched once.
-	var (
-		challengeID uuid.UUID
-		capital     float64
-		grantAccess bool
-	)
-	if req.ChallengeID != "" {
+	// Resolve the optional challenges up front so a bad id fails before any
+	// invite is sent, and so each starting capital is fetched once.
+	var grants []challengeGrant
+	if len(req.ChallengeIDs) > 0 {
 		if h.access == nil {
 			return httputil.BadRequest(c, "challenge access is unavailable")
 		}
-		id, err := uuid.Parse(req.ChallengeID)
-		if err != nil {
-			return httputil.BadRequest(c, "invalid challengeId")
+		for _, raw := range req.ChallengeIDs {
+			id, err := uuid.Parse(raw)
+			if err != nil {
+				return httputil.BadRequest(c, "invalid challengeId")
+			}
+			initial, err := h.access.GetChallengeCapital(c.Context(), id)
+			if err != nil {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
+			}
+			grants = append(grants, challengeGrant{id: id, capital: initial})
 		}
-		initial, err := h.access.GetChallengeCapital(c.Context(), id)
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "challenge not found"})
-		}
-		challengeID, capital, grantAccess = id, initial, true
 	}
 
 	results := make([]bulkInviteResult, 0, len(parsed.Valid)+len(parsed.Invalid))
@@ -167,8 +172,8 @@ func (h *Handler) BulkInviteStudents(c *fiber.Ctx) error {
 			failed++
 		}
 
-		if grantAccess {
-			if detail := h.grantChallengeAccess(c, challengeID, capital, email, u); detail != "" {
+		for _, g := range grants {
+			if detail := h.grantChallengeAccess(c, g.id, g.capital, email, u); detail != "" {
 				res.Detail = appendDetail(res.Detail, detail)
 			}
 		}

@@ -15,9 +15,9 @@ import type { User } from '@/types'
 // ── Invite modal ──────────────────────────────────────────────────────────────
 //
 // Two modes share one modal: a single address, or a pasted list for a whole
-// section. The bulk mode can also grant access to a challenge, since a
-// challenge is locked until the admin grants it — inviting a section and
-// unlocking their challenge is one action rather than two.
+// section. The bulk mode can also grant access to one or more challenges,
+// since a challenge is locked until the admin grants it — inviting a section
+// and unlocking their challenges is one action rather than several.
 
 type InviteMode = 'single' | 'bulk'
 
@@ -63,7 +63,9 @@ function InviteModal({ onClose }: { onClose: () => void }) {
 
   // Bulk-invite state
   const [bulkText, setBulkText] = useState('')
-  const [challengeId, setChallengeId] = useState('')
+  const [challengeIds, setChallengeIds] = useState<string[]>([])
+  const toggleChallenge = (id: string) =>
+    setChallengeIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])
 
   const invite = useMutation({
     mutationFn: () => userApi.inviteStudent({ email, firstName: '', lastName: '' }),
@@ -78,7 +80,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
   const bulkInvite = useMutation({
     mutationFn: () => userApi.bulkInvite({
       emails: parsedEmails,
-      challengeId: challengeId || undefined,
+      challengeIds: challengeIds.length ? challengeIds : undefined,
     }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
   })
@@ -258,23 +260,37 @@ function InviteModal({ onClose }: { onClose: () => void }) {
               </div>
 
               <div>
-                <label htmlFor="grant-challenge" className="block text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary mb-1.5">
-                  Also grant access to a challenge <span className="text-ink-tertiary dark:text-dark-ink-tertiary">(optional)</span>
+                <label className="block text-xs font-medium text-ink-secondary dark:text-dark-ink-secondary mb-1.5">
+                  Also grant access to challenges <span className="text-ink-tertiary dark:text-dark-ink-tertiary">(optional)</span>
                 </label>
-                <select
-                  id="grant-challenge"
-                  value={challengeId}
-                  onChange={e => setChallengeId(e.target.value)}
-                  className={inputClass}
-                >
-                  <option value="">No challenge</option>
-                  {grantable.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} ({c.status})</option>
-                  ))}
-                </select>
+                {grantable.length === 0 ? (
+                  <p className="text-xs text-ink-tertiary dark:text-dark-ink-tertiary border border-border dark:border-dark-border rounded px-3 py-2">
+                    No open challenges to grant.
+                  </p>
+                ) : (
+                  <div className="border border-border dark:border-dark-border rounded-lg divide-y divide-border dark:divide-dark-border max-h-40 overflow-y-auto">
+                    {grantable.map(c => (
+                      <label
+                        key={c.id}
+                        htmlFor={`grant-challenge-${c.id}`}
+                        className="flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer hover:bg-surface-secondary dark:hover:bg-dark-surface-secondary"
+                      >
+                        <input
+                          id={`grant-challenge-${c.id}`}
+                          type="checkbox"
+                          checked={challengeIds.includes(c.id)}
+                          onChange={() => toggleChallenge(c.id)}
+                          className="w-3.5 h-3.5 rounded border-border dark:border-dark-border accent-ink dark:accent-dark-ink flex-shrink-0"
+                        />
+                        <span className="flex-1 min-w-0 truncate text-ink dark:text-dark-ink">{c.name}</span>
+                        <span className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary flex-shrink-0">{c.status}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
                 <p className="text-[11px] text-ink-tertiary dark:text-dark-ink-tertiary mt-1.5">
-                  Challenges are locked until access is granted. This unlocks and enrolls
-                  every invitee, taking effect as soon as they register.
+                  Challenges are locked until access is granted. Selecting one or more unlocks
+                  and enrolls every invitee into each, taking effect as soon as they register.
                 </p>
               </div>
 
